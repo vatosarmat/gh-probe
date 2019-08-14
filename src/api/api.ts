@@ -4,8 +4,7 @@ import parseLinkHeader from 'parse-link-header'
 import { User, UserBrief, SearchResult, Repo } from './types'
 
 class FetchPager<T> implements AsyncIterableIterator<T> {
-  private abortController: AbortController = new AbortController()
-
+  private abortController: AbortController | null = null
   private currentLinkHeader: parseLinkHeader.Links | null = null
 
   constructor(
@@ -19,6 +18,8 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
     if (!this.nextUrl) {
       throw Error('Trying to fetch without nextUrl')
     }
+
+    this.abortController = new AbortController()
 
     return fetch(this.nextUrl, {
       signal: this.abortController.signal
@@ -36,12 +37,17 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
         return response.json()
       })
       .then(data => {
-        // console.log(data)
         return {
           value: this.creator(data),
           done: !Boolean(this.nextUrl)
         }
       })
+  }
+
+  abort() {
+    if (this.abortController) {
+      this.abortController.abort()
+    }
   }
 }
 

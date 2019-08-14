@@ -5,12 +5,12 @@ describe('API layer', () => {
   const testUser = process.env.TEST_USER!
   const testUserBio = process.env.TEST_USER_BIO!
   const testRepo = process.env.TEST_REPO!
-  const testUserManyRepos = process.env.TEST_USER_MANY_REPOS!
+  const testUserWithManyRepos = process.env.TEST_USER_WITH_MANY_REPOS!
 
   beforeAll(() => {
     const token = process.env.GITHUB_TOKEN!
 
-    if (!(token && testUser && testUserBio && testRepo && testUserManyRepos)) {
+    if (!(token && testUser && testUserBio && testRepo && testUserWithManyRepos)) {
       throw Error('Test environment not properly configured')
     }
 
@@ -55,7 +55,7 @@ describe('API layer', () => {
   })
 
   describe('fetchRepos - fetches user repos', () => {
-    it('Fetches repos, single page case', () => {
+    it('Single page case', () => {
       return expect(api.fetchRepos(testUser).next()).resolves.toEqual(
         expect.objectContaining({
           value: expect.arrayContaining([
@@ -68,8 +68,8 @@ describe('API layer', () => {
       )
     })
 
-    it('Fetches repos, multi-page case', () => {
-      return expect(api.fetchRepos(testUserManyRepos).next()).resolves.toEqual(
+    it('Multi-page case', () => {
+      return expect(api.fetchRepos(testUserWithManyRepos).next()).resolves.toEqual(
         expect.objectContaining({
           value: expect.objectContaining({
             length: 100
@@ -77,6 +77,14 @@ describe('API layer', () => {
           done: false
         })
       )
+    })
+
+    it('Abort', () => {
+      const pager = api.fetchRepos(testUser)
+      const prom = pager.next()
+      pager.abort()
+
+      return expect(prom).rejects.toEqual(expect.anything())
     })
   })
 })
