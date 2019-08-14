@@ -32,5 +32,4 @@ export interface Repo {
   readonly updated_at: Date
   readonly html_url: string
   readonly archived: boolean
-  readonly owner_avatar_url: string
 }

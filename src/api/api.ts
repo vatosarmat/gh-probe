@@ -35,10 +35,13 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
 
         return response.json()
       })
-      .then(data => ({
-        value: this.creator(data),
-        done: !Boolean(this.nextUrl)
-      }))
+      .then(data => {
+        // console.log(data)
+        return {
+          value: this.creator(data),
+          done: !Boolean(this.nextUrl)
+        }
+      })
   }
 }
 
@@ -97,9 +100,10 @@ export default class {
   }
 
   fetchRepos(username: string): FetchPager<Repo[]> {
-    const endpoint = `users/${username}`
+    const endpoint = `users/${username}/repos`
     const params = {
-      accessToken: this.accessToken
+      accessToken: this.accessToken,
+      per_page: 100
     }
 
     return new FetchPager<Repo[]>(this.url(endpoint, params), repos =>
@@ -113,8 +117,7 @@ export default class {
           forks_count,
           updated_at,
           html_url,
-          archived,
-          owner: { avatar_url }
+          archived
         }: any) => ({
           id,
           name,
@@ -124,8 +127,7 @@ export default class {
           forks_count,
           updated_at,
           html_url,
-          archived,
-          owner_avatar_url: avatar_url
+          archived
         })
       )
     )
