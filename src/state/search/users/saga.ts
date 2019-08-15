@@ -9,10 +9,11 @@ type RequestAction = ReturnType<typeof request>
 
 function* searchUser(api: Api, { payload: query }: RequestAction) {
   try {
-    const data = yield call(api.fetchUser, query)
+    const searchResult = yield call(api.fetchUser, query)
+
+    yield put(success(searchResult.items))
   } catch (error) {
     yield put(failure(error))
-  } finally {
   }
 }
 
