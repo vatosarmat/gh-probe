@@ -1,7 +1,7 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
 import { UserBrief } from 'api'
 
-interface State {
+export interface State {
   readonly result: UserBrief[]
   readonly inProgress: boolean
   readonly error: Error | null

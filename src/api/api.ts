@@ -1,5 +1,6 @@
 import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
+import camelCase from 'camelcase'
 
 import { User, UserBrief, SearchResult, Repo } from './types'
 
@@ -14,7 +15,7 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
 
   [Symbol.asyncIterator] = () => this
 
-  next(): Promise<IteratorResult<T>> {
+  next = (): Promise<IteratorResult<T>> => {
     if (!this.nextUrl) {
       throw Error('Trying to fetch without nextUrl')
     }
@@ -44,7 +45,7 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
       })
   }
 
-  abort() {
+  abort = () => {
     if (this.abortController) {
       this.abortController.abort()
     }
@@ -52,6 +53,26 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
 }
 
 export default class {
+  static getTesEnv(): Record<string, string> {
+    const ret: { [key: string]: any } = {}
+    for (const param of [
+      'TEST_USER',
+      'TEST_USER_BIO',
+      'TEST_USER_REPO',
+      'TEST_USER_WITH_MANY_REPOS',
+      'GITHUB_TOKEN'
+    ]) {
+      const value = process.env[param]
+      if (!value) {
+        throw Error('Test environment not properly configured. Missing parameter ' + param)
+      }
+
+      ret[camelCase(param.replace(/^TEST_/, ''))] = value
+    }
+
+    return ret
+  }
+
   private readonly baseUrl = 'https://api.github.com'
   private abortController: AbortController | null = null
 
@@ -61,7 +82,7 @@ export default class {
     return `${this.baseUrl}/${endpoint}?${qs(params)}`
   }
 
-  searchUser(q: string): Promise<SearchResult<UserBrief>> {
+  searchUser = (q: string): Promise<SearchResult<UserBrief>> => {
     const endpoint = 'search/users'
     const params = {
       accessToken: this.accessToken,
@@ -85,7 +106,7 @@ export default class {
       }))
   }
 
-  fetchUser(username: string): Promise<User> {
+  fetchUser = (username: string): Promise<User> => {
     const endpoint = `users/${username}`
     const params = {
       accessToken: this.accessToken
@@ -105,7 +126,7 @@ export default class {
       }))
   }
 
-  fetchRepos(username: string): FetchPager<Repo[]> {
+  fetchRepos = (username: string): FetchPager<Repo[]> => {
     const endpoint = `users/${username}/repos`
     const params = {
       accessToken: this.accessToken,
