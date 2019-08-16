@@ -39,7 +39,7 @@ describe('Search-users duck', () => {
     })
   })
 
-  it('REQUEST-SUCCESS sets correct state', () => {
+  it('REQUEST sets correct state', () => {
     store.dispatch(request(testEnv.user))
     promisedState = waitForState(store)
     expect(store.getState().inProgress).toBeTruthy()
@@ -61,19 +61,25 @@ describe('Search-users duck', () => {
     )
   })
 
-  it('REQUEST sets correct state', () => {
-    fetchMock.mock('http://example.com', 200)
-    store.dispatch(request(testEnv.user))
-    promisedState = waitForState(store)
-    expect(store.getState().inProgress).toBeTruthy()
-  })
+  describe('with mocked fetch', () => {
+    const realFetch = window.fetch
 
-  it('FAILURE sets correct state', () => {
-    return expect(promisedState).resolves.toEqual(
-      expect.objectContaining({
-        inProgress: false,
-        error: expect.any(Error)
-      })
-    )
+    afterAll(() => {
+      window.fetch = realFetch
+    })
+
+    it('FAILURE sets correct state', () => {
+      window.fetch = jest.fn().mockRejectedValue(new Error('NONONO'))
+
+      store.dispatch(request(testEnv.user))
+      promisedState = waitForState(store)
+
+      return expect(promisedState).resolves.toEqual(
+        expect.objectContaining({
+          inProgress: false,
+          error: expect.any(Error)
+        })
+      )
+    })
   })
 })
