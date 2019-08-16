@@ -19,9 +19,9 @@ export const searchUsersActions = createAsyncAction(
   'search/user/FAILURE'
 )<string, UserBrief[], Error>()
 
-type ReposAction = ActionType<typeof searchUsersActions>
+type RootAction = ActionType<typeof searchUsersActions>
 
-export default createReducer<State, ReposAction>(defaultState, {
+export default createReducer<State, RootAction>(defaultState, {
   'search/user/REQUEST': () => ({
     ...defaultState,
     inProgress: true

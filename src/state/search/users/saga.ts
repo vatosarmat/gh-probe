@@ -1,4 +1,4 @@
-import { call, put, takeLatest, select } from 'redux-saga/effects'
+import { call, put, takeLatest } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 import { searchUsersActions } from './reducer'
 import Api from 'api'

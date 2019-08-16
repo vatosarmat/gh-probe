@@ -2,17 +2,17 @@ import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
 import { waitForState } from 'utils'
-import reducer, { searchUsersActions, State } from './reducer'
+import reducer, { fetchUserActions, State } from './reducer'
 import saga from './saga'
 import Api from 'api'
 
-describe('Search-users duck', () => {
+describe('User duck', () => {
   let api: Api
   let testEnv: Record<string, string>
   let store: Store<State>
   let promisedState: Promise<State>
 
-  const { request } = searchUsersActions
+  const { request } = fetchUserActions
 
   beforeAll(() => {
     testEnv = Api.getTesEnv()
@@ -25,8 +25,8 @@ describe('Search-users duck', () => {
 
   it('Initial state', () => {
     expect(store.getState()).toEqual({
-      result: [],
-      inProgress: false,
+      data: null,
+      isFetching: false,
       error: null
     })
   })
@@ -34,20 +34,19 @@ describe('Search-users duck', () => {
   it('REQUEST sets correct state', () => {
     store.dispatch(request(testEnv.user))
     promisedState = waitForState(store)
-    expect(store.getState().inProgress).toBeTruthy()
+    expect(store.getState().isFetching).toBeTruthy()
   })
 
   it('SUCCESS sets correct state', () => {
     return expect(promisedState).resolves.toEqual(
       expect.objectContaining({
-        result: expect.arrayContaining([
-          expect.objectContaining({
-            login: testEnv.user,
-            type: 'User',
-            avatar_url: expect.any(String)
-          })
-        ]),
-        inProgress: false,
+        data: expect.objectContaining({
+          login: testEnv.user,
+          type: 'User',
+          avatar_url: expect.any(String),
+          bio: testEnv.userBio
+        }),
+        isFetching: false,
         error: null
       })
     )
@@ -68,7 +67,7 @@ describe('Search-users duck', () => {
 
       return expect(promisedState).resolves.toEqual(
         expect.objectContaining({
-          inProgress: false,
+          isFetching: false,
           error: expect.any(Error)
         })
       )
