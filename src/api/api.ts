@@ -6,7 +6,8 @@ import { User, UserBrief, SearchResult, Repo } from './types'
 
 class FetchPager<T> implements AsyncIterableIterator<T> {
   private abortController: AbortController | null = null
-  private currentLinkHeader: parseLinkHeader.Links | null = null
+  private current: number = 1
+  private total: number = 1
 
   constructor(
     private nextUrl: string | null,
@@ -29,9 +30,15 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
         this.nextUrl = null
         const link = response.headers.get('link')
         if (link) {
-          this.currentLinkHeader = parseLinkHeader(link)
-          if (this.currentLinkHeader && this.currentLinkHeader.next) {
-            this.nextUrl = this.currentLinkHeader.next.url
+          const linkHeader = parseLinkHeader(link)
+          if (linkHeader && linkHeader.next) {
+            this.nextUrl = linkHeader.next.url
+
+            this.total = parseInt(linkHeader.last.page)
+            this.current = parseInt(linkHeader.next.page) - 1
+          } else {
+            //we either on last page or have only one page
+            this.current = this.total
           }
         }
 
@@ -40,6 +47,8 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
       .then(data => {
         return {
           value: this.creator(data),
+          current: this.current,
+          total: this.total,
           done: !Boolean(this.nextUrl)
         }
       })

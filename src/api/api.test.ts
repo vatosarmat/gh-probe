@@ -28,6 +28,7 @@ describe('API layer', () => {
     })
 
     it('Successive call aborts previous one', () => {
+      expect.assertions(2)
       return Promise.all([
         expect(api.searchUser(testEnv.user)).rejects.toEqual(expect.anything()),
         expect(api.searchUser(testEnv.user)).resolves.toEqual(expect.anything())
@@ -55,17 +56,23 @@ describe('API layer', () => {
               name: testEnv.userRepo
             })
           ]),
+          current: 1,
+          total: 1,
           done: true
         })
       )
     })
 
     it('Multi-page case', () => {
-      return expect(api.fetchRepos(testEnv.userWithManyRepos).next()).resolves.toEqual(
+      const pager = api.fetchRepos(testEnv.userWithManyRepos)
+
+      return expect(pager.next().then(() => pager.next())).resolves.toEqual(
         expect.objectContaining({
           value: expect.objectContaining({
             length: 100
           }),
+          current: 2,
+          total: expect.any(Number),
           done: false
         })
       )
