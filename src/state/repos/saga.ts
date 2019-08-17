@@ -1,4 +1,5 @@
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { CANCEL } from 'redux-saga'
+import { call, put, fork, cancelled, take, race, join } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 import { fetchReposActions } from './reducer'
 import Api, { Repo, ReposPage } from 'api'
@@ -11,9 +12,16 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
   const repos: Repo[] = []
   const fetcher = api.fetchRepos(username)
 
+  const nextPage = () => {
+    const prom = fetcher.next()
+    //@ts-ignore
+    prom[CANCEL] = fetcher.abort()
+    return prom
+  }
+
   try {
     while (true) {
-      const { current, total, done, value: items }: ReposPage = yield call(fetcher.next)
+      const { current, total, done, value: items }: ReposPage = yield call(nextPage)
 
       repos.push(...items.filter(repo => !repo.fork))
 
@@ -32,6 +40,7 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
       })
     )
   } catch (error) {
+    console.log(error)
     yield put(
       complete({
         items: repos,
@@ -39,9 +48,24 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
         error
       })
     )
+  } finally {
+    if (yield cancelled()) {
+      yield put(
+        complete({
+          items: repos,
+          status: 'ABORTED',
+          error: null
+        })
+      )
+    }
   }
 }
 
 export default function*(api: Api) {
-  yield takeLatest(getType(start), fetchRepos, api)
+  while (true) {
+    const action = yield take(getType(start))
+    const task = yield fork(fetchRepos, api, action)
+
+    yield race([join(task), take(getType(abort))])
+  }
 }

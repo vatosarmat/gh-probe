@@ -35,7 +35,7 @@ export const fetchReposActions = {
 
 type RootAction = ActionType<typeof fetchReposActions>
 
-export const reposReducer = createReducer<State, RootAction>(defaultState, {
+export default createReducer<State, RootAction>(defaultState, {
   'repos/FETCH_START': state => ({
     ...state,
     status: 'IN_PROGRESS'
