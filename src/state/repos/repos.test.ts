@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
-import { waitForState } from 'utils'
+import { waitForStateChange } from 'utils'
 import reducer, { fetchReposActions, State } from './reducer'
 import saga from './saga'
 import Api from 'api'
@@ -10,7 +10,6 @@ describe('Repos duck', () => {
   let api: Api
   let testEnv: Record<string, string>
   let store: Store<State>
-  let promisedState: Promise<State>
 
   const { start, abort } = fetchReposActions
 
@@ -32,14 +31,13 @@ describe('Repos duck', () => {
     })
   })
 
-  it('START sets correct state', () => {
-    store.dispatch(start(testEnv.user))
-    promisedState = waitForState(store)
-    expect(store.getState().status).toEqual('IN_PROGRESS')
-  })
+  it('FETCH_START, FETCH_COMPLETE in single page case', () => {
+    expect.assertions(2)
 
-  it('COMPLETE sets correct state in single page case', () => {
-    return expect(promisedState).resolves.toEqual(
+    store.dispatch(start(testEnv.user))
+    expect(store.getState().status).toEqual('IN_PROGRESS')
+
+    return expect(waitForStateChange(store)).resolves.toEqual(
       expect.objectContaining({
         items: expect.arrayContaining([
           expect.objectContaining({
@@ -53,25 +51,48 @@ describe('Repos duck', () => {
     )
   })
 
-  // describe('with mocked fetch', () => {
-  //   const realFetch = window.fetch
+  it('FETCH_START, FETCH_PAGE_READY, FETCH_ABORT in multi page case', async () => {
+    expect.assertions(2)
 
-  //   afterAll(() => {
-  //     window.fetch = realFetch
-  //   })
+    store.dispatch(start(testEnv.userWithManyRepos))
 
-  //   it('FAILURE sets correct state', () => {
-  //     window.fetch = jest.fn().mockRejectedValueOnce(new Error('NONONO'))
+    await waitForStateChange(store)
+    let state = await waitForStateChange(store)
 
-  //     store.dispatch(request(testEnv.user))
-  //     promisedState = waitForState(store)
+    expect(state).toEqual(
+      expect.objectContaining({
+        items: expect.any(Array),
+        progress: expect.objectContaining({
+          current: 2,
+          total: expect.any(Number)
+        }),
+        status: 'IN_PROGRESS',
+        error: null
+      })
+    )
 
-  //     return expect(promisedState).resolves.toEqual(
-  //       expect.objectContaining({
-  //         isFetching: false,
-  //         error: expect.any(Error)
-  //       })
-  //     )
-  //   })
-  // })
+    store.dispatch(abort())
+    expect(store.getState().status).toEqual('ABORTED')
+  })
+
+  describe('with mocked fetch', () => {
+    const realFetch = window.fetch
+
+    afterAll(() => {
+      window.fetch = realFetch
+    })
+
+    it('FETCH_COMPLETE with error', () => {
+      window.fetch = jest.fn().mockRejectedValueOnce(new Error('NONONO'))
+
+      store.dispatch(start(testEnv.user))
+
+      return expect(waitForStateChange(store)).resolves.toEqual(
+        expect.objectContaining({
+          status: 'ERROR',
+          error: expect.any(Error)
+        })
+      )
+    })
+  })
 })

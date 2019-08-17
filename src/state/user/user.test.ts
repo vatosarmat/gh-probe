@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
-import { waitForState } from 'utils'
+import { waitForStateChange } from 'utils'
 import reducer, { fetchUserActions, State } from './reducer'
 import saga from './saga'
 import Api from 'api'
@@ -33,7 +33,7 @@ describe('User duck', () => {
 
   it('REQUEST sets correct state', () => {
     store.dispatch(request(testEnv.user))
-    promisedState = waitForState(store)
+    promisedState = waitForStateChange(store)
     expect(store.getState().isFetching).toBeTruthy()
   })
 
@@ -63,7 +63,7 @@ describe('User duck', () => {
       window.fetch = jest.fn().mockRejectedValueOnce(new Error('NONONO'))
 
       store.dispatch(request(testEnv.user))
-      promisedState = waitForState(store)
+      promisedState = waitForStateChange(store)
 
       return expect(promisedState).resolves.toEqual(
         expect.objectContaining({

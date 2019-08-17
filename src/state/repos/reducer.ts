@@ -14,7 +14,7 @@ interface Completion {
 
 export interface State {
   readonly items: Repo[]
-  readonly status: 'IDLE' | 'IN_PROGRESS' | 'ABORTING' | Completion['status']
+  readonly status: 'IDLE' | 'IN_PROGRESS' | Completion['status']
   readonly progress: Progress | null
   readonly error: Error | null
 }
@@ -46,10 +46,7 @@ export default createReducer<State, RootAction>(defaultState, {
     progress: payload
   }),
 
-  'repos/FETCH_ABORT': state => ({
-    ...state,
-    status: 'ABORTING'
-  }),
+  'repos/FETCH_ABORT': state => state,
 
   'repos/FETCH_COMPLETE': (state, { payload }) => ({
     ...state,
