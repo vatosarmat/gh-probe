@@ -32,4 +32,12 @@ export interface Repo {
   readonly updated_at: Date
   readonly html_url: string
   readonly archived: boolean
+  readonly fork: boolean
 }
+
+export interface Page<T> extends IteratorResult<T> {
+  readonly current: number
+  readonly total: number
+}
+
+export type ReposPage = Page<Repo[]>

@@ -18,5 +18,5 @@ function* searchUser(api: Api, { payload: query }: RequestAction) {
 }
 
 export default function*(api: Api) {
-  yield takeLatest(getType(searchUsersActions.request), searchUser, api)
+  yield takeLatest(getType(request), searchUser, api)
 }

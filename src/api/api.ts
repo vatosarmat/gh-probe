@@ -2,7 +2,7 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import camelCase from 'camelcase'
 
-import { User, UserBrief, SearchResult, Repo } from './types'
+import { User, UserBrief, SearchResult, Repo, Page } from './types'
 
 class FetchPager<T> implements AsyncIterableIterator<T> {
   private abortController: AbortController | null = null
@@ -16,7 +16,7 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
 
   [Symbol.asyncIterator] = () => this
 
-  next = (): Promise<IteratorResult<T>> => {
+  next = (): Promise<Page<T>> => {
     if (!this.nextUrl) {
       throw Error('Trying to fetch without nextUrl')
     }

@@ -7,9 +7,9 @@ const { request, success, failure } = fetchUserActions
 
 type RequestAction = ReturnType<typeof request>
 
-function* fetchUser(api: Api, { payload: login }: RequestAction) {
+function* fetchUser(api: Api, { payload: username }: RequestAction) {
   try {
-    const userData = yield call(api.fetchUser, login)
+    const userData = yield call(api.fetchUser, username)
 
     yield put(success(userData))
   } catch (error) {
@@ -18,5 +18,5 @@ function* fetchUser(api: Api, { payload: login }: RequestAction) {
 }
 
 export default function*(api: Api) {
-  yield takeLatest(getType(fetchUserActions.request), fetchUser, api)
+  yield takeLatest(getType(request), fetchUser, api)
 }
