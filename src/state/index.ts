@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { all, call } from 'redux-saga/effects'
 
-import Api from 'api'
+import Api from 'concepts/api'
 import layout, { layoutActions } from './layout'
 import repos, { fetchReposActions, saga as reposSaga } from './repos'
 import user, { fetchUserActions, saga as userSaga } from './user'

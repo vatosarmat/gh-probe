@@ -1,5 +1,5 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
-import { UserBrief } from 'api'
+import { UserBrief } from 'concepts/api'
 
 export interface State {
   readonly result: UserBrief[]

@@ -1,5 +1,5 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
-import { User } from 'api'
+import { User } from 'concepts/api'
 
 export interface State {
   readonly data: User | null

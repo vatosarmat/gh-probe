@@ -1,5 +1,5 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
-import { Repo } from 'api'
+import { Repo } from 'concepts/api'
 
 interface Progress {
   readonly current: number

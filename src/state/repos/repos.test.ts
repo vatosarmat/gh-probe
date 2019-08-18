@@ -4,7 +4,7 @@ import createSagaMiddleware from 'redux-saga'
 import { waitForStateChange } from 'utils'
 import reducer, { fetchReposActions, State } from './reducer'
 import saga from './saga'
-import Api from 'api'
+import Api from 'concepts/api'
 
 describe('Repos duck', () => {
   let api: Api

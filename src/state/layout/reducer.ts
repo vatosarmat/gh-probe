@@ -1,9 +1,9 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
-//import {defaultPrimaryColor, defaultReposPerPage, PrimaryColor, ReposPerPage} from "../misc/entities"
+import { ReposPerPage, PrimaryColor } from 'concepts/layout'
 
 interface State {
-  reposPerPage: 5 | 10 | 15 | 20
-  primaryColor: 'indigo' | 'purple' | 'teal'
+  reposPerPage: ReposPerPage
+  primaryColor: PrimaryColor
 }
 
 const defaultState: State = {
@@ -12,8 +12,8 @@ const defaultState: State = {
 }
 
 export const layoutActions = {
-  setReposPerPage: createStandardAction('layout/SET_REPOS_PER_PAGE')<State['reposPerPage']>(),
-  setPrimaryColor: createStandardAction('layout/SET_PRIMARY_COLOR')<State['primaryColor']>()
+  setReposPerPage: createStandardAction('layout/SET_REPOS_PER_PAGE')<ReposPerPage>(),
+  setPrimaryColor: createStandardAction('layout/SET_PRIMARY_COLOR')<PrimaryColor>()
 }
 
 type RootAction = ActionType<typeof layoutActions>
