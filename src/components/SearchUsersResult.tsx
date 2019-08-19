@@ -63,7 +63,9 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({
     return (
       <Box p={4}>
         <Typography variant="subtitle1" color="error" display="block">
-          {error}
+          {error.toString()}
+          <br />
+          {error.message}
         </Typography>
       </Box>
     )

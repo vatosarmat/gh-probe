@@ -9,7 +9,6 @@ import {
   withStyles,
   WithStyles,
   Grid,
-  Box,
   Typography,
   Link
 } from '@material-ui/core'
@@ -89,20 +88,28 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
   inputElementId = cuid()
   inputElementRef: RefObject<HTMLInputElement> = React.createRef()
 
-  handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = evt.target
+  setInput(value: string) {
+    const input = value.toString().trim()
 
-    this.setState(state => ({
-      ...state,
-      [name]: value
-    }))
+    this.setState(
+      {
+        input
+      },
+      () => this.inputElementRef.current!.focus()
+    )
+  }
+
+  handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = evt.target
+
+    this.setInput(value)
   }
 
   handleButtonClick = () => {
     const { searchUsersRequest } = this.props
     const { input } = this.state
 
-    searchUsersRequest(input.trim())
+    searchUsersRequest(input)
   }
 
   handleKeyDown = (evt: KeyboardEvent) => {
@@ -117,29 +124,18 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     } = evt
 
     if (dataset.text) {
-      this.setState(
-        {
-          input: dataset.text
-        },
-        () => {
-          this.inputElementRef.current!.focus()
-        }
-      )
+      this.setInput(dataset.text)
     }
   }
 
   handleSearchModifierClick = (evt: MouseEvent<HTMLElement>) => {
+    const { input } = this.state
     const {
       currentTarget: { dataset }
     } = evt
 
     if (dataset.modifier) {
-      this.setState(state => {
-        this.inputElementRef.current!.focus()
-        return {
-          input: state.input + ' ' + dataset.modifier
-        }
-      })
+      this.setInput(input + ' ' + dataset.modifier)
     }
   }
 
