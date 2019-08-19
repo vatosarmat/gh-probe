@@ -11,10 +11,13 @@ import {
 } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
 import SearchUsersForm from './SearchUsersForm'
 import SearchUsersResult from './SearchUsersResult'
+import UserCard from './UserCard'
+import ReposList from './ReposList'
 import { State } from 'state'
 import { PrimaryColor, primaryColorTuple } from 'concepts/layout'
 
@@ -42,7 +45,20 @@ const theme: ThemeDict = primaryColorTuple.reduce(
   {}
 )
 
-console.log(theme)
+const SearchRoute: React.FC = () => (
+  <>
+    <SearchUsersForm examples={['satansdeer', 'tj', 'mozilla', 'microsoft']} />
+    <Divider />
+    <SearchUsersResult />
+  </>
+)
+
+const UserRoute: React.FC = () => (
+  <>
+    <UserCard />
+    <ReposList />
+  </>
+)
 
 interface AppProps {
   primaryColor: PrimaryColor
@@ -55,9 +71,12 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar title="GitHub repos" />
-        <SearchUsersForm examples={['satansdeer', 'tj', 'mozilla', 'microsoft']} />
-        <Divider />
-        <SearchUsersResult />
+        <BrowserRouter>
+          <Switch>
+            <Route path="/users/:login" component={UserRoute} />
+            <Route component={SearchRoute} />
+          </Switch>
+        </BrowserRouter>
       </Container>
     </MuiThemeProvider>
   )
