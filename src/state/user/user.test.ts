@@ -2,15 +2,15 @@ import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
 import { waitForStateChange } from 'utils'
-import reducer, { fetchUserActions, State } from './reducer'
+import reducer, { fetchUserActions, UserState } from './reducer'
 import saga from './saga'
 import Api from 'concepts/api'
 
 describe('User duck', () => {
   let api: Api
   let testEnv: Record<string, string>
-  let store: Store<State>
-  let promisedState: Promise<State>
+  let store: Store<UserState>
+  let promisedState: Promise<UserState>
 
   const { request } = fetchUserActions
 

@@ -2,15 +2,15 @@ import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
 import { waitForStateChange } from 'utils'
-import reducer, { searchUsersActions, State } from './reducer'
+import reducer, { searchUsersActions, SearchUsersState } from './reducer'
 import saga from './saga'
 import Api from 'concepts/api'
 
 describe('Search-users duck', () => {
   let api: Api
   let testEnv: Record<string, string>
-  let store: Store<State>
-  let promisedState: Promise<State>
+  let store: Store<SearchUsersState>
+  let promisedState: Promise<SearchUsersState>
 
   const { request } = searchUsersActions
 

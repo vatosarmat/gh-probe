@@ -2,14 +2,14 @@ import { createStore, applyMiddleware, Store } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
 import { waitForStateChange } from 'utils'
-import reducer, { fetchReposActions, State } from './reducer'
+import reducer, { fetchReposActions, ReposState } from './reducer'
 import saga from './saga'
 import Api from 'concepts/api'
 
 describe('Repos duck', () => {
   let api: Api
   let testEnv: Record<string, string>
-  let store: Store<State>
+  let store: Store<ReposState>
 
   const { start, abort } = fetchReposActions
 

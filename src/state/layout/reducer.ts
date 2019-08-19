@@ -1,12 +1,12 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
 import { ReposPerPage, PrimaryColor } from 'concepts/layout'
 
-interface State {
+export interface LayoutState {
   reposPerPage: ReposPerPage
   primaryColor: PrimaryColor
 }
 
-const defaultState: State = {
+const defaultState: LayoutState = {
   reposPerPage: 10,
   primaryColor: 'indigo'
 }
@@ -18,7 +18,7 @@ export const layoutActions = {
 
 type RootAction = ActionType<typeof layoutActions>
 
-export default createReducer<State, RootAction>(defaultState, {
+export default createReducer<LayoutState, RootAction>(defaultState, {
   'layout/SET_REPOS_PER_PAGE': (state, { payload }) => ({
     ...state,
     reposPerPage: payload

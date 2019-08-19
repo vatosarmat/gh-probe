@@ -12,14 +12,14 @@ interface Completion {
   readonly error: Error | null
 }
 
-export interface State {
+export interface ReposState {
   readonly items: Repo[]
   readonly status: 'IDLE' | 'IN_PROGRESS' | Completion['status']
   readonly progress: Progress | null
   readonly error: Error | null
 }
 
-export const defaultState: State = {
+export const defaultState: ReposState = {
   items: [],
   status: 'IDLE',
   progress: null,
@@ -35,7 +35,7 @@ export const fetchReposActions = {
 
 type RootAction = ActionType<typeof fetchReposActions>
 
-export default createReducer<State, RootAction>(defaultState, {
+export default createReducer<ReposState, RootAction>(defaultState, {
   'repos/FETCH_START': state => ({
     ...state,
     status: 'IN_PROGRESS'

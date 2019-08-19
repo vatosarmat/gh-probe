@@ -1,13 +1,13 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
 import { User } from 'concepts/api'
 
-export interface State {
+export interface UserState {
   readonly data: User | null
   readonly isFetching: boolean
   readonly error: Error | null
 }
 
-const defaultState: State = {
+const defaultState: UserState = {
   data: null,
   isFetching: false,
   error: null
@@ -21,7 +21,7 @@ export const fetchUserActions = createAsyncAction('user/REQUEST', 'user/SUCCESS'
 
 type RootAction = ActionType<typeof fetchUserActions>
 
-export default createReducer<State, RootAction>(defaultState, {
+export default createReducer<UserState, RootAction>(defaultState, {
   'user/REQUEST': () => ({
     ...defaultState,
     isFetching: true

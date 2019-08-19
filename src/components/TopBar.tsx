@@ -13,8 +13,6 @@ import {
   makeStyles,
   Radio,
   RadioGroup,
-  Tab,
-  Tabs,
   Typography
 } from '@material-ui/core'
 import { teal, indigo, purple } from '@material-ui/core/colors'
@@ -23,14 +21,14 @@ import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
 import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'concepts/layout'
-import { layoutActions } from 'state'
+import { layoutActions, State } from 'state'
 
 interface TopBarProps {
   readonly title: string
   readonly reposPerPage: ReposPerPage
   readonly primaryColor: PrimaryColor
 
-  readonly setReposPerPage: typeof settingsAction.setReposPerPage
+  readonly setReposPerPage: typeof layoutActions.setReposPerPage
   readonly setPrimaryColor: typeof layoutActions.setPrimaryColor
 }
 
@@ -168,7 +166,7 @@ const TopBar: React.FC<TopBarProps> = ({
 }
 
 export default connect(
-  ({ layout: { primaryColor, reposPerPage } }) => ({
+  ({ layout: { primaryColor, reposPerPage } }: State) => ({
     primaryColor,
     reposPerPage
   }),
