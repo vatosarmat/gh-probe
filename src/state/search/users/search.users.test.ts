@@ -25,7 +25,8 @@ describe('Search-users duck', () => {
 
   it('Initial state', () => {
     expect(store.getState()).toEqual({
-      result: [],
+      query: '',
+      result: null,
       inProgress: false,
       error: null
     })
@@ -47,6 +48,7 @@ describe('Search-users duck', () => {
             avatar_url: expect.any(String)
           })
         ]),
+        query: testEnv.user,
         inProgress: false,
         error: null
       })
