@@ -12,28 +12,58 @@ import createSagaMiddleware from 'redux-saga'
 
 import App from './components/App'
 import reducer, { rootSaga } from 'state'
+import Api from 'concepts/api'
 
-const pReducer = persistReducer(
-  {
-    key: 'root',
-    storage
-  },
-  reducer
+const ErrorComponent: React.FC<{ error: Error }> = ({ error }) => (
+  <div
+    style={{
+      fontFamily: 'sans-serif',
+      margin: '5rem'
+    }}
+  >
+    <p>App failed to start:</p>
+    <p
+      style={{
+        color: 'red',
+        fontWeight: 'bold'
+      }}
+    >
+      {error.toString()}
+    </p>
+  </div>
 )
-const sagaMiddleware = createSagaMiddleware()
 
-const store = createStore(pReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
-const persistor = persistStore(store)
-sagaMiddleware.run(rootSaga)
+try {
+  if (!process.env.GITHUB_TOKEN) {
+    throw Error('No GITHUB_TOKEN in env')
+  }
 
-ReactDOM.render(
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <CssBaseline />
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </PersistGate>
-  </Provider>,
-  document.getElementById('root')
-)
+  const api = new Api(process.env.GITHUB_TOKEN)
+
+  const pReducer = persistReducer(
+    {
+      key: 'root',
+      storage
+    },
+    reducer
+  )
+  const sagaMiddleware = createSagaMiddleware()
+
+  const store = createStore(pReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
+  const persistor = persistStore(store)
+  sagaMiddleware.run(rootSaga, api)
+
+  ReactDOM.render(
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <CssBaseline />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>,
+    document.getElementById('root')
+  )
+} catch (error) {
+  ReactDOM.render(<ErrorComponent error={error} />, document.getElementById('root'))
+}

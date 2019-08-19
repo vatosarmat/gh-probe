@@ -11,13 +11,7 @@ import searchUsers, {
   SearchUsersState
 } from './search'
 
-export function* rootSaga() {
-  if (!process.env.GITHUB_TOKEN) {
-    throw Error('No GITHUB_TOKEN in env')
-  }
-
-  const api = new Api(process.env.GITHUB_TOKEN)
-
+export function* rootSaga(api: Api) {
   yield all([call(reposSaga, api), call(userSaga, api), call(searchUsersSaga, api)])
 }
 
