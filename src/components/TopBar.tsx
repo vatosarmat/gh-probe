@@ -21,15 +21,15 @@ import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
 import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'concepts/layout'
-import { State, layoutActions, getReposPerPage, getPrimaryColor } from 'state'
+import { State, setPrimaryColor, setReposPerPage, getReposPerPage, getPrimaryColor } from 'state'
 
 interface TopBarProps {
   readonly title: string
   readonly reposPerPage: ReposPerPage
   readonly primaryColor: PrimaryColor
 
-  readonly setReposPerPage: typeof layoutActions.setReposPerPage
-  readonly setPrimaryColor: typeof layoutActions.setPrimaryColor
+  readonly setReposPerPage: typeof setReposPerPage
+  readonly setPrimaryColor: typeof setPrimaryColor
 }
 
 const useStyles = makeStyles(theme => ({
@@ -171,7 +171,7 @@ export default connect(
     reposPerPage: getReposPerPage(state)
   }),
   {
-    setPrimaryColor: layoutActions.setPrimaryColor,
-    setReposPerPage: layoutActions.setReposPerPage
+    setPrimaryColor,
+    setReposPerPage
   }
 )(TopBar)

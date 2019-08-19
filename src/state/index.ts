@@ -29,7 +29,11 @@ export interface State {
 }
 
 export default combineReducers({ layout, repos, user, searchUsers })
-export { layoutActions, fetchReposActions, fetchUserActions, searchUsersActions }
+
+//layout
+const { setReposPerPage, setPrimaryColor } = layoutActions
+
+export { setReposPerPage, setPrimaryColor }
 
 export function getReposPerPage(state: State) {
   return state.layout.reposPerPage
@@ -38,3 +42,12 @@ export function getReposPerPage(state: State) {
 export function getPrimaryColor(state: State) {
   return state.layout.primaryColor
 }
+
+//searchUsers
+const { request: searchUsersRequest } = searchUsersActions
+
+export { searchUsersRequest }
+
+//fetchUser
+
+//fetchRepos

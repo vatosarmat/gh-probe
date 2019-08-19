@@ -10,12 +10,12 @@ import {
   withStyles,
   WithStyles
 } from '@material-ui/core'
-import { Group, Person } from '@material-ui/icons'
+import { AccountSearch } from 'mdi-material-ui'
 import cuid from 'cuid'
 import React, { ChangeEvent, Component, FormEvent, KeyboardEvent, RefObject } from 'react'
 import { connect } from 'react-redux'
-import { defaultEntity, entityExample, EntityType, isEntityType } from '../misc/entities'
-import { ReduxState, ReduxOperation, operationAction } from '../store'
+
+import { State, searchUsersRequest } from 'state'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -40,22 +40,12 @@ const styles = (theme: Theme) =>
   })
 
 //TODO: input validation
-interface RepoQueryFormProps extends WithStyles<typeof styles> {
-  repoListFetchStart: typeof operationAction.repoListFetchStart
-  repoListFetchAbort: typeof operationAction.repoListFetchAbort
-
-  entityType: EntityType
-  appStatus: ReduxOperation['appStatus']
-  fetchProgress: ReduxOperation['fetchProgress']
-  stopIssued: ReduxOperation['stopIssued']
+interface SearchUsersFormProps extends WithStyles<typeof styles> {
+  readonly example: string
+  readonly searchUsersRequest: typeof searchUsersRequest
 }
 
-interface ButtonBehavior {
-  descr: 'query' | 'abort'
-  disabled: boolean
-}
-
-class RepoQueryForm extends Component<RepoQueryFormProps> {
+class SearchUsersForm extends Component<SearchUsersFormProps> {
   state = {
     input: ''
   }
@@ -73,21 +63,10 @@ class RepoQueryForm extends Component<RepoQueryFormProps> {
   }
 
   handleButtonClick = () => {
-    const { entityType, repoListFetchStart, repoListFetchAbort } = this.props
-    const buttonState = this.buttonState()
+    const { searchUsersRequest } = this.props
+    const { input } = this.state
 
-    if (buttonState.descr === 'abort') {
-      repoListFetchAbort({})
-    } else if (buttonState.descr === 'query') {
-      const { input } = this.state
-
-      const entitySelector = {
-        key: entityType,
-        value: input
-      }
-
-      repoListFetchStart({ entitySelector })
-    }
+    searchUsersRequest(input)
   }
 
   handleKeyDown = (evt: KeyboardEvent) => {
@@ -97,9 +76,10 @@ class RepoQueryForm extends Component<RepoQueryFormProps> {
   }
 
   handleExampleClick = () => {
+    const { example } = this.props
     this.setState(
       {
-        input: entityExample[this.props.entityType]
+        input: example
       },
       () => {
         this.inputElementRef.current!.focus()
@@ -107,46 +87,9 @@ class RepoQueryForm extends Component<RepoQueryFormProps> {
     )
   }
 
-  buttonState(): ButtonBehavior {
-    const { appStatus, fetchProgress, stopIssued } = this.props
-
-    if (appStatus === 'REPO_LIST_FETCH') {
-      if (fetchProgress) {
-        return stopIssued
-          ? {
-              descr: 'abort',
-              disabled: true
-            }
-          : {
-              descr: 'abort',
-              disabled: false
-            }
-      }
-
-      return {
-        descr: 'query',
-        disabled: true
-      }
-    }
-
-    return {
-      descr: 'query',
-      disabled: false
-    }
-  }
-
   render() {
     const { input } = this.state
-    const { classes, entityType, appStatus } = this.props
-
-    const buttonState = this.buttonState()
-
-    const icon =
-      entityType === 'organization' ? (
-        <Group fontSize="large" className={classes.icon} />
-      ) : (
-        <Person fontSize="large" className={classes.icon} />
-      )
+    const { classes, example } = this.props
 
     return (
       <Box
@@ -157,36 +100,27 @@ class RepoQueryForm extends Component<RepoQueryFormProps> {
         display="flex"
         alignItems="end"
       >
-        {icon}
+        <AccountSearch fontSize="large" className={classes.icon} />
         <FormControl className={classes.textField} fullWidth error={!input}>
-          <InputLabel htmlFor={this.inputElementId}>{entityType}</InputLabel>
+          <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
           <Input
             name="input"
             id={this.inputElementId}
             value={input}
             inputRef={this.inputElementRef}
-            disabled={appStatus === 'REPO_LIST_FETCH'}
             onChange={this.handleInputChange}
             onKeyDown={this.handleKeyDown}
           />
-          {appStatus === 'RESET' && (
-            <FormHelperText component="em" className={classes.helperText} error={false}>
-              Example:
-              <span className={classes.exampleSpan} onClick={this.handleExampleClick}>
-                {entityExample[entityType]}
-              </span>
-            </FormHelperText>
-          )}
+          <FormHelperText component="em" className={classes.helperText} error={false}>
+            Example:
+            <span className={classes.exampleSpan} onClick={this.handleExampleClick}>
+              {example}
+            </span>
+          </FormHelperText>
         </FormControl>
 
-        <Button
-          size="small"
-          variant="outlined"
-          color="primary"
-          onClick={this.handleButtonClick}
-          disabled={buttonState.disabled || !input}
-        >
-          {buttonState.descr}
+        <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
+          Search
         </Button>
       </Box>
     )
@@ -194,13 +128,8 @@ class RepoQueryForm extends Component<RepoQueryFormProps> {
 }
 
 export default connect(
-  ({ operation: { appStatus, fetchProgress, stopIssued } }: ReduxState) => ({
-    appStatus,
-    fetchProgress,
-    stopIssued
-  }),
+  () => {},
   {
-    repoListFetchStart: operationAction.repoListFetchStart,
-    repoListFetchAbort: operationAction.repoListFetchAbort
+    searchUsersRequest
   }
-)(withStyles(styles)(RepoQueryForm))
+)(withStyles(styles)(SearchUsersForm))
