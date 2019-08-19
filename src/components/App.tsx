@@ -6,7 +6,8 @@ import {
   createStyles,
   makeStyles,
   Paper,
-  Theme
+  Theme,
+  Divider
 } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
@@ -54,7 +55,8 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar title="GitHub repos" />
-        <SearchUsersForm example="tj" />
+        <SearchUsersForm examples={['satansdeer', 'tj', 'mozilla', 'microsoft']} />
+        <Divider />
         <SearchUsersResult />
       </Container>
     </MuiThemeProvider>

@@ -7,8 +7,11 @@ import {
   ListItemText,
   Avatar,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Box,
+  ListItemSecondaryAction
 } from '@material-ui/core'
+import { Group, Person } from '@material-ui/icons'
 
 import { State, getSearchUsersResult, getSearchUsersInProgress, getSearchUsersError } from 'state'
 import { UserBrief } from 'concepts/api'
@@ -20,13 +23,16 @@ interface UsersListProps {
 const UsersList: React.FC<UsersListProps> = ({ items }) => {
   return (
     <List>
-      {items.map(({ login, avatar_url }) => {
+      {items.map(({ login, type, avatar_url }) => {
         return (
           <ListItem key={login} button>
             <ListItemAvatar>
               <Avatar alt={login} src={avatar_url} />
             </ListItemAvatar>
             <ListItemText primary={login} />
+            <ListItemSecondaryAction>
+              {type === 'User' ? <Person /> : <Group />}
+            </ListItemSecondaryAction>
           </ListItem>
         )
       })}
@@ -43,18 +49,28 @@ interface SearchUsersResultProps {
 const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ result, inProgress, error }) => {
   if (error) {
     return (
-      <Typography variant="subtitle1" color="error" display="block">
-        {error}
-      </Typography>
+      <Box p={4}>
+        <Typography variant="subtitle1" color="error" display="block">
+          {error}
+        </Typography>
+      </Box>
     )
   }
 
   if (inProgress) {
-    return <CircularProgress />
+    return (
+      <Box p={4} textAlign="center">
+        <CircularProgress />
+      </Box>
+    )
   }
 
-  if (result.length) {
-    return <UsersList items={result} />
+  if (result) {
+    return (
+      <Box p={2}>
+        <UsersList items={result} />
+      </Box>
+    )
   }
 
   return null

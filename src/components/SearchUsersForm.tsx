@@ -12,7 +12,15 @@ import {
 } from '@material-ui/core'
 import { AccountSearch } from 'mdi-material-ui'
 import cuid from 'cuid'
-import React, { ChangeEvent, Component, FormEvent, KeyboardEvent, RefObject } from 'react'
+import React, {
+  Fragment,
+  ChangeEvent,
+  Component,
+  MouseEvent,
+  FormEvent,
+  KeyboardEvent,
+  RefObject
+} from 'react'
 import { connect } from 'react-redux'
 
 import { searchUsersRequest } from 'state'
@@ -41,7 +49,7 @@ const styles = (theme: Theme) =>
 
 //TODO: input validation
 interface SearchUsersFormProps extends WithStyles<typeof styles> {
-  readonly example: string
+  readonly examples: string[]
   readonly searchUsersRequest: typeof searchUsersRequest
 }
 
@@ -75,21 +83,26 @@ class SearchUsersForm extends Component<SearchUsersFormProps> {
     }
   }
 
-  handleExampleClick = () => {
-    const { example } = this.props
-    this.setState(
-      {
-        input: example
-      },
-      () => {
-        this.inputElementRef.current!.focus()
-      }
-    )
+  handleExampleClick = (evt: MouseEvent<HTMLSpanElement>) => {
+    const {
+      currentTarget: { dataset }
+    } = evt
+
+    if (dataset.text) {
+      this.setState(
+        {
+          input: dataset.text
+        },
+        () => {
+          this.inputElementRef.current!.focus()
+        }
+      )
+    }
   }
 
   render() {
     const { input } = this.state
-    const { classes, example } = this.props
+    const { classes, examples } = this.props
 
     return (
       <Box
@@ -112,10 +125,28 @@ class SearchUsersForm extends Component<SearchUsersFormProps> {
             onKeyDown={this.handleKeyDown}
           />
           <FormHelperText component="em" className={classes.helperText} error={false}>
-            Example:
-            <span className={classes.exampleSpan} onClick={this.handleExampleClick}>
-              {example}
-            </span>
+            Examples:{' '}
+            {examples.slice(0, -1).map(example => (
+              <Fragment key={example}>
+                <span
+                  className={classes.exampleSpan}
+                  onClick={this.handleExampleClick}
+                  data-text={example}
+                >
+                  {example}
+                </span>
+                {', '}
+              </Fragment>
+            ))}
+            {
+              <span
+                className={classes.exampleSpan}
+                onClick={this.handleExampleClick}
+                data-text={examples[examples.length - 1]}
+              >
+                {examples[examples.length - 1]}
+              </span>
+            }
           </FormHelperText>
         </FormControl>
 
@@ -128,7 +159,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps> {
 }
 
 export default connect(
-  () => {},
+  () => ({}),
   {
     searchUsersRequest
   }
