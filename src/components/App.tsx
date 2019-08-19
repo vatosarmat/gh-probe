@@ -4,7 +4,6 @@ import {
   Container,
   createMuiTheme,
   createStyles,
-  Divider,
   makeStyles,
   Paper,
   Theme

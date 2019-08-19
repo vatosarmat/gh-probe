@@ -21,7 +21,7 @@ import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
 import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'concepts/layout'
-import { layoutActions, State } from 'state'
+import { State, layoutActions, getReposPerPage, getPrimaryColor } from 'state'
 
 interface TopBarProps {
   readonly title: string
@@ -166,9 +166,9 @@ const TopBar: React.FC<TopBarProps> = ({
 }
 
 export default connect(
-  ({ layout: { primaryColor, reposPerPage } }: State) => ({
-    primaryColor,
-    reposPerPage
+  (state: State) => ({
+    primaryColor: getPrimaryColor(state),
+    reposPerPage: getReposPerPage(state)
   }),
   {
     setPrimaryColor: layoutActions.setPrimaryColor,
