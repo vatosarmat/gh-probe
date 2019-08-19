@@ -12,6 +12,8 @@ import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 
 import TopBar from './TopBar'
+import SearchUsersForm from './SearchUsersForm'
+import SearchUsersResult from './SearchUsersResult'
 import { State } from 'state'
 import { PrimaryColor, primaryColorTuple } from 'concepts/layout'
 
@@ -52,6 +54,8 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar title="GitHub repos" />
+        <SearchUsersForm example="tj" />
+        <SearchUsersResult />
       </Container>
     </MuiThemeProvider>
   )

@@ -15,7 +15,7 @@ import cuid from 'cuid'
 import React, { ChangeEvent, Component, FormEvent, KeyboardEvent, RefObject } from 'react'
 import { connect } from 'react-redux'
 
-import { State, searchUsersRequest } from 'state'
+import { searchUsersRequest } from 'state'
 
 const styles = (theme: Theme) =>
   createStyles({
