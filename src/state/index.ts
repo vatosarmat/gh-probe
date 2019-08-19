@@ -42,6 +42,10 @@ const { request: searchUsersRequest } = searchUsersActions
 
 export { searchUsersRequest }
 
+export function getSearchUsersQuery(state: State) {
+  return state.searchUsers.query
+}
+
 export function getSearchUsersResult(state: State) {
   return state.searchUsers.result
 }

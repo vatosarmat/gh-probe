@@ -2,13 +2,15 @@ import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
 import { UserBrief } from 'concepts/api'
 
 export interface SearchUsersState {
-  readonly result: UserBrief[]
+  readonly query: string
+  readonly result: UserBrief[] | null
   readonly inProgress: boolean
   readonly error: Error | null
 }
 
 const defaultState: SearchUsersState = {
-  result: [],
+  query: '',
+  result: null,
   inProgress: false,
   error: null
 }
@@ -22,8 +24,9 @@ export const searchUsersActions = createAsyncAction(
 type RootAction = ActionType<typeof searchUsersActions>
 
 export default createReducer<SearchUsersState, RootAction>(defaultState, {
-  'search/users/REQUEST': () => ({
+  'search/users/REQUEST': (state, { payload }) => ({
     ...defaultState,
+    query: payload,
     inProgress: true
   }),
 

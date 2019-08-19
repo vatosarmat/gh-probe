@@ -13,7 +13,13 @@ import {
 } from '@material-ui/core'
 import { Group, Person } from '@material-ui/icons'
 
-import { State, getSearchUsersResult, getSearchUsersInProgress, getSearchUsersError } from 'state'
+import {
+  State,
+  getSearchUsersQuery,
+  getSearchUsersResult,
+  getSearchUsersInProgress,
+  getSearchUsersError
+} from 'state'
 import { UserBrief } from 'concepts/api'
 
 interface UsersListProps {
@@ -27,7 +33,7 @@ const UsersList: React.FC<UsersListProps> = ({ items }) => {
         return (
           <ListItem key={login} button>
             <ListItemAvatar>
-              <Avatar alt={login} src={avatar_url} />
+              <Avatar alt="" src={avatar_url} />
             </ListItemAvatar>
             <ListItemText primary={login} />
             <ListItemSecondaryAction>
@@ -41,12 +47,18 @@ const UsersList: React.FC<UsersListProps> = ({ items }) => {
 }
 
 interface SearchUsersResultProps {
-  readonly result: UserBrief[]
+  readonly query: string
+  readonly result: UserBrief[] | null
   readonly inProgress: boolean
   readonly error: Error | null
 }
 
-const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ result, inProgress, error }) => {
+const SearchUsersResult: React.FC<SearchUsersResultProps> = ({
+  query,
+  result,
+  inProgress,
+  error
+}) => {
   if (error) {
     return (
       <Box p={4}>
@@ -66,9 +78,26 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ result, inProgres
   }
 
   if (result) {
+    if (result.length) {
+      return (
+        <Box p={2}>
+          <UsersList items={result} />
+        </Box>
+      )
+    }
+
     return (
-      <Box p={2}>
-        <UsersList items={result} />
+      <Box p={4}>
+        <Typography variant="subtitle1" color="error" display="block">
+          No results found for query{' '}
+          <span
+            style={{
+              wordSpacing: '.4rem'
+            }}
+          >
+            "{query}"
+          </span>
+        </Typography>
       </Box>
     )
   }
@@ -77,6 +106,7 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ result, inProgres
 }
 
 export default connect((state: State) => ({
+  query: getSearchUsersQuery(state),
   result: getSearchUsersResult(state),
   inProgress: getSearchUsersInProgress(state),
   error: getSearchUsersError(state)

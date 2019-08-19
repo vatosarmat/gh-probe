@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   createStyles,
   FormControl,
@@ -8,7 +7,11 @@ import {
   InputLabel,
   Theme,
   withStyles,
-  WithStyles
+  WithStyles,
+  Grid,
+  Box,
+  Typography,
+  Link
 } from '@material-ui/core'
 import { AccountSearch } from 'mdi-material-ui'
 import cuid from 'cuid'
@@ -27,9 +30,22 @@ import { searchUsersRequest } from 'state'
 
 const styles = (theme: Theme) =>
   createStyles({
+    gridContainer: {
+      padding: theme.spacing(4)
+    },
+
+    gridInputItem: {
+      display: 'flex',
+      alignItems: 'flex-end'
+    },
+
     textField: {
       marginLeft: theme.spacing(1),
       marginRight: theme.spacing(2)
+    },
+
+    searchInput: {
+      wordSpacing: '.4rem'
     },
 
     icon: {
@@ -44,16 +60,28 @@ const styles = (theme: Theme) =>
     exampleSpan: {
       cursor: 'pointer',
       textDecoration: 'underline dotted'
+    },
+
+    searchModifiers: {
+      wordSpacing: '.8rem',
+      marginLeft: '.8rem'
+    },
+
+    searchModifier: {
+      cursor: 'pointer'
     }
   })
 
-//TODO: input validation
 interface SearchUsersFormProps extends WithStyles<typeof styles> {
   readonly examples: string[]
   readonly searchUsersRequest: typeof searchUsersRequest
 }
 
-class SearchUsersForm extends Component<SearchUsersFormProps> {
+interface SearchUsersFormState {
+  input: string
+}
+
+class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormState> {
   state = {
     input: ''
   }
@@ -74,7 +102,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps> {
     const { searchUsersRequest } = this.props
     const { input } = this.state
 
-    searchUsersRequest(input)
+    searchUsersRequest(input.trim())
   }
 
   handleKeyDown = (evt: KeyboardEvent) => {
@@ -100,60 +128,106 @@ class SearchUsersForm extends Component<SearchUsersFormProps> {
     }
   }
 
+  handleSearchModifierClick = (evt: MouseEvent<HTMLElement>) => {
+    const {
+      currentTarget: { dataset }
+    } = evt
+
+    if (dataset.modifier) {
+      this.setState(state => {
+        this.inputElementRef.current!.focus()
+        return {
+          input: state.input + ' ' + dataset.modifier
+        }
+      })
+    }
+  }
+
+  componentDidMount() {
+    this.inputElementRef.current!.focus()
+  }
+
   render() {
     const { input } = this.state
     const { classes, examples } = this.props
 
     return (
-      <Box
+      <Grid
+        container
         component="form"
+        className={classes.gridContainer}
         onSubmit={(evt: FormEvent) => evt.preventDefault()}
-        p={4}
-        pb={5}
-        display="flex"
-        alignItems="end"
+        spacing={6}
       >
-        <AccountSearch fontSize="large" className={classes.icon} />
-        <FormControl className={classes.textField} fullWidth error={!input}>
-          <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
-          <Input
-            name="input"
-            id={this.inputElementId}
-            value={input}
-            inputRef={this.inputElementRef}
-            onChange={this.handleInputChange}
-            onKeyDown={this.handleKeyDown}
-          />
-          <FormHelperText component="em" className={classes.helperText} error={false}>
-            Examples:{' '}
-            {examples.slice(0, -1).map(example => (
-              <Fragment key={example}>
+        <Grid item xs={12} className={classes.gridInputItem}>
+          <AccountSearch fontSize="large" className={classes.icon} />
+          <FormControl className={classes.textField} fullWidth error={!input}>
+            <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
+            <Input
+              name="input"
+              id={this.inputElementId}
+              classes={{
+                input: classes.searchInput
+              }}
+              value={input}
+              inputRef={this.inputElementRef}
+              onChange={this.handleInputChange}
+              onKeyDown={this.handleKeyDown}
+            />
+            <FormHelperText component="em" className={classes.helperText} error={false}>
+              Examples:{' '}
+              {examples.slice(0, -1).map(example => (
+                <Fragment key={example}>
+                  <span
+                    className={classes.exampleSpan}
+                    onClick={this.handleExampleClick}
+                    data-text={example}
+                  >
+                    {example}
+                  </span>
+                  {', '}
+                </Fragment>
+              ))}
+              {
                 <span
                   className={classes.exampleSpan}
                   onClick={this.handleExampleClick}
-                  data-text={example}
+                  data-text={examples[examples.length - 1]}
                 >
-                  {example}
+                  {examples[examples.length - 1]}
                 </span>
-                {', '}
-              </Fragment>
-            ))}
-            {
-              <span
-                className={classes.exampleSpan}
-                onClick={this.handleExampleClick}
-                data-text={examples[examples.length - 1]}
-              >
-                {examples[examples.length - 1]}
-              </span>
-            }
-          </FormHelperText>
-        </FormControl>
+              }
+            </FormHelperText>
+          </FormControl>
 
-        <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
-          Search
-        </Button>
-      </Box>
+          <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
+            Search
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            Add modifier:{' '}
+            <span className={classes.searchModifiers}>
+              <Link
+                component="span"
+                className={classes.searchModifier}
+                onClick={this.handleSearchModifierClick}
+                data-modifier="in:login"
+              >
+                in:login
+              </Link>{' '}
+              <Link
+                component="span"
+                className={classes.searchModifier}
+                onClick={this.handleSearchModifierClick}
+                data-modifier="type:organization"
+              >
+                type:organization
+              </Link>
+            </span>
+          </Typography>
+        </Grid>
+      </Grid>
     )
   }
 }
