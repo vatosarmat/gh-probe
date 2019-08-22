@@ -14,8 +14,19 @@ import { RouteChildrenProps } from 'react-router'
 import { Link as RouterLink } from 'react-router-dom'
 
 import ReposList from './ReposList'
-import { State, getUserData, getUserIsFetching, getUserError, fetchUserRequest } from 'state'
+import {
+  State,
+  getUserData,
+  getUserIsFetching,
+  getUserError,
+  getReposStatus,
+  fetchUserRequest,
+  fetchReposStart,
+  fetchReposAbort,
+  getReposUsername
+} from 'state'
 import { User } from 'concepts/api'
+import { ReposFetchStatus } from 'concepts/repos'
 
 const useStyles = makeStyles(theme => ({
   img: {
@@ -112,6 +123,10 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
 
 interface UserRouteProps extends RouteChildrenProps<{ username: string }> {
   readonly fetchUserRequest: typeof fetchUserRequest
+  readonly fetchReposStart: typeof fetchReposStart
+
+  readonly reposFetchStatus: ReposFetchStatus
+  readonly reposUsername: string
 
   readonly user: User | null
   readonly isFetching: boolean
@@ -123,11 +138,20 @@ const UserRoute: React.FC<UserRouteProps> = ({
   user,
   isFetching,
   error,
-  fetchUserRequest
+  reposFetchStatus,
+  reposUsername,
+  fetchUserRequest,
+  fetchReposStart
 }) => {
   useEffect(() => {
-    if (match && (!user || user.login !== match.params.username)) {
+    if (!match) {
+      return
+    }
+
+    if (!user || user.login !== match.params.username) {
       fetchUserRequest(match.params.username)
+    } else if (reposUsername !== match.params.username) {
+      fetchReposStart(match.params.username)
     }
   })
 
@@ -168,7 +192,9 @@ export default connect(
   (state: State) => ({
     user: getUserData(state),
     isFetching: getUserIsFetching(state),
-    error: getUserError(state)
+    error: getUserError(state),
+    reposFetchStatus: getReposStatus(state),
+    reposUsername: getReposUsername(state)
   }),
-  { fetchUserRequest }
+  { fetchUserRequest, fetchReposStart }
 )(UserRoute)

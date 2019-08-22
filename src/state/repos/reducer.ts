@@ -1,25 +1,20 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
 import { Repo } from 'concepts/api'
-
-interface Progress {
-  readonly current: number
-  readonly total: number
-}
+import { ReposFetchStatus, ReposFetchProgress } from 'concepts/repos'
 
 interface Completion {
-  readonly status: 'ABORTED' | 'ERROR' | 'FULL'
+  readonly status: ReposFetchStatus
   readonly items: Repo[]
   readonly error: Error | null
 }
 
-export interface ReposState {
-  readonly items: Repo[]
-  readonly status: 'IDLE' | 'IN_PROGRESS' | Completion['status']
-  readonly progress: Progress | null
-  readonly error: Error | null
+export interface ReposState extends Completion {
+  readonly progress: ReposFetchProgress | null
+  readonly username: string
 }
 
 export const defaultState: ReposState = {
+  username: '',
   items: [],
   status: 'IDLE',
   progress: null,
@@ -28,7 +23,7 @@ export const defaultState: ReposState = {
 
 export const fetchReposActions = {
   start: createStandardAction('repos/FETCH_START')<string>(),
-  pageReady: createStandardAction('repos/FETCH_PAGE_READY')<Progress>(),
+  pageReady: createStandardAction('repos/FETCH_PAGE_READY')<ReposFetchProgress>(),
   abort: createStandardAction('repos/FETCH_ABORT')(),
   complete: createStandardAction('repos/FETCH_COMPLETE')<Completion>()
 }
@@ -36,9 +31,10 @@ export const fetchReposActions = {
 type RootAction = ActionType<typeof fetchReposActions>
 
 export default createReducer<ReposState, RootAction>(defaultState, {
-  'repos/FETCH_START': state => ({
+  'repos/FETCH_START': (state, { payload }) => ({
     ...state,
-    status: 'IN_PROGRESS'
+    status: 'IN_PROGRESS',
+    username: payload
   }),
 
   'repos/FETCH_PAGE_READY': (state, { payload }) => ({
