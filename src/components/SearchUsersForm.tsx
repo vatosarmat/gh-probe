@@ -88,15 +88,12 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
   inputElementId = cuid()
   inputElementRef: RefObject<HTMLInputElement> = React.createRef()
 
-  setInput(value: string) {
+  setInput(value: string, setFocus?: true) {
     const input = value.toString().trim()
 
-    this.setState(
-      {
-        input
-      },
-      () => this.inputElementRef.current!.focus()
-    )
+    this.setState({
+      input
+    })
   }
 
   handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -125,6 +122,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
 
     if (dataset.text) {
       this.setInput(dataset.text)
+      this.inputElementRef.current!.focus()
     }
   }
 
@@ -136,6 +134,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
 
     if (dataset.modifier) {
       this.setInput(input + ' ' + dataset.modifier)
+      this.inputElementRef.current!.focus()
     }
   }
 

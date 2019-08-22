@@ -1,29 +1,86 @@
 import React, { useEffect } from 'react'
-import { Divider, Box, Typography, CircularProgress } from '@material-ui/core'
+import { Divider, Box, Typography, CircularProgress, makeStyles, Link } from '@material-ui/core'
+import { Group, LocationOn, Bookmark } from '@material-ui/icons'
 import { connect } from 'react-redux'
+import { RouteChildrenProps } from 'react-router'
 
 import ReposList from './ReposList'
 import { State, getUserData, getUserIsFetching, getUserError, fetchUserRequest } from 'state'
 import { User } from 'concepts/api'
+
+const useStyles = makeStyles(theme => ({
+  img: {
+    flexBasis: '20%',
+    borderRadius: theme.shape.borderRadius
+  },
+  repoInfoIcon: {
+    marginRight: theme.spacing(1)
+  },
+
+  repoInfoCaption: {
+    marginRight: theme.spacing(3)
+  }
+}))
+
+interface IconWithCaptionProps {
+  readonly icon: React.ComponentType<any>
+  readonly caption: string
+  readonly link?: true
+}
+
+const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, link }) => {
+  const styles = useStyles()
+
+  return (
+    <>
+      <Icon className={styles.repoInfoIcon} htmlColor="gray" />
+      {link ? (
+        <Link className={styles.repoInfoCaption} href={caption} target="_blank">
+          {caption}
+        </Link>
+      ) : (
+        <Typography className={styles.repoInfoCaption} variant="body2">
+          {caption}
+        </Typography>
+      )}
+    </>
+  )
+}
 
 interface UserCardProps {
   readonly user: User
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
-  const { login, type, name, bio, avatar_url, location, company, blog } = user
+  const styles = useStyles()
+  let { login, name, bio, avatar_url, location, company, blog } = user
+
+  name = name || login
 
   return (
-    <Box p={6}>
-      <img src={avatar_url} alt={name} />
-      <Typography variant="h5" />
+    <Box p={4}>
+      <Box display="flex" mb={2}>
+        <img src={avatar_url} alt={name} className={styles.img} />
+        <Box px={2}>
+          <Typography variant="h5">{name}</Typography>
+          {name === login || (
+            <Typography variant="subtitle1" color="textSecondary">
+              {login}
+            </Typography>
+          )}
+          <Box display="flex" alignItems="center" pt={2}>
+            {company && <IconWithCaption icon={Group} caption={company} />}
+            {location && <IconWithCaption icon={LocationOn} caption={location} />}
+            {blog && <IconWithCaption icon={Bookmark} caption={blog} link />}
+          </Box>
+        </Box>
+      </Box>
+      {bio && <Typography>{bio}</Typography>}
     </Box>
   )
 }
 
-interface UserRouteProps {
-  readonly username: string
-
+interface UserRouteProps extends RouteChildrenProps<{ username: string }> {
   readonly fetchUserRequest: typeof fetchUserRequest
 
   readonly user: User | null
@@ -32,14 +89,16 @@ interface UserRouteProps {
 }
 
 const UserRoute: React.FC<UserRouteProps> = ({
-  username,
+  match,
   user,
   isFetching,
   error,
   fetchUserRequest
 }) => {
   useEffect(() => {
-    fetchUserRequest(username)
+    if (match && (!user || user.login !== match.params.username)) {
+      fetchUserRequest(match.params.username)
+    }
   })
 
   if (error) {
@@ -62,13 +121,16 @@ const UserRoute: React.FC<UserRouteProps> = ({
     )
   }
 
-  return (
-    <>
-      <UserCard />
-      <Divider />
-      <ReposList />
-    </>
-  )
+  if (user && match && user.login === match.params.username) {
+    return (
+      <>
+        <UserCard user={user} />
+        <Divider />
+        <ReposList />
+      </>
+    )
+  }
+  return null
 }
 
 export default connect(
