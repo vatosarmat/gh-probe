@@ -10,7 +10,9 @@ import {
   WithStyles,
   Grid,
   Typography,
-  Link
+  Link,
+  Tooltip,
+  ClickAwayListener
 } from '@material-ui/core'
 import { AccountSearch } from 'mdi-material-ui'
 import cuid from 'cuid'
@@ -78,11 +80,13 @@ interface SearchUsersFormProps extends WithStyles<typeof styles> {
 
 interface SearchUsersFormState {
   input: string
+  error: boolean
 }
 
 class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormState> {
   state = {
-    input: ''
+    input: '',
+    error: false
   }
 
   inputElementId = cuid()
@@ -92,7 +96,8 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     const { value: input } = evt.target
 
     this.setState({
-      input
+      input,
+      error: false
     })
   }
 
@@ -100,12 +105,22 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     const { searchUsersRequest } = this.props
     const { input } = this.state
 
-    //TODO: validate
-    searchUsersRequest(input)
+    const query = input.toString().trim()
+
+    if (query) {
+      this.setState(
+        {
+          input: query
+        },
+        () => searchUsersRequest(query)
+      )
+    } else {
+      this.setState({ input: '', error: true })
+    }
   }
 
   handleKeyDown = (evt: KeyboardEvent) => {
-    if (evt.key === 'Enter' && this.state.input) {
+    if (evt.key === 'Enter') {
       this.handleButtonClick()
     }
   }
@@ -140,12 +155,16 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     }
   }
 
+  handleClickAway = () => {
+    this.setState({ error: false })
+  }
+
   componentDidMount() {
     this.inputElementRef.current!.focus()
   }
 
   render() {
-    const { input } = this.state
+    const { input, error } = this.state
     const { classes, examples } = this.props
 
     return (
@@ -158,45 +177,50 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
       >
         <Grid item xs={12} className={classes.gridInputItem}>
           <AccountSearch fontSize="large" className={classes.icon} />
-          <FormControl className={classes.textField} fullWidth error={!input}>
-            <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
-            <Input
-              name="input"
-              id={this.inputElementId}
-              classes={{
-                input: classes.searchInput
-              }}
-              value={input}
-              inputRef={this.inputElementRef}
-              onChange={this.handleInputChange}
-              onKeyDown={this.handleKeyDown}
-            />
-            <FormHelperText component="em" className={classes.helperText} error={false}>
-              Examples:{' '}
-              {examples.slice(0, -1).map(example => (
-                <Fragment key={example}>
+
+          <Tooltip title="Query must be non-empty" open={!!error} placement="top">
+            <FormControl className={classes.textField} fullWidth error={!input}>
+              <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
+              <ClickAwayListener onClickAway={this.handleClickAway}>
+                <Input
+                  error={!!error}
+                  name="input"
+                  id={this.inputElementId}
+                  classes={{
+                    input: classes.searchInput
+                  }}
+                  value={input}
+                  inputRef={this.inputElementRef}
+                  onChange={this.handleInputChange}
+                  onKeyDown={this.handleKeyDown}
+                />
+              </ClickAwayListener>
+              <FormHelperText component="em" className={classes.helperText} error={false}>
+                Examples:{' '}
+                {examples.slice(0, -1).map(example => (
+                  <Fragment key={example}>
+                    <span
+                      className={classes.exampleSpan}
+                      onClick={this.handleExampleClick}
+                      data-text={example}
+                    >
+                      {example}
+                    </span>
+                    {', '}
+                  </Fragment>
+                ))}
+                {
                   <span
                     className={classes.exampleSpan}
                     onClick={this.handleExampleClick}
-                    data-text={example}
+                    data-text={examples[examples.length - 1]}
                   >
-                    {example}
+                    {examples[examples.length - 1]}
                   </span>
-                  {', '}
-                </Fragment>
-              ))}
-              {
-                <span
-                  className={classes.exampleSpan}
-                  onClick={this.handleExampleClick}
-                  data-text={examples[examples.length - 1]}
-                >
-                  {examples[examples.length - 1]}
-                </span>
-              }
-            </FormHelperText>
-          </FormControl>
-
+                }
+              </FormHelperText>
+            </FormControl>
+          </Tooltip>
           <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
             Search
           </Button>
