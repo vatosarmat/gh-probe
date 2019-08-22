@@ -1,8 +1,17 @@
 import React, { useEffect } from 'react'
-import { Divider, Box, Typography, CircularProgress, makeStyles, Link } from '@material-ui/core'
-import { Group, LocationOn, Bookmark } from '@material-ui/icons'
+import {
+  Divider,
+  Box,
+  Typography,
+  CircularProgress,
+  makeStyles,
+  Link,
+  Button
+} from '@material-ui/core'
+import { Group, LocationOn, Bookmark, ArrowBack } from '@material-ui/icons'
 import { connect } from 'react-redux'
 import { RouteChildrenProps } from 'react-router'
+import { Link as RouterLink } from 'react-router-dom'
 
 import ReposList from './ReposList'
 import { State, getUserData, getUserIsFetching, getUserError, fetchUserRequest } from 'state'
@@ -20,6 +29,15 @@ const useStyles = makeStyles(theme => ({
 
   repoInfoCaption: {
     marginRight: theme.spacing(3)
+  },
+
+  backButton: {
+    marginLeft: theme.spacing(1),
+    marginTop: theme.spacing(2)
+  },
+
+  backIcon: {
+    marginRight: theme.spacing(1)
   }
 }))
 
@@ -45,6 +63,17 @@ const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, 
         </Typography>
       )}
     </Box>
+  )
+}
+
+const BackButton: React.FC = () => {
+  const styles = useStyles()
+
+  return (
+    <Button className={styles.backButton} variant="text" size="small" component={RouterLink} to="/">
+      <ArrowBack className={styles.backIcon} />
+      Back to search
+    </Button>
   )
 }
 
@@ -125,6 +154,7 @@ const UserRoute: React.FC<UserRouteProps> = ({
   if (user && match && user.login === match.params.username) {
     return (
       <>
+        <BackButton />
         <UserCard user={user} />
         <Divider />
         <ReposList />
