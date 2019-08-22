@@ -10,7 +10,8 @@ import { User } from 'concepts/api'
 
 const useStyles = makeStyles(theme => ({
   img: {
-    flexBasis: '20%',
+    flexBasis: '25%',
+    flexShrink: 0,
     borderRadius: theme.shape.borderRadius
   },
   repoInfoIcon: {
@@ -32,7 +33,7 @@ const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, 
   const styles = useStyles()
 
   return (
-    <>
+    <Box display="flex" flexWrap="nowrap" py={0.5}>
       <Icon className={styles.repoInfoIcon} htmlColor="gray" />
       {link ? (
         <Link className={styles.repoInfoCaption} href={caption} target="_blank">
@@ -43,7 +44,7 @@ const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, 
           {caption}
         </Typography>
       )}
-    </>
+    </Box>
   )
 }
 
@@ -59,7 +60,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
 
   return (
     <Box p={4}>
-      <Box display="flex" mb={2}>
+      <Box display="flex" mb={2} alignItems="start">
         <img src={avatar_url} alt={name} className={styles.img} />
         <Box px={2}>
           <Typography variant="h5">{name}</Typography>
@@ -68,7 +69,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
               {login}
             </Typography>
           )}
-          <Box display="flex" alignItems="center" pt={2}>
+          <Box display="flex" flexWrap="wrap">
             {company && <IconWithCaption icon={Group} caption={company} />}
             {location && <IconWithCaption icon={LocationOn} caption={location} />}
             {blog && <IconWithCaption icon={Bookmark} caption={blog} link />}

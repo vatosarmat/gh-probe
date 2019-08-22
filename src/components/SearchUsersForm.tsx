@@ -88,24 +88,19 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
   inputElementId = cuid()
   inputElementRef: RefObject<HTMLInputElement> = React.createRef()
 
-  setInput(value: string, setFocus?: true) {
-    const input = value.toString().trim()
+  handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value: input } = evt.target
 
     this.setState({
       input
     })
   }
 
-  handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { value } = evt.target
-
-    this.setInput(value)
-  }
-
   handleButtonClick = () => {
     const { searchUsersRequest } = this.props
     const { input } = this.state
 
+    //TODO: validate
     searchUsersRequest(input)
   }
 
@@ -121,20 +116,27 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     } = evt
 
     if (dataset.text) {
-      this.setInput(dataset.text)
-      this.inputElementRef.current!.focus()
+      this.setState(
+        {
+          input: dataset.text
+        },
+        () => this.inputElementRef.current!.focus()
+      )
     }
   }
 
   handleSearchModifierClick = (evt: MouseEvent<HTMLElement>) => {
-    const { input } = this.state
     const {
       currentTarget: { dataset }
     } = evt
 
     if (dataset.modifier) {
-      this.setInput(input + ' ' + dataset.modifier)
-      this.inputElementRef.current!.focus()
+      this.setState(
+        state => ({
+          input: state.input + ' ' + dataset.modifier
+        }),
+        () => this.inputElementRef.current!.focus()
+      )
     }
   }
 
