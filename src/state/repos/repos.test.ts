@@ -24,6 +24,7 @@ describe('Repos duck', () => {
 
   it('Initial state', () => {
     expect(store.getState()).toEqual({
+      username: '',
       items: [],
       status: 'IDLE',
       progress: null,
