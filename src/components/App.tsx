@@ -16,8 +16,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import TopBar from './TopBar'
 import SearchUsersForm from './SearchUsersForm'
 import SearchUsersResult from './SearchUsersResult'
-import UserCard from './UserCard'
-import ReposList from './ReposList'
+import UserRoute from './UserRoute'
 import { State } from 'state'
 import { PrimaryColor, primaryColorTuple } from 'concepts/layout'
 
@@ -53,13 +52,6 @@ const SearchRoute: React.FC = () => (
   </>
 )
 
-const UserRoute: React.FC = () => (
-  <>
-    <UserCard />
-    <ReposList />
-  </>
-)
-
 interface AppProps {
   primaryColor: PrimaryColor
 }
@@ -73,7 +65,7 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
         <TopBar title="GitHub repos" />
         <BrowserRouter>
           <Switch>
-            <Route path="/users/:login" component={UserRoute} />
+            <Route path="/users/:username" component={UserRoute} />
             <Route component={SearchRoute} />
           </Switch>
         </BrowserRouter>

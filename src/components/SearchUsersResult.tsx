@@ -12,6 +12,7 @@ import {
   ListItemSecondaryAction
 } from '@material-ui/core'
 import { Group, Person } from '@material-ui/icons'
+import { Link } from 'react-router-dom'
 
 import {
   State,
@@ -31,7 +32,7 @@ const UsersList: React.FC<UsersListProps> = ({ items }) => {
     <List>
       {items.map(({ login, type, avatar_url }) => {
         return (
-          <ListItem key={login} button>
+          <ListItem key={login} button component={Link} to={`/users/${login}`}>
             <ListItemAvatar>
               <Avatar alt="" src={avatar_url} />
             </ListItemAvatar>
