@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import { RouteChildrenProps } from 'react-router'
 import { Link as RouterLink } from 'react-router-dom'
 
+import ReposProgress from './ReposProgress'
 import ReposList from './ReposList'
 import {
   State,
@@ -22,7 +23,6 @@ import {
   getReposStatus,
   fetchUserRequest,
   fetchReposStart,
-  fetchReposAbort,
   getReposUsername
 } from 'state'
 import { User } from 'concepts/api'
@@ -181,7 +181,11 @@ const UserRoute: React.FC<UserRouteProps> = ({
         <BackButton />
         <UserCard user={user} />
         <Divider />
-        <ReposList />
+        {reposFetchStatus === 'IDLE' || reposFetchStatus === 'IN_PROGRESS' ? (
+          <ReposProgress />
+        ) : (
+          <ReposList />
+        )}
       </>
     )
   }
