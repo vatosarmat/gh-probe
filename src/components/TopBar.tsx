@@ -21,7 +21,14 @@ import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
 import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'concepts/layout'
-import { State, setPrimaryColor, setReposPerPage, getReposPerPage, getPrimaryColor } from 'state'
+import {
+  State,
+  setPrimaryColor,
+  setReposPerPage,
+  getReposPerPage,
+  getPrimaryColor,
+  resetState
+} from 'state'
 
 interface TopBarProps {
   readonly title: string
@@ -30,6 +37,7 @@ interface TopBarProps {
 
   readonly setReposPerPage: typeof setReposPerPage
   readonly setPrimaryColor: typeof setPrimaryColor
+  readonly resetState: typeof resetState
 }
 
 const useStyles = makeStyles(theme => ({
@@ -92,7 +100,8 @@ const TopBar: React.FC<TopBarProps> = ({
   reposPerPage,
   primaryColor,
   setReposPerPage,
-  setPrimaryColor
+  setPrimaryColor,
+  resetState
 }) => {
   const classes = useStyles()
 
@@ -112,6 +121,10 @@ const TopBar: React.FC<TopBarProps> = ({
 
   const handlePrimaryColorChange = (evt: unknown, value: string) => {
     setPrimaryColor(value as PrimaryColor)
+  }
+
+  const handleResetClick = () => {
+    resetState()
   }
 
   return (
@@ -150,7 +163,7 @@ const TopBar: React.FC<TopBarProps> = ({
             </RadioGroup>
           </FormControl>
           <Divider />
-          <Button color="secondary" className={classes.resetButton}>
+          <Button color="secondary" className={classes.resetButton} onClick={handleResetClick}>
             Reset application state
           </Button>
           <Divider />
@@ -172,6 +185,7 @@ export default connect(
   }),
   {
     setPrimaryColor,
-    setReposPerPage
+    setReposPerPage,
+    resetState
   }
 )(TopBar)

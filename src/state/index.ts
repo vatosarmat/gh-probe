@@ -24,6 +24,11 @@ export interface State {
 
 export default combineReducers({ layout, repos, user, searchUsers })
 
+//common
+export function resetState() {
+  return { type: 'RESET' }
+}
+
 //layout
 const { setReposPerPage, setPrimaryColor } = layoutActions
 

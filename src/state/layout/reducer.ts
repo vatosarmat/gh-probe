@@ -16,9 +16,11 @@ export const layoutActions = {
   setPrimaryColor: createStandardAction('layout/SET_PRIMARY_COLOR')<PrimaryColor>()
 }
 
-type RootAction = ActionType<typeof layoutActions>
+type RootAction = ActionType<typeof layoutActions> | { type: 'RESET' }
 
 export default createReducer<LayoutState, RootAction>(defaultState, {
+  RESET: () => defaultState,
+
   'layout/SET_REPOS_PER_PAGE': (state, { payload }) => ({
     ...state,
     reposPerPage: payload

@@ -19,9 +19,11 @@ export const fetchUserActions = createAsyncAction('user/REQUEST', 'user/SUCCESS'
   Error
 >()
 
-type RootAction = ActionType<typeof fetchUserActions>
+type RootAction = ActionType<typeof fetchUserActions> | { type: 'RESET' }
 
 export default createReducer<UserState, RootAction>(defaultState, {
+  RESET: () => defaultState,
+
   'user/REQUEST': () => ({
     ...defaultState,
     isFetching: true

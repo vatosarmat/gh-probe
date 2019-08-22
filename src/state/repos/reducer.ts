@@ -28,9 +28,11 @@ export const fetchReposActions = {
   complete: createStandardAction('repos/FETCH_COMPLETE')<Completion>()
 }
 
-type RootAction = ActionType<typeof fetchReposActions>
+type RootAction = ActionType<typeof fetchReposActions> | { type: 'RESET' }
 
 export default createReducer<ReposState, RootAction>(defaultState, {
+  RESET: () => defaultState,
+
   'repos/FETCH_START': (state, { payload }) => ({
     ...state,
     status: 'IN_PROGRESS',

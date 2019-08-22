@@ -21,9 +21,11 @@ export const searchUsersActions = createAsyncAction(
   'search/users/FAILURE'
 )<string, UserBrief[], Error>()
 
-type RootAction = ActionType<typeof searchUsersActions>
+type RootAction = ActionType<typeof searchUsersActions> | { type: 'RESET' }
 
 export default createReducer<SearchUsersState, RootAction>(defaultState, {
+  RESET: () => defaultState,
+
   'search/users/REQUEST': (state, { payload }) => ({
     ...defaultState,
     query: payload,
