@@ -175,13 +175,14 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
         onSubmit={(evt: FormEvent) => evt.preventDefault()}
         spacing={6}
       >
-        <Grid item xs={12} className={classes.gridInputItem}>
-          <AccountSearch fontSize="large" className={classes.icon} />
+        <ClickAwayListener onClickAway={this.handleClickAway}>
+          <Grid item xs={12} className={classes.gridInputItem}>
+            <AccountSearch fontSize="large" className={classes.icon} />
 
-          <Tooltip title="Query must be non-empty" open={!!error} placement="top">
-            <FormControl className={classes.textField} fullWidth error={!input}>
-              <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
-              <ClickAwayListener onClickAway={this.handleClickAway}>
+            <Tooltip title="Query must be non-empty" open={!!error} placement="top">
+              <FormControl className={classes.textField} fullWidth error={!input}>
+                <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
+
                 <Input
                   error={!!error}
                   name="input"
@@ -194,37 +195,42 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
                   onChange={this.handleInputChange}
                   onKeyDown={this.handleKeyDown}
                 />
-              </ClickAwayListener>
-              <FormHelperText component="em" className={classes.helperText} error={false}>
-                Examples:{' '}
-                {examples.slice(0, -1).map(example => (
-                  <Fragment key={example}>
+                <FormHelperText component="em" className={classes.helperText} error={false}>
+                  Examples:{' '}
+                  {examples.slice(0, -1).map(example => (
+                    <Fragment key={example}>
+                      <span
+                        className={classes.exampleSpan}
+                        onClick={this.handleExampleClick}
+                        data-text={example}
+                      >
+                        {example}
+                      </span>
+                      {', '}
+                    </Fragment>
+                  ))}
+                  {
                     <span
                       className={classes.exampleSpan}
                       onClick={this.handleExampleClick}
-                      data-text={example}
+                      data-text={examples[examples.length - 1]}
                     >
-                      {example}
+                      {examples[examples.length - 1]}
                     </span>
-                    {', '}
-                  </Fragment>
-                ))}
-                {
-                  <span
-                    className={classes.exampleSpan}
-                    onClick={this.handleExampleClick}
-                    data-text={examples[examples.length - 1]}
-                  >
-                    {examples[examples.length - 1]}
-                  </span>
-                }
-              </FormHelperText>
-            </FormControl>
-          </Tooltip>
-          <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
-            Search
-          </Button>
-        </Grid>
+                  }
+                </FormHelperText>
+              </FormControl>
+            </Tooltip>
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              onClick={this.handleButtonClick}
+            >
+              Search
+            </Button>
+          </Grid>
+        </ClickAwayListener>
         <Grid item xs={12}>
           <Typography>
             Add modifier:{' '}
