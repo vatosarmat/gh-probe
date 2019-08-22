@@ -153,7 +153,8 @@ export default class {
           forks_count,
           updated_at,
           html_url,
-          archived
+          archived,
+          fork
         }: any) => ({
           id,
           name,
@@ -163,7 +164,8 @@ export default class {
           forks_count,
           updated_at,
           html_url,
-          archived
+          archived,
+          fork
         })
       )
     )

@@ -35,7 +35,7 @@ function ReposProgress({ progress, fetchReposAbort }: ReposProgressProps) {
     return (
       <Box textAlign="center" py={4} px={4}>
         <Typography variant="caption" gutterBottom>
-          {progress.current + '/' + progress.total}
+          Loading repos: {progress.current + '/' + progress.total}
         </Typography>
         <LinearProgress variant="determinate" value={(progress.current * 100) / progress.total} />
         <Button
