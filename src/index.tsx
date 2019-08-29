@@ -34,11 +34,11 @@ const ErrorComponent: React.FC<{ error: Error }> = ({ error }) => (
 )
 
 try {
-  if (!process.env.REACT_APP_GITHUB_TOKEN) {
-    throw Error('No REACT_APP_GITHUB_TOKEN in env')
+  if (!process.env.REACT_APP_GITHUB_PROXY_BASE_URL) {
+    throw Error('No REACT_APP_GITHUB_PROXY_BASE_URL in env')
   }
 
-  const api = new Api(process.env.REACT_APP_GITHUB_TOKEN)
+  const api = new Api(process.env.REACT_APP_GITHUB_PROXY_BASE_URL)
 
   const pReducer = persistReducer(
     {

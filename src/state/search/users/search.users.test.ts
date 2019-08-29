@@ -16,7 +16,7 @@ describe('Search-users duck', () => {
 
   beforeAll(() => {
     testEnv = Api.getTesEnv()
-    api = new Api(testEnv.githubToken)
+    api = new Api(testEnv.githubProxyBaseUrl)
 
     const sagaMiddleware = createSagaMiddleware()
     store = createStore(reducer, applyMiddleware(sagaMiddleware))

@@ -6,7 +6,7 @@ describe('API layer', () => {
 
   beforeAll(() => {
     testEnv = Api.getTesEnv()
-    api = new Api(testEnv.githubToken)
+    api = new Api(testEnv.githubProxyBaseUrl)
   })
 
   describe('searchUser - search user or organization', () => {

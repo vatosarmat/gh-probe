@@ -69,7 +69,7 @@ export default class {
       'TEST_USER_BIO',
       'TEST_USER_REPO',
       'TEST_USER_WITH_MANY_REPOS',
-      'GITHUB_TOKEN'
+      'GITHUB_PROXY_BASE_URL'
     ]) {
       const value = process.env[param]
       if (!value) {
@@ -82,10 +82,9 @@ export default class {
     return ret
   }
 
-  private readonly baseUrl = 'https://api.github.com'
   private abortController: AbortController | null = null
 
-  constructor(private readonly accessToken: string) {}
+  constructor(private readonly baseUrl: string) {}
 
   private url(endpoint: string, params: { [key: string]: any }): string {
     return `${this.baseUrl}/${endpoint}?${qs(params)}`
@@ -94,7 +93,6 @@ export default class {
   searchUser = (q: string): Promise<SearchResult<UserBrief>> => {
     const endpoint = 'search/users'
     const params = {
-      accessToken: this.accessToken,
       q,
       per_page: 10
     }
@@ -117,9 +115,7 @@ export default class {
 
   fetchUser = (username: string): Promise<User> => {
     const endpoint = `users/${username}`
-    const params = {
-      accessToken: this.accessToken
-    }
+    const params = {}
 
     return fetch(this.url(endpoint, params))
       .then(response => response.json())
@@ -138,7 +134,6 @@ export default class {
   fetchRepos = (username: string): FetchPager<Repo[]> => {
     const endpoint = `users/${username}/repos`
     const params = {
-      accessToken: this.accessToken,
       per_page: 100
     }
 
