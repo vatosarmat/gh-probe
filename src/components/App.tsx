@@ -46,7 +46,7 @@ const theme: ThemeDict = primaryColorTuple.reduce(
 
 const SearchRoute: React.FC = () => (
   <>
-    <SearchUsersForm examples={['satansdeer', 'tj', 'mozilla', 'microsoft']} />
+    <SearchUsersForm examples={['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft']} />
     <Divider />
     <SearchUsersResult />
   </>
