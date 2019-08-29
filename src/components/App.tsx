@@ -63,7 +63,7 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar title="GitHub repos" />
-        <BrowserRouter>
+        <BrowserRouter basename="/gh-probe">
           <Switch>
             <Route path="/users/:username" component={UserRoute} />
             <Route component={SearchRoute} />
