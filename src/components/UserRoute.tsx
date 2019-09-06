@@ -30,9 +30,13 @@ import { ReposFetchStatus } from 'concepts/repos'
 
 const useStyles = makeStyles(theme => ({
   img: {
-    flexBasis: '25%',
-    flexShrink: 0,
+    width: '100%',
     borderRadius: theme.shape.borderRadius
+  },
+
+  imgContainer: {
+    flexBasis: '25%',
+    flexShrink: 0
   },
   repoInfoIcon: {
     marginRight: theme.spacing(1)
@@ -100,8 +104,10 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
 
   return (
     <Box p={4}>
-      <Box display="flex" mb={2} alignItems="start">
-        <img src={avatar_url} alt={name} className={styles.img} />
+      <Box display="flex" mb={2} alignItems="flex-start">
+        <div className={styles.imgContainer}>
+          <img className={styles.img} src={avatar_url} alt={name} />
+        </div>
         <Box px={2}>
           <Typography variant="h5">{name}</Typography>
           {name === login || (
