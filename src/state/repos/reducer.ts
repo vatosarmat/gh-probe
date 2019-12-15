@@ -1,6 +1,12 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
 import { Repo } from 'services/api'
-import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
+
+export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'ABORTED' | 'ERROR' | 'FULL'
+
+export interface ReposFetchProgress {
+  readonly current: number
+  readonly total: number
+}
 
 interface Completion {
   readonly status: ReposFetchStatus
