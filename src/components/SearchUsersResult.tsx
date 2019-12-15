@@ -21,7 +21,7 @@ import {
   getSearchUsersInProgress,
   getSearchUsersError
 } from 'state'
-import { UserBrief } from 'concepts/api'
+import { UserBrief } from 'services/api'
 
 interface UsersListProps {
   readonly items: UserBrief[]

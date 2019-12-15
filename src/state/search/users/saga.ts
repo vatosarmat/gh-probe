@@ -1,7 +1,7 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 import { searchUsersActions } from './reducer'
-import Api from 'concepts/api'
+import Api from 'services/api'
 
 const { request, success, failure } = searchUsersActions
 

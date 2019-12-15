@@ -31,9 +31,9 @@ import {
   getReposError,
   getReposPerPage
 } from 'state'
-import { Repo } from 'concepts/api'
-import { ReposFetchStatus, ReposFetchProgress } from 'concepts/repos'
-import getLangColor from 'concepts/lang-color'
+import { Repo } from 'services/api'
+import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
+import getLangColor from 'services/lang-color'
 
 dayjs.extend(calendar)
 

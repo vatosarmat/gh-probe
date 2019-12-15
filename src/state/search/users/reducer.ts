@@ -1,5 +1,5 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
-import { UserBrief } from 'concepts/api'
+import { UserBrief } from 'services/api'
 
 export interface SearchUsersState {
   readonly query: string

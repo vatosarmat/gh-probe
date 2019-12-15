@@ -25,8 +25,8 @@ import {
   fetchReposStart,
   getReposUsername
 } from 'state'
-import { User } from 'concepts/api'
-import { ReposFetchStatus } from 'concepts/repos'
+import { User } from 'services/api'
+import { ReposFetchStatus } from 'services/repos'
 
 const useStyles = makeStyles(theme => ({
   img: {

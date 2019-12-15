@@ -12,7 +12,7 @@ import createSagaMiddleware from 'redux-saga'
 
 import App from './components/App'
 import reducer, { rootSaga } from 'state'
-import Api from 'concepts/api'
+import Api from 'services/api'
 
 const ErrorComponent: React.FC<{ error: Error }> = ({ error }) => (
   <div

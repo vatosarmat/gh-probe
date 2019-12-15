@@ -18,7 +18,7 @@ import SearchUsersForm from './SearchUsersForm'
 import SearchUsersResult from './SearchUsersResult'
 import UserRoute from './UserRoute'
 import { State } from 'state'
-import { PrimaryColor, primaryColorTuple } from 'concepts/layout'
+import { PrimaryColor, primaryColorTuple } from 'services/layout'
 
 const useStyles = makeStyles(theme =>
   createStyles({

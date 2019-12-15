@@ -1,6 +1,6 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
-import { Repo } from 'concepts/api'
-import { ReposFetchStatus, ReposFetchProgress } from 'concepts/repos'
+import { Repo } from 'services/api'
+import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
 
 interface Completion {
   readonly status: ReposFetchStatus

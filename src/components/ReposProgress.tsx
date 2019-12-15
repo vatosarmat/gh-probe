@@ -10,7 +10,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { State, fetchReposAbort, getReposProgress } from 'state'
-import { ReposFetchProgress } from 'concepts/repos'
+import { ReposFetchProgress } from 'services/repos'
 
 const useStyles = makeStyles(theme => ({
   abortButton: {

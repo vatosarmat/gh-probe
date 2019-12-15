@@ -1,5 +1,5 @@
 import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
-import { ReposPerPage, PrimaryColor } from 'concepts/layout'
+import { ReposPerPage, PrimaryColor } from 'services/layout'
 
 export interface LayoutState {
   reposPerPage: ReposPerPage

@@ -20,7 +20,7 @@ import { Menu as MenuIcon } from '@material-ui/icons'
 import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
-import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'concepts/layout'
+import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'services/layout'
 import {
   State,
   setPrimaryColor,
