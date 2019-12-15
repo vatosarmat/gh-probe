@@ -1,14 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {
-  Container,
-  createMuiTheme,
-  createStyles,
-  makeStyles,
-  Paper,
-  Theme,
-  Divider
-} from '@material-ui/core'
+import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme, Divider } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
@@ -30,7 +22,7 @@ const useStyles = makeStyles(theme =>
   })
 )
 
-type ThemeDict = Partial<Record<PrimaryColor, Theme>>
+type ThemeDict = Record<PrimaryColor, Theme>
 
 const theme: ThemeDict = primaryColorTuple.reduce(
   (themeMap, color: PrimaryColor) => ({
@@ -41,7 +33,7 @@ const theme: ThemeDict = primaryColorTuple.reduce(
       }
     })
   }),
-  {}
+  {} as ThemeDict
 )
 
 const SearchRoute: React.FC = () => (
@@ -52,9 +44,11 @@ const SearchRoute: React.FC = () => (
   </>
 )
 
-interface AppProps {
+interface StateProps {
   primaryColor: PrimaryColor
 }
+
+type AppProps = StateProps
 
 const App: React.FC<AppProps> = ({ primaryColor }) => {
   const classes = useStyles()
@@ -74,4 +68,6 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
   )
 }
 
-export default connect(({ layout: { primaryColor } }: State) => ({ primaryColor }))(App)
+export default connect<StateProps, {}, {}, State>(({ layout: { primaryColor } }) => ({
+  primaryColor
+}))(App)
