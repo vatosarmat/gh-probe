@@ -10,33 +10,17 @@ import { PersistGate } from 'redux-persist/integration/react'
 import storage from 'redux-persist/lib/storage'
 import createSagaMiddleware from 'redux-saga'
 
-import App from './components/App'
+import App from 'components/App'
+import AppError from 'components/AppError'
 import reducer, { rootSaga } from 'state'
 import Api from 'services/api'
-
-const ErrorComponent: React.FC<{ error: Error }> = ({ error }) => (
-  <div
-    style={{
-      fontFamily: 'sans-serif',
-      margin: '5rem'
-    }}
-  >
-    <p>App failed to start:</p>
-    <p
-      style={{
-        color: 'red',
-        fontWeight: 'bold'
-      }}
-    >
-      {error.toString()}
-    </p>
-  </div>
-)
 
 try {
   if (!process.env.REACT_APP_GITHUB_PROXY_BASE_URL) {
     throw Error('No REACT_APP_GITHUB_PROXY_BASE_URL in env')
   }
+  //throw if string is not a URL
+  new URL(process.env.REACT_APP_GITHUB_PROXY_BASE_URL)
 
   const api = new Api(process.env.REACT_APP_GITHUB_PROXY_BASE_URL)
 
@@ -65,5 +49,5 @@ try {
     document.getElementById('root')
   )
 } catch (error) {
-  ReactDOM.render(<ErrorComponent error={error} />, document.getElementById('root'))
+  ReactDOM.render(<AppError error={error} />, document.getElementById('root'))
 }
