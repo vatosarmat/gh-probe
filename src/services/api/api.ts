@@ -1,15 +1,48 @@
 import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import camelCase from 'camelcase'
+import { pick } from 'lodash'
 
-import { User, UserBrief, SearchResult, Repo, ReposPage } from './types'
+import { User, UserBrief, SearchResult, Repo } from './gh-types'
 
-class FetchPager implements AsyncIterableIterator<ReposPage> {
-  private abortController: AbortController | null = null
+interface ReposPage {
+  current: number
+  total: number
+  repos: Repo[]
+}
+
+function pickRepoFields(responseBody: any): Repo {
+  return pick(responseBody, [
+    'id',
+    'name',
+    'description',
+    'language',
+    'stargazers_count',
+    'forks_count',
+    'updated_at',
+    'html_url',
+    'archived',
+    'fork'
+  ])
+}
+
+function pickUserFields(responseBody: any): User {
+  return pick(responseBody, ['type', 'login', 'avatar_url', 'name', 'bio', 'location', 'company', 'blog'])
+}
+
+function pickUserBriefFields(responseBody: any): UserBrief {
+  return pick(responseBody, ['type', 'login', 'avatar_url'])
+}
+
+class ReposPager implements AsyncIterableIterator<ReposPage> {
+  private abortController?: AbortController
+  private nextUrl?: string
   private current: number = 1
   private total: number = 1
 
-  constructor(private nextUrl: string | null, private readonly creator: (object: any[]) => Repo[] = arg => arg) {}
+  constructor(nextUrl: string) {
+    this.nextUrl = nextUrl
+  }
 
   [Symbol.asyncIterator] = () => this
 
@@ -24,7 +57,7 @@ class FetchPager implements AsyncIterableIterator<ReposPage> {
       signal: this.abortController.signal
     })
       .then(response => {
-        this.nextUrl = null
+        this.nextUrl = undefined
         const link = response.headers.get('link')
         if (link) {
           const linkHeader = parseLinkHeader(link)
@@ -41,23 +74,15 @@ class FetchPager implements AsyncIterableIterator<ReposPage> {
 
         return response.json()
       })
-      .then(data => {
-        const value = {
-          repos: this.creator(data),
+      .then(data => ({
+        done: !Boolean(this.nextUrl),
+
+        value: {
+          repos: data.map(pickRepoFields),
           current: this.current,
           total: this.total
         }
-
-        return Boolean(this.nextUrl)
-          ? {
-              done: false,
-              value
-            }
-          : {
-              done: true,
-              value
-            }
-      })
+      }))
   }
 
   abort = () => {
@@ -115,7 +140,7 @@ export default class {
       .then(response => response.json())
       .then((result: SearchResult<any>) => ({
         ...result,
-        items: result.items.map(({ type, login, avatar_url }: any) => ({ type, login, avatar_url }))
+        items: result.items.map(pickUserBriefFields)
       }))
   }
 
@@ -125,50 +150,15 @@ export default class {
 
     return fetch(this.url(endpoint, params))
       .then(response => response.json())
-      .then(({ type, login, avatar_url, name, bio, location, company, blog }: any) => ({
-        type,
-        login,
-        avatar_url,
-        name,
-        bio,
-        location,
-        company,
-        blog
-      }))
+      .then(pickUserFields)
   }
 
-  fetchRepos = (username: string): FetchPager<Repo[]> => {
+  fetchRepos = (username: string): ReposPager => {
     const endpoint = `users/${username}/repos`
     const params = {
       per_page: 100
     }
 
-    return new FetchPager(this.url(endpoint, params), repos =>
-      repos.map(
-        ({
-          id,
-          name,
-          description,
-          language,
-          stargazers_count,
-          forks_count,
-          updated_at,
-          html_url,
-          archived,
-          fork
-        }: any) => ({
-          id,
-          name,
-          description,
-          language,
-          stargazers_count,
-          forks_count,
-          updated_at,
-          html_url,
-          archived,
-          fork
-        })
-      )
-    )
+    return new ReposPager(this.url(endpoint, params))
   }
 }

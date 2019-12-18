@@ -51,13 +51,16 @@ describe('API layer', () => {
     it('Single page case', () => {
       return expect(api.fetchRepos(testEnv.user).next()).resolves.toEqual(
         expect.objectContaining({
-          value: expect.arrayContaining([
-            expect.objectContaining({
-              name: testEnv.userRepo
-            })
-          ]),
-          current: 1,
-          total: 1,
+          value: expect.objectContaining({
+            current: 1,
+            total: 1,
+            repos: expect.arrayContaining([
+              expect.objectContaining({
+                name: testEnv.userRepo
+              })
+            ])
+          }),
+
           done: true
         })
       )
@@ -69,14 +72,17 @@ describe('API layer', () => {
       return expect(pager.next().then(() => pager.next())).resolves.toEqual(
         expect.objectContaining({
           value: expect.objectContaining({
-            length: 100
+            current: 2,
+            total: expect.any(Number),
+            repos: expect.objectContaining({
+              length: 100
+            })
           }),
-          current: 2,
-          total: expect.any(Number),
+
           done: false
         })
       )
-    })
+    }, 10000)
 
     it('Abort', () => {
       const pager = api.fetchRepos(testEnv.user)
