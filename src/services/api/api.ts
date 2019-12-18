@@ -2,21 +2,18 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import camelCase from 'camelcase'
 
-import { User, UserBrief, SearchResult, Repo, Page } from './types'
+import { User, UserBrief, SearchResult, Repo, ReposPage } from './types'
 
-class FetchPager<T> implements AsyncIterableIterator<T> {
+class FetchPager implements AsyncIterableIterator<ReposPage> {
   private abortController: AbortController | null = null
   private current: number = 1
   private total: number = 1
 
-  constructor(
-    private nextUrl: string | null,
-    private readonly creator: (arg: any) => T = arg => arg
-  ) {}
+  constructor(private nextUrl: string | null, private readonly creator: (object: any[]) => Repo[] = arg => arg) {}
 
   [Symbol.asyncIterator] = () => this
 
-  next = (): Promise<Page<T>> => {
+  next = (): Promise<IteratorResult<ReposPage>> => {
     if (!this.nextUrl) {
       throw Error('Trying to fetch without nextUrl')
     }
@@ -45,12 +42,21 @@ class FetchPager<T> implements AsyncIterableIterator<T> {
         return response.json()
       })
       .then(data => {
-        return {
-          value: this.creator(data),
+        const value = {
+          repos: this.creator(data),
           current: this.current,
-          total: this.total,
-          done: !Boolean(this.nextUrl)
+          total: this.total
         }
+
+        return Boolean(this.nextUrl)
+          ? {
+              done: false,
+              value
+            }
+          : {
+              done: true,
+              value
+            }
       })
   }
 
@@ -137,7 +143,7 @@ export default class {
       per_page: 100
     }
 
-    return new FetchPager<Repo[]>(this.url(endpoint, params), repos =>
+    return new FetchPager(this.url(endpoint, params), repos =>
       repos.map(
         ({
           id,
