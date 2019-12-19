@@ -1,6 +1,5 @@
 import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
-import camelCase from 'camelcase'
 import { pick } from 'lodash'
 
 import { User, UserBrief, SearchResult, Repo } from './gh-types'
@@ -92,8 +91,8 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
   }
 }
 
-export default class {
-  private abortController: AbortController | null = null
+export class Api {
+  private abortController?: AbortController
 
   constructor(private readonly baseUrl: string) {}
 

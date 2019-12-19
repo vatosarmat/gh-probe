@@ -2,7 +2,7 @@ import { CANCEL } from 'redux-saga'
 import { call, put, cancelled, take, race } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 import { fetchReposActions } from './reducer'
-import Api, { Repo, ReposPage } from 'services/api'
+import { Api, Repo, ReposPage } from 'services/api'
 
 const { start, pageReady, abort, aborted: fetchAborted, error: fetchError, complete: fetchComplete } = fetchReposActions
 
