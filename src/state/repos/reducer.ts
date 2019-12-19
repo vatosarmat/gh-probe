@@ -1,60 +1,91 @@
-import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
+import { DeepReadonly } from 'utility-types'
+import { ActionType, createReducer, createAction } from 'typesafe-actions'
 import { Repo } from 'services/api'
+import { omit, keyBy } from 'lodash'
 
-export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'ABORTED' | 'ERROR' | 'FULL'
+export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'ABORTED' | 'ERROR' | 'COMPLETE'
 
 export interface ReposFetchProgress {
-  readonly current: number
-  readonly total: number
+  current: number
+  total: number
 }
 
-interface Completion {
-  readonly status: ReposFetchStatus
-  readonly items: Repo[]
-  readonly error: Error | null
-}
+export type ReposState = DeepReadonly<{
+  username?: string
+  items: Record<number, Repo>
+  status: ReposFetchStatus
+  progress?: ReposFetchProgress
+  error?: string
+}>
 
-export interface ReposState extends Completion {
-  readonly progress: ReposFetchProgress | null
-  readonly username: string
-}
-
-export const defaultState: ReposState = {
-  username: '',
-  items: [],
-  status: 'IDLE',
-  progress: null,
-  error: null
+export const defaultReposState: ReposState = {
+  items: {},
+  status: 'IDLE'
 }
 
 export const fetchReposActions = {
-  start: createStandardAction('repos/FETCH_START')<string>(),
-  pageReady: createStandardAction('repos/FETCH_PAGE_READY')<ReposFetchProgress>(),
-  abort: createStandardAction('repos/FETCH_ABORT')(),
-  complete: createStandardAction('repos/FETCH_COMPLETE')<Completion>()
+  start: createAction('repos/FETCH_START')<string>(),
+  pageReady: createAction('repos/FETCH_PAGE_READY')<ReposFetchProgress>(),
+  abort: createAction('repos/FETCH_ABORT')(),
+
+  aborted: createAction('repos/FETCH_ABORTED')<Repo[]>(),
+  error: createAction('repos/FETCH_ERROR', (error: Error, items: Repo[]) => ({ error, items }))(),
+  complete: createAction('repos/FETCH_COMPLETE')<Repo[]>()
 }
 
-type RootAction = ActionType<typeof fetchReposActions> | { type: 'RESET' }
+type RootAction = ActionType<typeof fetchReposActions>
 
-export default createReducer<ReposState, RootAction>(defaultState, {
-  RESET: () => defaultState,
-
-  'repos/FETCH_START': (state, { payload }) => ({
-    ...state,
-    status: 'IN_PROGRESS',
-    username: payload
-  }),
-
+export default createReducer<ReposState, RootAction>(defaultReposState, {
+  'repos/FETCH_START': (state, { payload }) =>
+    omit(
+      {
+        ...state,
+        status: 'IN_PROGRESS' as const,
+        username: payload
+      },
+      ['progress', 'error']
+    ),
   'repos/FETCH_PAGE_READY': (state, { payload }) => ({
     ...state,
     progress: payload
   }),
-
   'repos/FETCH_ABORT': state => state,
 
-  'repos/FETCH_COMPLETE': (state, { payload }) => ({
-    ...state,
-    ...payload,
-    progress: null
-  })
+  'repos/FETCH_ABORTED': (state, { payload: items }) =>
+    omit(
+      {
+        ...state,
+        status: 'ABORTED' as const,
+        items: {
+          ...state.items,
+          ...keyBy(items, 'id')
+        }
+      },
+      ['progress', 'error']
+    ),
+  'repos/FETCH_ERROR': (state, { payload: { error, items } }) =>
+    omit(
+      {
+        ...state,
+        status: 'ERROR' as const,
+        error: error.toString(),
+        items: {
+          ...state.items,
+          ...keyBy(items, 'id')
+        }
+      },
+      ['progress']
+    ),
+  'repos/FETCH_COMPLETE': (state, { payload: items }) =>
+    omit(
+      {
+        ...state,
+        status: 'COMPLETE' as const,
+        items: {
+          ...state.items,
+          ...keyBy(items, 'id')
+        }
+      },
+      ['progress', 'error']
+    )
 })

@@ -46,7 +46,7 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
 
   [Symbol.asyncIterator] = () => this
 
-  next = (): Promise<IteratorResult<ReposPage>> => {
+  next = (): Promise<IteratorResult<ReposPage, ReposPage>> => {
     if (!this.nextUrl) {
       throw Error('Trying to fetch without nextUrl')
     }
@@ -93,26 +93,6 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
 }
 
 export default class {
-  static getTesEnv(): Record<string, string> {
-    const ret: { [key: string]: any } = {}
-    for (const param of [
-      'TEST_USER',
-      'TEST_USER_BIO',
-      'TEST_USER_REPO',
-      'TEST_USER_WITH_MANY_REPOS',
-      'GITHUB_PROXY_BASE_URL'
-    ]) {
-      const value = process.env[param]
-      if (!value) {
-        throw Error('Test environment not properly configured. Missing parameter ' + param)
-      }
-
-      ret[camelCase(param.replace(/^TEST_/, ''))] = value
-    }
-
-    return ret
-  }
-
   private abortController: AbortController | null = null
 
   constructor(private readonly baseUrl: string) {}

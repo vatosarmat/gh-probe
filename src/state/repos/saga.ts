@@ -4,7 +4,7 @@ import { getType } from 'typesafe-actions'
 import { fetchReposActions } from './reducer'
 import Api, { Repo, ReposPage } from 'services/api'
 
-const { start, pageReady, abort, complete } = fetchReposActions
+const { start, pageReady, abort, aborted: fetchAborted, error: fetchError, complete: fetchComplete } = fetchReposActions
 
 type RequestAction = ReturnType<typeof start>
 
@@ -21,9 +21,12 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
 
   try {
     while (true) {
-      const { current, total, done, value: items }: ReposPage = yield call(nextPage)
+      const {
+        done,
+        value: { repos, current, total }
+      }: IteratorResult<ReposPage, ReposPage> = yield call(nextPage)
 
-      repos.push(...items.filter(repo => !repo.fork))
+      repos.push(...repos.filter(repo => !repo.fork))
 
       if (done) {
         break
@@ -32,30 +35,12 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
       yield put(pageReady({ current, total }))
     }
 
-    yield put(
-      complete({
-        items: repos,
-        status: 'FULL',
-        error: null
-      })
-    )
+    yield put(fetchComplete(repos))
   } catch (error) {
-    yield put(
-      complete({
-        items: repos,
-        status: 'ERROR',
-        error
-      })
-    )
+    yield put(fetchError(error, repos))
   } finally {
     if (yield cancelled()) {
-      yield put(
-        complete({
-          items: repos,
-          status: 'ABORTED',
-          error: null
-        })
-      )
+      yield put(fetchAborted(repos))
     }
   }
 }
