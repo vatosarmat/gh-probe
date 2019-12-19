@@ -5,7 +5,7 @@ import { pick } from 'lodash'
 
 import { User, UserBrief, SearchResult, Repo } from './gh-types'
 
-interface ReposPage {
+export interface ReposPage {
   current: number
   total: number
   repos: Repo[]
@@ -34,7 +34,7 @@ function pickUserBriefFields(responseBody: any): UserBrief {
   return pick(responseBody, ['type', 'login', 'avatar_url'])
 }
 
-class ReposPager implements AsyncIterableIterator<ReposPage> {
+export class ReposPager implements AsyncIterableIterator<ReposPage> {
   private abortController?: AbortController
   private nextUrl?: string
   private current: number = 1

@@ -1,4 +1,3 @@
-import { LayoutState } from './reducer'
-export { default, layoutActions } from './reducer'
-
-export type LayoutState = LayoutState
+export * from './config'
+export * from './reducer'
+export { default } from './reducer'

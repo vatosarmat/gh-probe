@@ -1,26 +1,25 @@
-import { ActionType, createReducer, createStandardAction } from 'typesafe-actions'
-import { ReposPerPage, PrimaryColor } from 'services/layout'
+import { DeepReadonly } from 'utility-types'
+import { ActionType, createReducer, createAction } from 'typesafe-actions'
+import { ReposPerPage, PrimaryColor } from './config'
 
-export interface LayoutState {
+export type LayoutState = DeepReadonly<{
   reposPerPage: ReposPerPage
   primaryColor: PrimaryColor
-}
+}>
 
-const defaultState: LayoutState = {
+const defaultLayoutState: LayoutState = {
   reposPerPage: 10,
   primaryColor: 'indigo'
 }
 
 export const layoutActions = {
-  setReposPerPage: createStandardAction('layout/SET_REPOS_PER_PAGE')<ReposPerPage>(),
-  setPrimaryColor: createStandardAction('layout/SET_PRIMARY_COLOR')<PrimaryColor>()
+  setReposPerPage: createAction('layout/SET_REPOS_PER_PAGE')<ReposPerPage>(),
+  setPrimaryColor: createAction('layout/SET_PRIMARY_COLOR')<PrimaryColor>()
 }
 
-type RootAction = ActionType<typeof layoutActions> | { type: 'RESET' }
+type RootAction = ActionType<typeof layoutActions>
 
-export default createReducer<LayoutState, RootAction>(defaultState, {
-  RESET: () => defaultState,
-
+export default createReducer<LayoutState, RootAction>(defaultLayoutState, {
   'layout/SET_REPOS_PER_PAGE': (state, { payload }) => ({
     ...state,
     reposPerPage: payload
