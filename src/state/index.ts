@@ -1,5 +1,7 @@
 import { combineReducers, Action } from 'redux'
 import { all, call } from 'redux-saga/effects'
+// import { persistReducer } from 'redux-persist'
+// import storage from 'redux-persist/lib/storage'
 
 import layout, { LayoutState, defaultLayoutState } from './layout'
 import repos, { ReposState, defaultReposState, reposSaga } from './repos'
@@ -30,10 +32,31 @@ export const rootActions = {
 
 const fieldsReducer = combineReducers<State>({ layout, repos, user, usersSearch })
 
-export default function rootReducer(state: State, action: Action) {
+export default function rootReducer(state: State | undefined, action: Action) {
   if (action.type === 'RESET') {
     return defaultState
   }
 
   return fieldsReducer(state, action)
 }
+
+// function makePersistedReducer() {
+//   function persistSession() {
+//     const blacklist: (keyof SessionState)[] = ['authorize', 'logout']
+
+//     return persistReducer(
+//       {
+//         key: 'session',
+//         storage,
+//         blacklist
+//       },
+//       session
+//     )
+//   }
+
+//   const rootReducer = combineReducers({ session: persistSession(), posts, ui })
+
+//   return persistReducer({ key: 'root', storage }, rootReducer)
+// }
+
+// export const persistedReducer = makePersistedReducer()

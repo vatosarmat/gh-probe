@@ -1,11 +1,13 @@
+import { ActionType } from 'typesafe-actions'
 import { END } from 'redux-saga'
 import { call, setContext, Effect } from 'redux-saga/effects'
 import { expectSaga } from 'redux-saga-test-plan'
 
-// import { rootSaga, ACTIVE_MODIFY_TASKS } from '../rootSaga'
-// import { plainReducer, State } from '../rootReducer'
-import { SagaContext } from '../helpers'
-// import { Request } from '../sagaHelpers'
+import rootReducer, { State, rootSaga } from 'state'
+import { userActions } from 'state/user'
+import { usersSearchActions } from 'state/usersSearch'
+import { reposActions } from 'state/repos'
+import { SagaContext } from 'state/helpers'
 import { Api } from 'services/api'
 import 'utils/testing'
 
@@ -22,6 +24,10 @@ export function* runSagaTest<Fn extends (...args: any[]) => any>(fn: Fn, ...args
   yield call(fn, ...args)
 }
 
+type AppUserDispatchableAction = ActionType<
+  typeof userActions.request | typeof usersSearchActions.request | typeof reposActions.start | typeof reposActions.abort
+>
+
 export function expectSagaState({
   initialState,
   dispatchActions,
@@ -30,12 +36,12 @@ export function expectSagaState({
   unexpectedEffects
 }: {
   initialState: State
-  dispatchActions: Request[]
+  dispatchActions: AppUserDispatchableAction[]
   expectedState: State
   expectedEffects?: Effect[][]
   unexpectedEffects?: Effect[][]
 }) {
-  let chain = expectSaga(runSagaTest, rootSaga).withReducer(plainReducer, initialState)
+  let chain = expectSaga(runSagaTest, rootSaga).withReducer(rootReducer, initialState)
   chain = dispatchActions.reduce((ac, v) => ac.dispatch(v), chain)
 
   return chain
@@ -53,7 +59,5 @@ export function expectSagaState({
           expect(result.allEffects).not.toIncludeAllMembersOrdered(series)
         }
       }
-      //@ts-ignore
-      expect(rootSaga[ACTIVE_MODIFY_TASKS]).toEqual({})
     })
 }

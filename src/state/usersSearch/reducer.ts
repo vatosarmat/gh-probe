@@ -16,21 +16,21 @@ export const defaultUsersSearchState: UsersSearchState = {
 }
 
 export const usersSearchActions = createAsyncAction(
-  'search/users/REQUEST',
-  'search/users/SUCCESS',
-  'search/users/FAILURE'
+  'usersSearch/REQUEST',
+  'usersSearch/SUCCESS',
+  'usersSearch/FAILURE'
 )<string, UserBrief[], Error>()
 
 export type UsersSearchAction = ActionType<typeof usersSearchActions>
 
 export default createReducer<UsersSearchState, UsersSearchAction>(defaultUsersSearchState, {
-  'search/users/REQUEST': (state, { payload: query }) => ({
+  'usersSearch/REQUEST': (state, { payload: query }) => ({
     ...defaultUsersSearchState,
     query,
     inProgress: true
   }),
 
-  'search/users/SUCCESS': (state, { payload: result }) =>
+  'usersSearch/SUCCESS': (state, { payload: result }) =>
     omit(
       {
         ...state,
@@ -40,7 +40,7 @@ export default createReducer<UsersSearchState, UsersSearchAction>(defaultUsersSe
       ['error']
     ),
 
-  'search/users/FAILURE': (state, { payload: error }) => ({
+  'usersSearch/FAILURE': (state, { payload: error }) => ({
     ...state,
     inProgress: false,
     error: error.toString()
