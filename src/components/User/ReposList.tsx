@@ -22,15 +22,8 @@ import { Circle, SourceFork, Star } from 'mdi-material-ui'
 import React, { ChangeEvent, Component } from 'react'
 import { connect } from 'react-redux'
 
-import ArraySelect from './ArraySelect'
-import {
-  State,
-  getReposItems,
-  getReposProgress,
-  getReposStatus,
-  getReposError,
-  getReposPerPage
-} from 'state'
+import ArraySelect from '../ArraySelect'
+import { State, getReposItems, getReposProgress, getReposStatus, getReposError, getReposPerPage } from 'state'
 import { Repo } from 'services/api'
 import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
 import getLangColor from 'services/lang-color'
@@ -158,16 +151,7 @@ class ReposList extends Component<ReposListProps, ReposListState> {
 
   renderRepoCard(rep: Repo) {
     const { classes } = this.props
-    const {
-      name,
-      description,
-      language,
-      stargazers_count,
-      forks_count,
-      updated_at,
-      html_url,
-      archived
-    } = rep
+    const { name, description, language, stargazers_count, forks_count, updated_at, html_url, archived } = rep
 
     return (
       <Card elevation={0} className={classes.card}>
@@ -189,11 +173,7 @@ class ReposList extends Component<ReposListProps, ReposListState> {
             <Box display="flex" alignItems="center" pt={2}>
               {language && (
                 <>
-                  <Circle
-                    fontSize="inherit"
-                    className={classes.repoInfoIcon}
-                    htmlColor={getLangColor(language)}
-                  />
+                  <Circle fontSize="inherit" className={classes.repoInfoIcon} htmlColor={getLangColor(language)} />
                   <Typography variant="caption" className={classes.repoInfoCaption}>
                     {language}
                   </Typography>
@@ -209,11 +189,7 @@ class ReposList extends Component<ReposListProps, ReposListState> {
               ) : null}
               {forks_count > 0 ? (
                 <>
-                  <SourceFork
-                    fontSize="inherit"
-                    className={classes.repoInfoIcon}
-                    htmlColor="gray"
-                  />
+                  <SourceFork fontSize="inherit" className={classes.repoInfoIcon} htmlColor="gray" />
                   <Typography variant="caption" className={classes.repoInfoCaption}>
                     {forks_count}
                   </Typography>
@@ -234,13 +210,7 @@ class ReposList extends Component<ReposListProps, ReposListState> {
     )
   }
 
-  renderRepoListControl(
-    hasStars: boolean,
-    languages: Language[],
-    pagFrom: number,
-    pagTo: number,
-    total: number
-  ) {
+  renderRepoListControl(hasStars: boolean, languages: Language[], pagFrom: number, pagTo: number, total: number) {
     const {
       reposPerPage,
 
@@ -288,12 +258,7 @@ class ReposList extends Component<ReposListProps, ReposListState> {
           <FormControlLabel
             className={classes.starSortFormControl}
             control={
-              <Checkbox
-                color="primary"
-                checked={starSort}
-                onChange={this.handleStarSortChange}
-                value="starSort"
-              />
+              <Checkbox color="primary" checked={starSort} onChange={this.handleStarSortChange} value="starSort" />
             }
             label="Sort by stars"
           />
