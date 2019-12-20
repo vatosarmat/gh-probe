@@ -3,6 +3,7 @@ export const uerTypeTuple = ['User', 'Organization'] as const
 export type UserType = typeof uerTypeTuple[number]
 
 export interface UserBrief {
+  id: number
   type: UserType
   login: string
   avatar_url: string

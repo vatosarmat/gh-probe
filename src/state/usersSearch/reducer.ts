@@ -1,18 +1,19 @@
 import { DeepReadonly } from 'utility-types'
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
-import { omit } from 'lodash'
+import { omit, keyBy } from 'lodash'
 
 import { UserBrief } from 'services/api'
 
 export type UsersSearchState = DeepReadonly<{
   query?: string
-  result?: UserBrief[]
+  result: Record<number, UserBrief>
   inProgress: boolean
   error?: string
 }>
 
 export const defaultUsersSearchState: UsersSearchState = {
-  inProgress: false
+  inProgress: false,
+  result: {}
 }
 
 export const usersSearchActions = createAsyncAction(
@@ -30,11 +31,14 @@ export default createReducer<UsersSearchState, UsersSearchAction>(defaultUsersSe
     inProgress: true
   }),
 
-  'usersSearch/SUCCESS': (state, { payload: result }) =>
+  'usersSearch/SUCCESS': (state, { payload: resultArray }) =>
     omit(
       {
         ...state,
-        result,
+        result: {
+          ...state.result,
+          ...keyBy(resultArray, 'id')
+        },
         inProgress: false
       },
       ['error']
