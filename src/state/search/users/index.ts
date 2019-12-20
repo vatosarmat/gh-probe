@@ -1,6 +1,3 @@
-import { SearchUsersState } from './reducer'
-
-export { default, searchUsersActions } from './reducer'
-export { default as saga } from './saga'
-
-export type SearchUsersState = SearchUsersState
+export { default } from './reducer'
+export * from './reducer'
+export { default as searchUsersSaga } from './saga'

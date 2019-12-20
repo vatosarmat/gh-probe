@@ -10,7 +10,7 @@ export type UserState = DeepReadonly<{
   error?: string
 }>
 
-const defaultUserState: UserState = {
+export const defaultUserState: UserState = {
   isFetching: false
 }
 
@@ -34,13 +34,9 @@ export default createReducer<UserState, RootAction>(defaultUserState, {
       ['error']
     ),
 
-  'user/FAILURE': (state, { payload: error }) =>
-    omit(
-      {
-        ...state,
-        isFetching: false,
-        error: error.toString()
-      },
-      ['data']
-    )
+  'user/FAILURE': (state, { payload: error }) => ({
+    ...state,
+    isFetching: false,
+    error: error.toString()
+  })
 })

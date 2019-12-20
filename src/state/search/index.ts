@@ -1,4 +1,2 @@
-import { SearchUsersState } from './users'
-export { default, searchUsersActions, saga } from './users'
-
-export type SearchUsersState = SearchUsersState
+export { default } from './users'
+export * from './users'

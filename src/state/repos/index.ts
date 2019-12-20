@@ -1,3 +1,3 @@
 export { default } from './reducer'
 export * from './reducer'
-export { default as resposSaga } from './saga'
+export { default as reposSaga } from './saga'

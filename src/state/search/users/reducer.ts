@@ -1,18 +1,18 @@
+import { DeepReadonly } from 'utility-types'
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
+import { omit } from 'lodash'
+
 import { UserBrief } from 'services/api'
 
-export interface SearchUsersState {
-  readonly query: string
-  readonly result: UserBrief[] | null
-  readonly inProgress: boolean
-  readonly error: Error | null
-}
+export type SearchUsersState = DeepReadonly<{
+  query?: string
+  result?: UserBrief[]
+  inProgress: boolean
+  error?: string
+}>
 
-const defaultState: SearchUsersState = {
-  query: '',
-  result: null,
-  inProgress: false,
-  error: null
+export const defaultSearchUserState: SearchUsersState = {
+  inProgress: false
 }
 
 export const searchUsersActions = createAsyncAction(
@@ -21,27 +21,28 @@ export const searchUsersActions = createAsyncAction(
   'search/users/FAILURE'
 )<string, UserBrief[], Error>()
 
-type RootAction = ActionType<typeof searchUsersActions> | { type: 'RESET' }
+type RootAction = ActionType<typeof searchUsersActions>
 
-export default createReducer<SearchUsersState, RootAction>(defaultState, {
-  RESET: () => defaultState,
-
-  'search/users/REQUEST': (state, { payload }) => ({
-    ...defaultState,
-    query: payload,
+export default createReducer<SearchUsersState, RootAction>(defaultSearchUserState, {
+  'search/users/REQUEST': (state, { payload: query }) => ({
+    ...defaultSearchUserState,
+    query,
     inProgress: true
   }),
 
-  'search/users/SUCCESS': (state, { payload }) => ({
-    ...state,
-    result: payload,
-    inProgress: false,
-    error: null
-  }),
+  'search/users/SUCCESS': (state, { payload: result }) =>
+    omit(
+      {
+        ...state,
+        result,
+        inProgress: false
+      },
+      ['error']
+    ),
 
-  'search/users/FAILURE': (state, { payload }) => ({
+  'search/users/FAILURE': (state, { payload: error }) => ({
     ...state,
     inProgress: false,
-    error: payload
+    error: error.toString()
   })
 })
