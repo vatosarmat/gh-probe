@@ -1,5 +1,5 @@
-import { Effect, call, put, take } from 'redux-saga/effects'
-import { pick, cloneDeep } from 'lodash'
+import { call, put } from 'redux-saga/effects'
+import { cloneDeep } from 'lodash'
 
 import { usersSearchActions, State } from 'state'
 import { Mutable } from 'utils/common'

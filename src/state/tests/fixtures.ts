@@ -1,6 +1,6 @@
 import { keyBy, cloneDeep } from 'lodash'
 
-import { User, SearchResult, UserBrief } from 'services/api'
+import { User, SearchResult, UserBrief, ReposPage } from 'services/api'
 import { defaultState as _defaultState } from 'state'
 
 export default function() {
@@ -67,6 +67,66 @@ export default function() {
 
   const usersSearchResult = keyBy(usersSearchResultResponseBody.items, 'id')
 
+  const singleReposPage: ReposPage = {
+    total: 1,
+    current: 1,
+    repos: [
+      {
+        id: 40,
+        name: 'tic-tac-toe',
+        description: 'Stupid game',
+        language: 'Scheme',
+        stargazers_count: 12,
+        forks_count: 2,
+        updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
+        html_url: 'github.com/vasiliy/tic-tac-toe',
+        archived: false,
+        fork: false
+      }
+    ]
+  }
+
+  const reposPagesArray: ReposPage[] = [
+    {
+      total: 2,
+      current: 1,
+      repos: [
+        {
+          id: 54,
+          name: 'typescript',
+          description: 'Type-safe language compiled to JS',
+          language: 'typescript',
+          stargazers_count: 1312,
+          forks_count: 131,
+          updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
+          html_url: 'github.com/microsoft/typescript',
+          archived: false,
+          fork: false
+        }
+      ]
+    },
+    {
+      total: 2,
+      current: 2,
+      repos: [
+        {
+          id: 55,
+          name: 'vscode',
+          description: 'Source code editor',
+          language: 'typescript',
+          stargazers_count: 12000,
+          forks_count: 2333,
+          updated_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
+          html_url: 'github.com/microsoft/vscode',
+          archived: false,
+          fork: false
+        }
+      ]
+    }
+  ]
+
+  // IteratorResult<ReposPage, ReposPage>
+
   const networkError = new Error('No internet connection')
 
   const defaultState = cloneDeep(_defaultState)
@@ -77,6 +137,8 @@ export default function() {
     usersSearchQuery,
     usersSearchResultResponseBody,
     usersSearchResult,
+    singleReposPage,
+    reposPagesArray,
     networkError,
     defaultState
   }

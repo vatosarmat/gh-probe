@@ -1,3 +1,4 @@
+import { CANCEL } from 'redux-saga'
 import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import { pick } from 'lodash'
@@ -52,7 +53,7 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
 
     this.abortController = new AbortController()
 
-    return fetch(this.nextUrl, {
+    const prom = fetch(this.nextUrl, {
       signal: this.abortController.signal
     })
       .then(response => {
@@ -82,6 +83,9 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
           total: this.total
         }
       }))
+    ;(prom as any)[CANCEL] = this.abort
+
+    return prom
   }
 
   abort = () => {

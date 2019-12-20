@@ -1,4 +1,3 @@
-import { CANCEL } from 'redux-saga'
 import { call, put, cancelled, take, race, getContext } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 
@@ -13,24 +12,17 @@ type RequestAction = ReturnType<typeof start>
 
 function* fetchRepos({ payload: username }: RequestAction) {
   const api: SagaContext['api'] = yield getContext('api')
-  const repos: Repo[] = []
-  const fetcher = api.fetchRepos(username)
-
-  const nextPage = () => {
-    const prom = fetcher.next()
-    //@ts-ignore
-    prom[CANCEL] = fetcher.abort
-    return prom
-  }
+  const items: Repo[] = []
+  const fetcher = yield call(api.fetchRepos, username)
 
   try {
     while (true) {
       const {
         done,
         value: { repos, current, total }
-      }: IteratorResult<ReposPage, ReposPage> = yield call(nextPage)
+      }: IteratorResult<ReposPage, ReposPage> = yield call(fetcher.next)
 
-      repos.push(...repos.filter(repo => !repo.fork))
+      items.push(...repos.filter(repo => !repo.fork))
 
       if (done) {
         break
@@ -39,12 +31,12 @@ function* fetchRepos({ payload: username }: RequestAction) {
       yield put(pageReady({ current, total }))
     }
 
-    yield put(fetchComplete(repos))
+    yield put(fetchComplete(items))
   } catch (error) {
-    yield put(fetchError(error, repos))
+    yield put(fetchError(error, items))
   } finally {
     if (yield cancelled()) {
-      yield put(fetchAborted(repos))
+      yield put(fetchAborted(items))
     }
   }
 }

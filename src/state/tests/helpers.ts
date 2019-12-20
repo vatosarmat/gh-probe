@@ -9,6 +9,7 @@ import { usersSearchActions } from 'state/usersSearch'
 import { reposActions } from 'state/repos'
 import { SagaContext } from 'state/helpers'
 import { Api } from 'services/api'
+import { isNumber } from 'utils/common'
 import 'utils/testing'
 
 jest.mock('services/api')
@@ -36,16 +37,22 @@ export function expectSagaState({
   unexpectedEffects
 }: {
   initialState: State
-  dispatchActions: AppUserDispatchableAction[]
+  dispatchActions: (AppUserDispatchableAction | number)[]
   expectedState: State
   expectedEffects?: Effect[][]
   unexpectedEffects?: Effect[][]
 }) {
-  let chain = expectSaga(runSagaTest, rootSaga).withReducer(rootReducer, initialState)
-  chain = dispatchActions.reduce((ac, v) => ac.dispatch(v), chain)
+  let expectChain = expectSaga(runSagaTest, rootSaga).withReducer(rootReducer, initialState)
+  expectChain = dispatchActions.reduce((chain, v) => {
+    if (isNumber(v)) {
+      return chain.delay(v)
+    }
+    return chain.dispatch(v)
+  }, expectChain)
 
-  return chain
+  return expectChain
     .hasFinalState<State>(expectedState)
+    .delay(1)
     .dispatch(END)
     .run()
     .then(result => {
