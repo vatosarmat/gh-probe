@@ -2,7 +2,7 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import { pick } from 'lodash'
 
-import { User, UserBrief, SearchResult, Repo } from './gh-types'
+import { User, UserBrief, SearchResult, SearchResultItem, Repo } from './gh-types'
 
 export interface ReposPage {
   current: number
@@ -29,8 +29,8 @@ function pickUserFields(responseBody: any): User {
   return pick(responseBody, ['id', 'type', 'login', 'avatar_url', 'name', 'bio', 'location', 'company', 'blog'])
 }
 
-function pickUserBriefFields(responseBody: any): UserBrief {
-  return pick(responseBody, ['id', 'type', 'login', 'avatar_url'])
+function pickUsersSearchResultItemFields(responseBody: any): SearchResultItem<UserBrief> {
+  return pick(responseBody, ['id', 'type', 'login', 'avatar_url', 'score'])
 }
 
 export class ReposPager implements AsyncIterableIterator<ReposPage> {
@@ -119,7 +119,7 @@ export class Api {
       .then(response => response.json())
       .then((result: SearchResult<any>) => ({
         ...result,
-        items: result.items.map(pickUserBriefFields)
+        items: result.items.map(pickUsersSearchResultItemFields)
       }))
   }
 

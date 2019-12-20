@@ -17,10 +17,14 @@ export interface User extends UserBrief {
   blog: string | null
 }
 
+export type SearchResultItem<T> = T & {
+  score: number
+}
+
 export interface SearchResult<T> {
   total_count: number
   incomplete_results: boolean
-  items: T[]
+  items: SearchResultItem<T>[]
 }
 
 export interface Repo {
