@@ -1,6 +1,7 @@
 import { DeepReadonly } from 'utility-types'
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
-import { ReposPerPage, PrimaryColor } from './config'
+
+import { ReposPerPage, PrimaryColor, defaultPrimaryColor, defaultReposPerPage } from 'config'
 
 export type LayoutState = DeepReadonly<{
   reposPerPage: ReposPerPage
@@ -8,8 +9,8 @@ export type LayoutState = DeepReadonly<{
 }>
 
 export const defaultLayoutState: LayoutState = {
-  reposPerPage: 10,
-  primaryColor: 'indigo'
+  reposPerPage: defaultReposPerPage,
+  primaryColor: defaultPrimaryColor
 }
 
 export const layoutActions = {

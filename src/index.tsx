@@ -12,8 +12,8 @@ import createSagaMiddleware from 'redux-saga'
 
 import App from 'components/App'
 import AppError from 'components/AppError'
-import reducer, { rootSaga } from 'state'
-import Api from 'services/api'
+import reducer, { rootSaga, SagaContext } from 'state'
+import { Api } from 'services/api'
 
 try {
   if (!process.env.REACT_APP_GITHUB_PROXY_BASE_URL) {
@@ -31,11 +31,12 @@ try {
     },
     reducer
   )
-  const sagaMiddleware = createSagaMiddleware()
-
+  const context: SagaContext = { api }
+  const sagaMiddleware = createSagaMiddleware({ context })
   const store = createStore(pReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
   const persistor = persistStore(store)
-  sagaMiddleware.run(rootSaga, api)
+
+  sagaMiddleware.run(rootSaga)
 
   ReactDOM.render(
     <Provider store={store}>

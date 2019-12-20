@@ -6,8 +6,8 @@ import { MuiThemeProvider } from '@material-ui/core/styles'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
-import SearchUsersForm from './SearchUsersForm'
-import SearchUsersResult from './SearchUsersResult'
+import SearchUsersForm from './Search/SearchUsersForm'
+import SearchUsersResult from './Search/SearchUsersResult'
 import UserRoute from './UserRoute'
 import { State } from 'state'
 import { PrimaryColor, primaryColorTuple } from 'services/layout'
@@ -34,14 +34,6 @@ const theme: ThemeDict = primaryColorTuple.reduce(
     })
   }),
   {} as ThemeDict
-)
-
-const SearchRoute: React.FC = () => (
-  <>
-    <SearchUsersForm examples={['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft']} />
-    <Divider />
-    <SearchUsersResult />
-  </>
 )
 
 interface StateProps {
