@@ -4,28 +4,28 @@ import { omit } from 'lodash'
 
 import { UserBrief } from 'services/api'
 
-export type SearchUsersState = DeepReadonly<{
+export type UsersSearchState = DeepReadonly<{
   query?: string
   result?: UserBrief[]
   inProgress: boolean
   error?: string
 }>
 
-export const defaultSearchUserState: SearchUsersState = {
+export const defaultUsersSearchState: UsersSearchState = {
   inProgress: false
 }
 
-export const searchUsersActions = createAsyncAction(
+export const usersSearchActions = createAsyncAction(
   'search/users/REQUEST',
   'search/users/SUCCESS',
   'search/users/FAILURE'
 )<string, UserBrief[], Error>()
 
-type RootAction = ActionType<typeof searchUsersActions>
+export type UsersSearchAction = ActionType<typeof usersSearchActions>
 
-export default createReducer<SearchUsersState, RootAction>(defaultSearchUserState, {
+export default createReducer<UsersSearchState, UsersSearchAction>(defaultUsersSearchState, {
   'search/users/REQUEST': (state, { payload: query }) => ({
-    ...defaultSearchUserState,
+    ...defaultUsersSearchState,
     query,
     inProgress: true
   }),

@@ -5,9 +5,9 @@ import { getType } from 'typesafe-actions'
 import { Repo, ReposPage } from 'services/api'
 import { SagaContext } from 'state/helpers'
 
-import { fetchReposActions } from './reducer'
+import { reposActions } from './reducer'
 
-const { start, pageReady, abort, aborted: fetchAborted, error: fetchError, complete: fetchComplete } = fetchReposActions
+const { start, pageReady, abort, aborted: fetchAborted, error: fetchError, complete: fetchComplete } = reposActions
 
 type RequestAction = ReturnType<typeof start>
 

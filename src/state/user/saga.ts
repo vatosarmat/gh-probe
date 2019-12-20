@@ -4,9 +4,9 @@ import { getType } from 'typesafe-actions'
 import { User } from 'services/api'
 import { SagaContext } from 'state/helpers'
 
-import { fetchUserActions } from './reducer'
+import { userActions } from './reducer'
 
-const { request, success, failure } = fetchUserActions
+const { request, success, failure } = userActions
 
 type RequestAction = ReturnType<typeof request>
 

@@ -23,7 +23,7 @@ export const defaultReposState: ReposState = {
   status: 'IDLE'
 }
 
-export const fetchReposActions = {
+export const reposActions = {
   start: createAction('repos/FETCH_START')<string>(),
   pageReady: createAction('repos/FETCH_PAGE_READY')<ReposFetchProgress>(),
   abort: createAction('repos/FETCH_ABORT')(),
@@ -33,9 +33,9 @@ export const fetchReposActions = {
   complete: createAction('repos/FETCH_COMPLETE')<Repo[]>()
 }
 
-type RootAction = ActionType<typeof fetchReposActions>
+export type ReposAction = ActionType<typeof reposActions>
 
-export default createReducer<ReposState, RootAction>(defaultReposState, {
+export default createReducer<ReposState, ReposAction>(defaultReposState, {
   'repos/FETCH_START': (state, { payload }) =>
     omit(
       {

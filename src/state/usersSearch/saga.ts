@@ -4,13 +4,13 @@ import { getType } from 'typesafe-actions'
 import { SearchResult, UserBrief } from 'services/api'
 import { SagaContext } from 'state/helpers'
 
-import { searchUsersActions } from './reducer'
+import { usersSearchActions } from './reducer'
 
-const { request, success, failure } = searchUsersActions
+const { request, success, failure } = usersSearchActions
 
 type RequestAction = ReturnType<typeof request>
 
-function* searchUser({ payload: query }: RequestAction) {
+function* usersSearch({ payload: query }: RequestAction) {
   const api: SagaContext['api'] = yield getContext('api')
 
   try {
@@ -23,5 +23,5 @@ function* searchUser({ payload: query }: RequestAction) {
 }
 
 export default function*() {
-  yield takeLatest(getType(request), searchUser)
+  yield takeLatest(getType(request), usersSearch)
 }

@@ -14,11 +14,11 @@ export const defaultUserState: UserState = {
   isFetching: false
 }
 
-export const fetchUserActions = createAsyncAction('user/REQUEST', 'user/SUCCESS', 'user/FAILURE')<string, User, Error>()
+export const userActions = createAsyncAction('user/REQUEST', 'user/SUCCESS', 'user/FAILURE')<string, User, Error>()
 
-type RootAction = ActionType<typeof fetchUserActions>
+export type UserAction = ActionType<typeof userActions>
 
-export default createReducer<UserState, RootAction>(defaultUserState, {
+export default createReducer<UserState, UserAction>(defaultUserState, {
   'user/REQUEST': () => ({
     ...defaultUserState,
     isFetching: true
