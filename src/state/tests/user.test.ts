@@ -1,40 +1,49 @@
 import { Effect, call, put, take } from 'redux-saga/effects'
 import { pick, cloneDeep } from 'lodash'
 
-import { userActions } from 'state'
+import { userActions, State } from 'state'
 import { Mutable } from 'utils/common'
 import makeFx from './fixtures'
 import { expectSagaState, api } from './helpers'
 
-describe('Post add operation', () => {
+describe('Fetch user data', () => {
   let fx: ReturnType<typeof makeFx>
   beforeEach(() => {
     fx = makeFx()
     jest.resetAllMocks()
   })
 
-  const { add } = postsActions
-  const { response } = sessionActions
-
   it('Success', () => {
-    const author = fx.usersArray[0]
-    const expectedPost = fx.postsByAuthor[author.id][0]
-    const postData = fx.postDatas[expectedPost.id]
-    ;(api.addPost as jest.Mock).mockResolvedValueOnce(expectedPost)
+    const expectedUser = fx.usersArray[0]
+    ;(api.fetchUser as jest.Mock).mockResolvedValueOnce(expectedUser)
 
     const initialState = fx.defaultState as Mutable<State>
-    initialState.session.user = author
-    initialState.session.authorizedOnServer = true
 
     const expectedState = cloneDeep(initialState)
-    expectedState.posts.items = pick(fx.posts, expectedPost.id)
-    expectedState.posts.modify = { [NEW_POST_ID]: { status: 'SUCCESS', kind: 'add', result: expectedPost.id } }
+    expectedState.user.data = expectedUser
 
     return expectSagaState({
       initialState,
-      dispatchActions: [add.request(postData)],
+      dispatchActions: [userActions.request(expectedUser.name!)],
       expectedState,
-      expectedEffects: [[put(add.requested()), call(api.addPost, postData), put(add.success(expectedPost))]]
+      expectedEffects: [[call(api.fetchUser, expectedUser.name!), put(userActions.success(expectedUser))]]
+    })
+  })
+
+  it('Network error', () => {
+    const user = fx.usersArray[0]
+    ;(api.fetchUser as jest.Mock).mockRejectedValueOnce(fx.networkError)
+
+    const initialState = fx.defaultState as Mutable<State>
+
+    const expectedState = cloneDeep(initialState)
+    expectedState.user.error = fx.networkError.toString()
+
+    return expectSagaState({
+      initialState,
+      dispatchActions: [userActions.request(user.name!)],
+      expectedState,
+      expectedEffects: [[call(api.fetchUser, user.name!), put(userActions.failure(fx.networkError))]]
     })
   })
 })

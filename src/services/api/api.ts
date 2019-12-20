@@ -26,11 +26,11 @@ function pickRepoFields(responseBody: any): Repo {
 }
 
 function pickUserFields(responseBody: any): User {
-  return pick(responseBody, ['type', 'login', 'avatar_url', 'name', 'bio', 'location', 'company', 'blog'])
+  return pick(responseBody, ['id', 'type', 'login', 'avatar_url', 'name', 'bio', 'location', 'company', 'blog'])
 }
 
 function pickUserBriefFields(responseBody: any): UserBrief {
-  return pick(responseBody, ['type', 'login', 'avatar_url'])
+  return pick(responseBody, ['id', 'type', 'login', 'avatar_url'])
 }
 
 export class ReposPager implements AsyncIterableIterator<ReposPage> {
