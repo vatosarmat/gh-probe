@@ -6,4 +6,8 @@ export const reposPerPageTuple = [5, 10, 15, 20] as const
 export type ReposPerPage = typeof reposPerPageTuple[number]
 export const defaultReposPerPage: ReposPerPage = 10
 
-export const exampleUsers = ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft']
+export const appConfig = {
+  exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
+  title: 'GitHub repos',
+  basename: '/gh-probe'
+}

@@ -1,16 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme, Divider } from '@material-ui/core'
+import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
-import SearchUsersForm from './Search/SearchUsersForm'
-import SearchUsersResult from './Search/SearchUsersResult'
-import UserRoute from './UserRoute'
+import SearchRoute from './Search'
+import UserRoute from './User'
 import { State } from 'state'
-import { PrimaryColor, primaryColorTuple } from 'services/layout'
+import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -48,8 +47,8 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
   return (
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
-        <TopBar title="GitHub repos" />
-        <BrowserRouter basename="/gh-probe">
+        <TopBar title={appConfig.title} />
+        <BrowserRouter basename={appConfig.basename}>
           <Switch>
             <Route path="/users/:username" component={UserRoute} />
             <Route component={SearchRoute} />
