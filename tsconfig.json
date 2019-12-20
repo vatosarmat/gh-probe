@@ -17,5 +17,6 @@
     "baseUrl": "src"
   },
 
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/components/User", "src/components/Search"]
 }

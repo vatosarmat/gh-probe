@@ -20,25 +20,12 @@ import { Menu as MenuIcon } from '@material-ui/icons'
 import { connect } from 'react-redux'
 
 import ArraySelect from './ArraySelect'
-import { ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'services/layout'
-import {
-  State,
-  setPrimaryColor,
-  setReposPerPage,
-  getReposPerPage,
-  getPrimaryColor,
-  resetState
-} from 'state'
+import { appConfig, ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'config'
+import { State, layoutSelectors, layoutActions, rootActions } from 'state'
 
-interface TopBarProps {
-  readonly title: string
-  readonly reposPerPage: ReposPerPage
-  readonly primaryColor: PrimaryColor
-
-  readonly setReposPerPage: typeof setReposPerPage
-  readonly setPrimaryColor: typeof setPrimaryColor
-  readonly resetState: typeof resetState
-}
+const { getPrimaryColor, getReposPerPage } = layoutSelectors
+const { setPrimaryColor, setReposPerPage } = layoutActions
+const { reset: resetState } = rootActions
 
 const useStyles = makeStyles(theme => ({
   perPageSelect: {
@@ -95,8 +82,20 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
+interface StateProps {
+  reposPerPage: ReposPerPage
+  primaryColor: PrimaryColor
+}
+
+interface DispatchProps {
+  setReposPerPage: typeof setReposPerPage
+  setPrimaryColor: typeof setPrimaryColor
+  resetState: typeof resetState
+}
+
+type TopBarProps = StateProps & DispatchProps
+
 const TopBar: React.FC<TopBarProps> = ({
-  title,
   reposPerPage,
   primaryColor,
   setReposPerPage,
@@ -133,7 +132,7 @@ const TopBar: React.FC<TopBarProps> = ({
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>
-        {title}
+        {appConfig.title}
       </Typography>
       <Dialog open={open} onClose={handleDialogClose}>
         <DialogTitle>Settings</DialogTitle>
@@ -152,9 +151,9 @@ const TopBar: React.FC<TopBarProps> = ({
               Color scheme
             </Typography>
             <RadioGroup name="gender1" value={primaryColor} onChange={handlePrimaryColorChange}>
-              {primaryColorTuple.map((color, key) => (
+              {primaryColorTuple.map(color => (
                 <FormControlLabel
-                  key={key}
+                  key={color}
                   value={color}
                   control={<Radio classes={{ root: classes[color], checked: classes.checked }} />}
                   label={color}
@@ -178,8 +177,8 @@ const TopBar: React.FC<TopBarProps> = ({
   )
 }
 
-export default connect(
-  (state: State) => ({
+export default connect<StateProps, DispatchProps, {}, State>(
+  state => ({
     primaryColor: getPrimaryColor(state),
     reposPerPage: getReposPerPage(state)
   }),

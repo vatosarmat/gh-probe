@@ -3,13 +3,15 @@ import { connect } from 'react-redux'
 import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+// import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
-import SearchRoute from './Search'
-import UserRoute from './User'
-import { State } from 'state'
-import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
+// import SearchRoute from './Search'
+// import UserRoute from './User'
+import { State, layoutSelectors } from 'state'
+import { PrimaryColor, primaryColorTuple } from 'config'
+
+const { getPrimaryColor } = layoutSelectors
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -47,18 +49,18 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
   return (
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
-        <TopBar title={appConfig.title} />
-        <BrowserRouter basename={appConfig.basename}>
+        <TopBar />
+        {/* <BrowserRouter basename={appConfig.basename}>
           <Switch>
             <Route path="/users/:username" component={UserRoute} />
             <Route component={SearchRoute} />
           </Switch>
-        </BrowserRouter>
+        </BrowserRouter> */}
       </Container>
     </MuiThemeProvider>
   )
 }
 
-export default connect<StateProps, {}, {}, State>(({ layout: { primaryColor } }) => ({
-  primaryColor
+export default connect<StateProps, {}, {}, State>(state => ({
+  primaryColor: getPrimaryColor(state)
 }))(App)
