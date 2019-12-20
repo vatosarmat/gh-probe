@@ -1,14 +1,18 @@
 import { CANCEL } from 'redux-saga'
-import { call, put, cancelled, take, race } from 'redux-saga/effects'
+import { call, put, cancelled, take, race, getContext } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
+
+import { Repo, ReposPage } from 'services/api'
+import { SagaContext } from 'state/helpers'
+
 import { fetchReposActions } from './reducer'
-import { Api, Repo, ReposPage } from 'services/api'
 
 const { start, pageReady, abort, aborted: fetchAborted, error: fetchError, complete: fetchComplete } = fetchReposActions
 
 type RequestAction = ReturnType<typeof start>
 
-function* fetchRepos(api: Api, { payload: username }: RequestAction) {
+function* fetchRepos({ payload: username }: RequestAction) {
+  const api: SagaContext['api'] = yield getContext('api')
   const repos: Repo[] = []
   const fetcher = api.fetchRepos(username)
 
@@ -45,10 +49,10 @@ function* fetchRepos(api: Api, { payload: username }: RequestAction) {
   }
 }
 
-export default function*(api: Api) {
+export default function*() {
   while (true) {
     const action = yield take(getType(start))
 
-    yield race([call(fetchRepos, api, action), take(getType(abort))])
+    yield race([call(fetchRepos, action), take(getType(abort))])
   }
 }

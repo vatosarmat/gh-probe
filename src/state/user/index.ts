@@ -1,6 +1,3 @@
-import { UserState } from './reducer'
-
-export { default, fetchUserActions } from './reducer'
-export { default as saga } from './saga'
-
-export type UserState = UserState
+export { default } from './reducer'
+export * from './reducer'
+export { default as userSaga } from './saga'

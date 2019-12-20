@@ -1,44 +1,46 @@
+import { DeepReadonly } from 'utility-types'
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
+import { omit } from 'lodash'
+
 import { User } from 'services/api'
 
-export interface UserState {
-  readonly data: User | null
-  readonly isFetching: boolean
-  readonly error: Error | null
+export type UserState = DeepReadonly<{
+  data?: User
+  isFetching: boolean
+  error?: string
+}>
+
+const defaultUserState: UserState = {
+  isFetching: false
 }
 
-const defaultState: UserState = {
-  data: null,
-  isFetching: false,
-  error: null
-}
+export const fetchUserActions = createAsyncAction('user/REQUEST', 'user/SUCCESS', 'user/FAILURE')<string, User, Error>()
 
-export const fetchUserActions = createAsyncAction('user/REQUEST', 'user/SUCCESS', 'user/FAILURE')<
-  string,
-  User,
-  Error
->()
+type RootAction = ActionType<typeof fetchUserActions>
 
-type RootAction = ActionType<typeof fetchUserActions> | { type: 'RESET' }
-
-export default createReducer<UserState, RootAction>(defaultState, {
-  RESET: () => defaultState,
-
+export default createReducer<UserState, RootAction>(defaultUserState, {
   'user/REQUEST': () => ({
-    ...defaultState,
+    ...defaultUserState,
     isFetching: true
   }),
 
-  'user/SUCCESS': (state, { payload }) => ({
-    ...state,
-    data: payload,
-    isFetching: false,
-    error: null
-  }),
+  'user/SUCCESS': (state, { payload: user }) =>
+    omit(
+      {
+        ...state,
+        data: user,
+        isFetching: false
+      },
+      ['error']
+    ),
 
-  'user/FAILURE': (state, { payload }) => ({
-    ...state,
-    isFetching: false,
-    error: payload
-  })
+  'user/FAILURE': (state, { payload: error }) =>
+    omit(
+      {
+        ...state,
+        isFetching: false,
+        error: error.toString()
+      },
+      ['data']
+    )
 })

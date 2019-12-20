@@ -1,15 +1,20 @@
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, put, takeLatest, getContext } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
+
+import { User } from 'services/api'
+import { SagaContext } from 'state/helpers'
+
 import { fetchUserActions } from './reducer'
-import Api from 'services/api'
 
 const { request, success, failure } = fetchUserActions
 
 type RequestAction = ReturnType<typeof request>
 
-function* fetchUser(api: Api, { payload: username }: RequestAction) {
+function* fetchUser({ payload: username }: RequestAction) {
+  const api: SagaContext['api'] = yield getContext('api')
+
   try {
-    const userData = yield call(api.fetchUser, username)
+    const userData: User = yield call(api.fetchUser, username)
 
     yield put(success(userData))
   } catch (error) {
@@ -17,6 +22,6 @@ function* fetchUser(api: Api, { payload: username }: RequestAction) {
   }
 }
 
-export default function*(api: Api) {
-  yield takeLatest(getType(request), fetchUser, api)
+export default function*() {
+  yield takeLatest(getType(request), fetchUser)
 }
