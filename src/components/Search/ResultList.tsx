@@ -1,72 +1,27 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Avatar,
-  Typography,
-  CircularProgress,
-  Box,
-  ListItemSecondaryAction
-} from '@material-ui/core'
-import { Group, Person } from '@material-ui/icons'
-import { Link } from 'react-router-dom'
+import { List, Typography, CircularProgress, Box } from '@material-ui/core'
 
-import {
-  State,
-  getSearchUsersQuery,
-  getSearchUsersResult,
-  getSearchUsersInProgress,
-  getSearchUsersError
-} from 'state'
-import { UserBrief } from 'services/api'
+import ResultItem from './ResultItem'
+import { State, usersSearchSelectors } from 'state'
 
-interface UsersListProps {
-  readonly items: UserBrief[]
+const { getSearchQuery, getSearchError, getSearchResultIds, isSearchInProgress } = usersSearchSelectors
+
+interface StateProps {
+  query?: string
+  resultIds: number[]
+  inProgress: boolean
+  error?: string
 }
 
-const UsersList: React.FC<UsersListProps> = ({ items }) => {
-  return (
-    <List>
-      {items.map(({ login, type, avatar_url }) => {
-        return (
-          <ListItem key={login} button component={Link} to={`/users/${login}`}>
-            <ListItemAvatar>
-              <Avatar alt="" src={avatar_url} />
-            </ListItemAvatar>
-            <ListItemText primary={login} />
-            <ListItemSecondaryAction>
-              {type === 'User' ? <Person /> : <Group />}
-            </ListItemSecondaryAction>
-          </ListItem>
-        )
-      })}
-    </List>
-  )
-}
+type SearchUsersResultProps = StateProps
 
-interface SearchUsersResultProps {
-  readonly query: string
-  readonly result: UserBrief[] | null
-  readonly inProgress: boolean
-  readonly error: Error | null
-}
-
-const SearchUsersResult: React.FC<SearchUsersResultProps> = ({
-  query,
-  result,
-  inProgress,
-  error
-}) => {
+const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ query, resultIds, inProgress, error }) => {
   if (error) {
     return (
       <Box p={4}>
         <Typography variant="subtitle1" color="error" display="block">
-          {error.toString()}
-          <br />
-          {error.message}
+          {error}
         </Typography>
       </Box>
     )
@@ -80,15 +35,19 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({
     )
   }
 
-  if (result) {
-    if (result.length) {
-      return (
-        <Box p={2}>
-          <UsersList items={result} />
-        </Box>
-      )
-    }
+  if (resultIds.length) {
+    return (
+      <Box p={2}>
+        <List>
+          {resultIds.map(id => (
+            <ResultItem key={id} id={id} />
+          ))}
+        </List>
+      </Box>
+    )
+  }
 
+  if (query) {
     return (
       <Box p={4}>
         <Typography variant="subtitle1" color="error" display="block">
@@ -108,9 +67,9 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({
   return null
 }
 
-export default connect((state: State) => ({
-  query: getSearchUsersQuery(state),
-  result: getSearchUsersResult(state),
-  inProgress: getSearchUsersInProgress(state),
-  error: getSearchUsersError(state)
+export default connect<StateProps, {}, {}, State>(state => ({
+  query: getSearchQuery(state),
+  error: getSearchError(state),
+  inProgress: isSearchInProgress(state),
+  resultIds: getSearchResultIds(state)
 }))(SearchUsersResult)

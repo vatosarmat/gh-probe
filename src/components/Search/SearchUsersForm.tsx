@@ -185,6 +185,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
                 <Input
                   error={!!error}
                   name="input"
+                  spellCheck={false}
                   id={this.inputElementId}
                   classes={{
                     input: classes.searchInput

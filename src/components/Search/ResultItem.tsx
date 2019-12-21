@@ -10,7 +10,7 @@ import { SearchResultItem, UserBrief } from '../../services/api'
 const { getSearchResultById } = usersSearchSelectors
 
 interface StateProps {
-  item: SearchResultItem<UserBrief>
+  item?: SearchResultItem<UserBrief>
 }
 
 interface OwnProps {
@@ -20,6 +20,9 @@ interface OwnProps {
 type ResultItemProps = StateProps & OwnProps
 
 const ResultItem: React.FC<ResultItemProps> = ({ item }) => {
+  if (!item) {
+    return null
+  }
   const { login, avatar_url, type } = item
 
   return (

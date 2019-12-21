@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
-// import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
-// import SearchRoute from './Search'
+import SearchRoute from './Search'
 // import UserRoute from './User'
 import { State, layoutSelectors } from 'state'
-import { PrimaryColor, primaryColorTuple } from 'config'
+import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
 
 const { getPrimaryColor } = layoutSelectors
 
@@ -45,17 +45,18 @@ type AppProps = StateProps
 
 const App: React.FC<AppProps> = ({ primaryColor }) => {
   const classes = useStyles()
+  const { basename } = appConfig
 
   return (
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar />
-        {/* <BrowserRouter basename={appConfig.basename}>
+        <BrowserRouter basename={basename}>
           <Switch>
-            <Route path="/users/:username" component={UserRoute} />
+            {/* <Route path="/users/:username" component={UserRoute} /> */}
             <Route component={SearchRoute} />
           </Switch>
-        </BrowserRouter> */}
+        </BrowserRouter>
       </Container>
     </MuiThemeProvider>
   )
