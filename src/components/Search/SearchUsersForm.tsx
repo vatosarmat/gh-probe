@@ -16,18 +16,13 @@ import {
 } from '@material-ui/core'
 import { AccountSearch } from 'mdi-material-ui'
 import cuid from 'cuid'
-import React, {
-  Fragment,
-  ChangeEvent,
-  Component,
-  MouseEvent,
-  FormEvent,
-  KeyboardEvent,
-  RefObject
-} from 'react'
+import React, { Fragment, ChangeEvent, Component, MouseEvent, FormEvent, KeyboardEvent, RefObject } from 'react'
 import { connect } from 'react-redux'
 
-import { searchUsersRequest } from 'state'
+import { usersSearchActions } from 'state'
+import { appConfig } from 'config'
+
+const { request: searchRequest } = usersSearchActions
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -73,10 +68,13 @@ const styles = (theme: Theme) =>
     }
   })
 
-interface SearchUsersFormProps extends WithStyles<typeof styles> {
-  readonly examples: string[]
-  readonly searchUsersRequest: typeof searchUsersRequest
+interface DispatchProps {
+  searchRequest: typeof searchRequest
 }
+
+type OwnProps = WithStyles<typeof styles>
+
+type SearchUsersFormProps = DispatchProps & OwnProps
 
 interface SearchUsersFormState {
   input: string
@@ -102,7 +100,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
   }
 
   handleButtonClick = () => {
-    const { searchUsersRequest } = this.props
+    const { searchRequest } = this.props
     const { input } = this.state
 
     const query = input.toString().trim()
@@ -112,7 +110,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
         {
           input: query
         },
-        () => searchUsersRequest(query)
+        () => searchRequest(query)
       )
     } else {
       this.setState({ input: '', error: true })
@@ -165,7 +163,8 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
 
   render() {
     const { input, error } = this.state
-    const { classes, examples } = this.props
+    const { classes } = this.props
+    const examples = appConfig.exampleUsers
 
     return (
       <Grid
@@ -199,11 +198,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
                   Examples:{' '}
                   {examples.slice(0, -1).map(example => (
                     <Fragment key={example}>
-                      <span
-                        className={classes.exampleSpan}
-                        onClick={this.handleExampleClick}
-                        data-text={example}
-                      >
+                      <span className={classes.exampleSpan} onClick={this.handleExampleClick} data-text={example}>
                         {example}
                       </span>
                       {', '}
@@ -221,12 +216,7 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
                 </FormHelperText>
               </FormControl>
             </Tooltip>
-            <Button
-              size="small"
-              variant="outlined"
-              color="primary"
-              onClick={this.handleButtonClick}
-            >
+            <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
               Search
             </Button>
           </Grid>
@@ -259,9 +249,6 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
   }
 }
 
-export default connect(
-  () => ({}),
-  {
-    searchUsersRequest
-  }
-)(withStyles(styles)(SearchUsersForm))
+export default connect(() => ({}), {
+  searchRequest
+})(withStyles(styles)(SearchUsersForm))

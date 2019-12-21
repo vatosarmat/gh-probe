@@ -1,7 +1,8 @@
-import { DeepReadonly } from 'utility-types'
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
 import { Repo } from 'services/api'
 import { omit, keyBy } from 'lodash'
+
+import { DeepReadonly } from 'utils/common'
 
 export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'ABORTED' | 'ERROR' | 'COMPLETE'
 

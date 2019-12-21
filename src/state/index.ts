@@ -11,7 +11,7 @@ import usersSearch, { UsersSearchState, defaultUsersSearchState, usersSearchSaga
 export * from './helpers'
 export { layoutActions, layoutSelectors } from './layout'
 export { userActions } from './user'
-export { usersSearchActions } from './usersSearch'
+export { usersSearchActions, usersSearchSelectors } from './usersSearch'
 export { reposActions } from './repos'
 
 export function* rootSaga() {

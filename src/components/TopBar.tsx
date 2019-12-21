@@ -126,13 +126,15 @@ const TopBar: React.FC<TopBarProps> = ({
     resetState()
   }
 
+  const { title } = appConfig
+
   return (
     <AppBar position="static" color="primary" className={classes.appBar}>
       <IconButton edge="start" color="inherit" aria-label="Menu" onClick={handleDialogOpen}>
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>
-        {appConfig.title}
+        {title}
       </Typography>
       <Dialog open={open} onClose={handleDialogClose}>
         <DialogTitle>Settings</DialogTitle>

@@ -17,3 +17,11 @@ export type Mutable<T> = {
     ? T[P]
     : Mutable<T[P]>
 }
+
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U>
+    ? DeepReadonly<U>[]
+    : T[P] extends (...args: any) => any
+    ? T[P]
+    : DeepReadonly<T[P]>
+}

@@ -1,6 +1,6 @@
-import { DeepReadonly } from 'utility-types'
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
 
+import { DeepReadonly } from 'utils/common'
 import { ReposPerPage, PrimaryColor, defaultPrimaryColor, defaultReposPerPage } from 'config'
 
 export type LayoutState = DeepReadonly<{

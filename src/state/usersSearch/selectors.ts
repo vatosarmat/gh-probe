@@ -1,22 +1,38 @@
-// //searchUsers
-// const { request: searchUsersRequest } = searchUsersActions
+import { orderBy } from 'lodash'
+import { createSelector } from 'reselect'
 
-// export { searchUsersRequest }
+import { UsersSearchState } from './reducer'
 
-// export function getSearchUsersQuery(state: State) {
-//   return state.searchUsers.query
-// }
+export interface IUsersSearchState {
+  readonly usersSearch: UsersSearchState
+}
 
-// export function getSearchUsersResult(state: State) {
-//   return state.searchUsers.result
-// }
+function getSearchQuery(state: IUsersSearchState) {
+  return state.usersSearch.query
+}
 
-// export function getSearchUsersInProgress(state: State) {
-//   return state.searchUsers.inProgress
-// }
+function getSearchResult(state: IUsersSearchState) {
+  return state.usersSearch.result
+}
 
-// export function getSearchUsersError(state: State) {
-//   return state.searchUsers.error
-// }
+const getSearchResultIds = createSelector(getSearchResult, result => orderBy(Object.values(result), 'score', 'desc'))
 
-export const usersSearchSelectors = {}
+function getSearchResultById(state: IUsersSearchState, { id }: { id: number }) {
+  return getSearchResult(state)[id]
+}
+
+function isSearchInProgress(state: IUsersSearchState) {
+  return state.usersSearch.inProgress
+}
+
+function getSearchError(state: IUsersSearchState) {
+  return state.usersSearch.error
+}
+
+export const usersSearchSelectors = {
+  getSearchQuery,
+  getSearchResultIds,
+  getSearchResultById,
+  isSearchInProgress,
+  getSearchError
+}

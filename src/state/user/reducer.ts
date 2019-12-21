@@ -1,7 +1,7 @@
-import { DeepReadonly } from 'utility-types'
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
 import { omit } from 'lodash'
 
+import { DeepReadonly } from 'utils/common'
 import { User } from 'services/api'
 
 export type UserState = DeepReadonly<{
