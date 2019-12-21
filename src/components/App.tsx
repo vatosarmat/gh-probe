@@ -7,7 +7,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import TopBar from './TopBar'
 import SearchRoute from './Search'
-// import UserRoute from './User'
+import UserRoute from './User'
 import { State, layoutSelectors } from 'state'
 import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
 
@@ -53,7 +53,7 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
         <TopBar />
         <BrowserRouter basename={basename}>
           <Switch>
-            {/* <Route path="/users/:username" component={UserRoute} /> */}
+            <Route path="/users/:username" component={UserRoute} />
             <Route component={SearchRoute} />
           </Switch>
         </BrowserRouter>

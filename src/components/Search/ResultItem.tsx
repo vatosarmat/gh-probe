@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import { ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction } from '@material-ui/core'
 import { Group, Person } from '@material-ui/icons'
 
-import { State, usersSearchSelectors } from '../../state'
-import { SearchResultItem, UserBrief } from '../../services/api'
+import { State, usersSearchSelectors } from 'state'
+import { SearchResultItem, UserBrief } from 'services/api'
 
 const { getSearchResultById } = usersSearchSelectors
 

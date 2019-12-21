@@ -1,19 +1,23 @@
-// //fetchUser
+import { UserState } from './reducer'
 
-// const { request: fetchUserRequest } = fetchUserActions
+interface IUserState {
+  user: UserState
+}
 
-// export { fetchUserRequest }
+export function getUserData(state: IUserState) {
+  return state.user.data
+}
 
-// export function getUserData(state: State) {
-//   return state.user.data
-// }
+export function getUserIsFetching(state: IUserState) {
+  return state.user.isFetching
+}
 
-// export function getUserIsFetching(state: State) {
-//   return state.user.isFetching
-// }
+export function getUserError(state: IUserState) {
+  return state.user.error
+}
 
-// export function getUserError(state: State) {
-//   return state.user.error
-// }
-
-export const userSelectors = {}
+export const userSelectors = {
+  getUserData,
+  getUserIsFetching,
+  getUserError
+}

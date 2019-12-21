@@ -19,7 +19,7 @@ import { teal, indigo, purple } from '@material-ui/core/colors'
 import { Menu as MenuIcon } from '@material-ui/icons'
 import { connect } from 'react-redux'
 
-import ArraySelect from './ArraySelect'
+import ArraySelect from './common/ArraySelect'
 import { appConfig, ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'config'
 import { State, layoutSelectors, layoutActions, rootActions } from 'state'
 

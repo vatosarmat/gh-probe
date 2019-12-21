@@ -10,9 +10,9 @@ import usersSearch, { UsersSearchState, defaultUsersSearchState, usersSearchSaga
 
 export * from './helpers'
 export { layoutActions, layoutSelectors } from './layout'
-export { userActions } from './user'
+export { userActions, userSelectors } from './user'
 export { usersSearchActions, usersSearchSelectors } from './usersSearch'
-export { reposActions } from './repos'
+export { reposActions, reposSelectors } from './repos'
 
 export function* rootSaga() {
   yield all([call(reposSaga), call(userSaga), call(usersSearchSaga)])

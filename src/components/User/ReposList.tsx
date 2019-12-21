@@ -22,7 +22,7 @@ import { Circle, SourceFork, Star } from 'mdi-material-ui'
 import React, { ChangeEvent, Component } from 'react'
 import { connect } from 'react-redux'
 
-import ArraySelect from '../ArraySelect'
+import ArraySelect from '../common/ArraySelect'
 import { State, getReposItems, getReposProgress, getReposStatus, getReposError, getReposPerPage } from 'state'
 import { Repo } from 'services/api'
 import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
