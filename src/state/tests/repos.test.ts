@@ -32,6 +32,7 @@ describe('Fetch repos by username', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.repos.username = username
     expectedState.repos.items = keyBy(expectedReposPage.repos, 'id')
     expectedState.repos.status = 'COMPLETE'
 
@@ -65,6 +66,7 @@ describe('Fetch repos by username', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.repos.username = username
     expectedState.repos.items = {
       ...keyBy(fx.reposPagesArray[0].repos, 'id'),
       ...keyBy(fx.reposPagesArray[1].repos, 'id')
@@ -108,6 +110,7 @@ describe('Fetch repos by username', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.repos.username = username
     expectedState.repos.items = keyBy(fx.reposPagesArray[0].repos, 'id')
     expectedState.repos.status = 'ERROR'
     expectedState.repos.error = fx.networkError.toString()
@@ -157,6 +160,7 @@ describe('Fetch repos by username', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.repos.username = username
     expectedState.repos.items = keyBy(fx.reposPagesArray[0].repos, 'id')
     expectedState.repos.status = 'ABORTED'
 
