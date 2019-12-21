@@ -18,9 +18,9 @@ const useStyles = makeStyles(theme => ({
 }))
 
 interface IconWithCaptionProps {
-  readonly icon: React.ComponentType<any>
-  readonly caption: string
-  readonly link?: true
+  icon: React.ComponentType<any>
+  caption: string
+  link?: true
 }
 
 const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, link }) => {

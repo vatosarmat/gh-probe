@@ -1,76 +1,68 @@
 import React, { useEffect } from 'react'
-import { Divider, Box, Typography, CircularProgress, makeStyles, Link, Button } from '@material-ui/core'
-import { Group, LocationOn, Bookmark, ArrowBack } from '@material-ui/icons'
+import { Divider } from '@material-ui/core'
 import { connect } from 'react-redux'
-import { RouteChildrenProps } from 'react-router'
+import { useParams } from 'react-router'
 import { Link as RouterLink } from 'react-router-dom'
+
+import { ErrorBox, ProgressBox } from 'components/common'
+import { User } from 'services/api'
+import { State, ReposFetchStatus, userSelectors, userActions, reposSelectors, reposActions } from 'state'
 
 import UserCard from './UserCard'
 import ReposProgress from './ReposProgress'
 import ReposList from './ReposList'
-import {
-  State,
-  getUserData,
-  getUserIsFetching,
-  getUserError,
-  getReposStatus,
-  fetchUserRequest,
-  fetchReposStart,
-  getReposUsername
-} from 'state'
-import { User } from 'services/api'
-import { ReposFetchStatus } from 'services/repos'
 
-interface UserRouteProps extends RouteChildrenProps<{ username: string }> {
-  readonly fetchUserRequest: typeof fetchUserRequest
-  readonly fetchReposStart: typeof fetchReposStart
+const { getUserData, getUserError, isUserDataFetching } = userSelectors
+const { request: requestUserData } = userActions
+const { getReposFetchStatus } = reposSelectors
+const { start: requestReposData } = reposActions
 
-  readonly reposFetchStatus: ReposFetchStatus
-  readonly reposUsername: string
+interface StateProps {
+  user?: User
+  isUserFetching: boolean
+  error?: string
 
-  readonly isFetching: boolean
-  readonly error: Error | null
+  reposFetchStatus: ReposFetchStatus
 }
 
+interface DispatchProps {
+  requestUserData: typeof requestUserData
+  requestReposData: typeof requestReposData
+}
+
+type UserRouteProps = StateProps & DispatchProps
+
 const UserRoute: React.FC<UserRouteProps> = ({
-  match,
-  isFetching,
+  user,
+  isUserFetching,
   error,
   reposFetchStatus,
-  reposUsername,
-  fetchUserRequest,
-  fetchReposStart
-}) => {
-  useEffect(() => {
-    if (!match) {
-      return
-    }
 
-    if (!user || user.login !== match.params.username) {
-      fetchUserRequest(match.params.username)
-    } else if (reposUsername !== match.params.username) {
-      fetchReposStart(match.params.username)
+  requestUserData,
+  requestReposData
+}) => {
+  const { username } = useParams<{ username: string }>()
+
+  useEffect(() => {
+    if (username) {
+      if (!user || user.login !== username) {
+        requestUserData(username)
+      } else if (reposUsername !== match.params.username) {
+        fetchReposStart(match.params.username)
+      }
     }
-  })
+  }, [username, user])
+
+  if (!username) {
+    return <ErrorBox error={'No such user'} />
+  }
 
   if (error) {
-    return (
-      <Box p={4}>
-        <Typography variant="subtitle1" color="error" display="block">
-          {error.toString()}
-          <br />
-          {error.message}
-        </Typography>
-      </Box>
-    )
+    return <ErrorBox error={error} />
   }
 
   if (isFetching) {
-    return (
-      <Box p={4} textAlign="center">
-        <CircularProgress />
-      </Box>
-    )
+    return <ProgressBox />
   }
 
   if (user && match && user.login === match.params.username) {

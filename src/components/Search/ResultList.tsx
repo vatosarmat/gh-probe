@@ -1,11 +1,27 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { List, Typography, CircularProgress, Box } from '@material-ui/core'
+import { List, Typography, makeStyles } from '@material-ui/core'
+
+import { State, usersSearchSelectors } from 'state'
+import { ProgressBox, ErrorBox } from 'components/common'
 
 import ResultItem from './ResultItem'
-import { State, usersSearchSelectors } from 'state'
 
 const { getSearchQuery, getSearchError, getSearchResultIds, isSearchInProgress } = usersSearchSelectors
+
+const useStyles = makeStyles(theme => ({
+  contentList: {
+    padding: theme.spacing(2)
+  },
+
+  contentEmpty: {
+    padding: theme.spacing(4)
+  },
+
+  queryText: {
+    wordSpacing: '.4rem'
+  }
+}))
 
 interface StateProps {
   query?: string
@@ -17,50 +33,35 @@ interface StateProps {
 type SearchUsersResultProps = StateProps
 
 const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ query, resultIds, inProgress, error }) => {
+  const styles = useStyles()
+
   if (error) {
-    return (
-      <Box p={4}>
-        <Typography variant="subtitle1" color="error" display="block">
-          {error}
-        </Typography>
-      </Box>
-    )
+    return <ErrorBox error={error} />
   }
 
   if (inProgress) {
-    return (
-      <Box p={4} textAlign="center">
-        <CircularProgress />
-      </Box>
-    )
+    return <ProgressBox />
   }
 
   if (resultIds.length) {
     return (
-      <Box p={2}>
+      <div className={styles.contentList}>
         <List>
           {resultIds.map(id => (
             <ResultItem key={id} id={id} />
           ))}
         </List>
-      </Box>
+      </div>
     )
   }
 
   if (query) {
     return (
-      <Box p={4}>
+      <div className={styles.contentEmpty}>
         <Typography variant="subtitle1" color="error" display="block">
-          No results found for query{' '}
-          <span
-            style={{
-              wordSpacing: '.4rem'
-            }}
-          >
-            "{query}"
-          </span>
+          No results found for query <span className={styles.queryText}>"{query}"</span>
         </Typography>
-      </Box>
+      </div>
     )
   }
 

@@ -9,10 +9,10 @@ import user, { UserState, defaultUserState, userSaga } from './user'
 import usersSearch, { UsersSearchState, defaultUsersSearchState, usersSearchSaga } from './usersSearch'
 
 export * from './helpers'
-export { layoutActions, layoutSelectors } from './layout'
-export { userActions, userSelectors } from './user'
-export { usersSearchActions, usersSearchSelectors } from './usersSearch'
-export { reposActions, reposSelectors } from './repos'
+export * from './layout'
+export * from './user'
+export * from './usersSearch'
+export * from './repos'
 
 export function* rootSaga() {
   yield all([call(reposSaga), call(userSaga), call(usersSearchSaga)])

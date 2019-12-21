@@ -8,7 +8,7 @@ export function getUserData(state: IUserState) {
   return state.user.data
 }
 
-export function getUserIsFetching(state: IUserState) {
+export function isUserDataFetching(state: IUserState) {
   return state.user.isFetching
 }
 
@@ -18,6 +18,6 @@ export function getUserError(state: IUserState) {
 
 export const userSelectors = {
   getUserData,
-  getUserIsFetching,
+  isUserDataFetching,
   getUserError
 }

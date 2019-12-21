@@ -1,13 +1,9 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { Typography, makeStyles } from '@material-ui/core'
 import { Group, LocationOn, Bookmark } from '@material-ui/icons'
 
 import IconWithCaption from './IconWithCaption'
-import { State, userSelectors } from 'state'
 import { User } from 'services/api'
-
-const { getUserData } = userSelectors
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,11 +37,9 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-interface StateProps {
+interface UserCardProps {
   user?: User
 }
-
-type UserCardProps = StateProps
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
   const styles = useStyles()
@@ -81,6 +75,4 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
   )
 }
 
-export default connect<StateProps, {}, {}, State>(state => ({
-  user: getUserData(state)
-}))(UserCard)
+export default UserCard
