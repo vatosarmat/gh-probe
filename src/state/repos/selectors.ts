@@ -1,39 +1,49 @@
+import { createSelector } from 'reselect'
+import { chain } from 'lodash'
+
 import { ReposState } from './reducer'
+import { Repo } from 'services/api'
 
 export interface IReposState {
   readonly repos: ReposState
 }
 
-export function getReposFetchStatus(state: IReposState) {
+function getReposFetchStatus(state: IReposState) {
   return state.repos.status
 }
 
-export const reposSelectors = {
-  getReposFetchStatus
-  // getReposPerPage,
-  // getPrimaryColor
-}
-/*
-
-const { start: fetchReposStart, abort: fetchReposAbort } = fetchReposActions
-
-export { fetchReposStart, fetchReposAbort }
-
-export function getReposUsername(state: State) {
+function getReposUsername(state: IReposState) {
   return state.repos.username
 }
 
-export function getReposItems(state: State) {
-  return state.repos.items
+function getReposError(state: IReposState) {
+  return state.repos.error
 }
 
-export function getReposProgress(state: State) {
+function getReposFetchProgress(state: IReposState) {
   return state.repos.progress
 }
 
-
-
-export function getReposError(state: State) {
-  return state.repos.error
+function getReposItems(state: IReposState) {
+  return state.repos.items
 }
-*/
+
+const getReposIds = createSelector(getReposItems, items =>
+  chain(Object.values(items))
+    .sortBy('name')
+    .map('id')
+    .value()
+)
+
+function getRepoById(state: IReposState, { id }: { id: number }): Repo | undefined {
+  return getReposItems(state)[id]
+}
+
+export const reposSelectors = {
+  getReposFetchStatus,
+  getReposUsername,
+  getReposError,
+  getReposFetchProgress,
+  getReposIds,
+  getRepoById
+}

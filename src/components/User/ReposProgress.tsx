@@ -1,65 +1,61 @@
-import {
-  Box,
-  CircularProgress,
-  LinearProgress,
-  Typography,
-  Button,
-  makeStyles
-} from '@material-ui/core'
+import { LinearProgress, Typography, Button, makeStyles } from '@material-ui/core'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { State, fetchReposAbort, getReposProgress } from 'state'
-import { ReposFetchProgress } from 'services/repos'
+import { ProgressBox } from 'components/common'
+import { State, ReposFetchProgress, reposActions, reposSelectors } from 'state'
+
+const { abort: abortReposFetch } = reposActions
+const { getReposFetchProgress } = reposSelectors
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    padding: theme.spacing(4),
+    textAlign: 'center'
+  },
+
   abortButton: {
     marginTop: theme.spacing(2)
   }
 }))
 
-interface ReposProgressProps {
-  readonly progress: ReposFetchProgress | null
-
-  readonly fetchReposAbort: typeof fetchReposAbort
+interface StateProps {
+  progress?: ReposFetchProgress
 }
 
-function ReposProgress({ progress, fetchReposAbort }: ReposProgressProps) {
+interface DispatchProps {
+  abortReposFetch: typeof abortReposFetch
+}
+
+type ReposProgressProps = StateProps & DispatchProps
+
+const ReposProgress: React.FC<ReposProgressProps> = ({ progress, abortReposFetch }) => {
   const styles = useStyles()
 
   function handleAbortClick() {
-    fetchReposAbort()
+    abortReposFetch()
   }
 
   if (progress) {
     return (
-      <Box textAlign="center" py={4} px={4}>
+      <div className={styles.root}>
         <Typography variant="caption" gutterBottom>
           Loading repos: {progress.current + '/' + progress.total}
         </Typography>
         <LinearProgress variant="determinate" value={(progress.current * 100) / progress.total} />
-        <Button
-          size="small"
-          variant="outlined"
-          onClick={handleAbortClick}
-          className={styles.abortButton}
-        >
+        <Button size="small" variant="outlined" onClick={handleAbortClick} className={styles.abortButton}>
           Abort
         </Button>
-      </Box>
+      </div>
     )
   }
 
-  return (
-    <Box textAlign="center" py={4}>
-      <CircularProgress />
-    </Box>
-  )
+  return <ProgressBox />
 }
 
-export default connect(
-  (state: State) => ({
-    progress: getReposProgress(state)
+export default connect<StateProps, DispatchProps, {}, State>(
+  state => ({
+    progress: getReposFetchProgress(state)
   }),
-  { fetchReposAbort }
+  { abortReposFetch }
 )(ReposProgress)

@@ -2,19 +2,19 @@ import React, { useEffect } from 'react'
 import { Divider } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { useParams } from 'react-router'
-import { Link as RouterLink } from 'react-router-dom'
 
 import { ErrorBox, ProgressBox } from 'components/common'
 import { User } from 'services/api'
 import { State, ReposFetchStatus, userSelectors, userActions, reposSelectors, reposActions } from 'state'
 
+import BackButton from './BackButton'
 import UserCard from './UserCard'
 import ReposProgress from './ReposProgress'
 import ReposList from './ReposList'
 
 const { getUserData, getUserError, isUserDataFetching } = userSelectors
 const { request: requestUserData } = userActions
-const { getReposFetchStatus } = reposSelectors
+const { getReposFetchStatus, getReposUsername } = reposSelectors
 const { start: requestReposData } = reposActions
 
 interface StateProps {
@@ -23,6 +23,7 @@ interface StateProps {
   error?: string
 
   reposFetchStatus: ReposFetchStatus
+  reposUsername?: string
 }
 
 interface DispatchProps {
@@ -37,23 +38,26 @@ const UserRoute: React.FC<UserRouteProps> = ({
   isUserFetching,
   error,
   reposFetchStatus,
+  reposUsername,
 
   requestUserData,
   requestReposData
 }) => {
-  const { username } = useParams<{ username: string }>()
+  const { username: paramUsername } = useParams<{ username: string }>()
+
+  const hasUserFetched = user && user.login === paramUsername
 
   useEffect(() => {
-    if (username) {
-      if (!user || user.login !== username) {
-        requestUserData(username)
-      } else if (reposUsername !== match.params.username) {
-        fetchReposStart(match.params.username)
+    if (paramUsername) {
+      if (!hasUserFetched) {
+        requestUserData(paramUsername)
+      } else if (reposUsername !== paramUsername) {
+        requestReposData(paramUsername)
       }
     }
-  }, [username, user])
+  }, [paramUsername, hasUserFetched, reposUsername, requestUserData, requestReposData])
 
-  if (!username) {
+  if (!paramUsername) {
     return <ErrorBox error={'No such user'} />
   }
 
@@ -61,11 +65,11 @@ const UserRoute: React.FC<UserRouteProps> = ({
     return <ErrorBox error={error} />
   }
 
-  if (isFetching) {
+  if (isUserFetching) {
     return <ProgressBox />
   }
 
-  if (user && match && user.login === match.params.username) {
+  if (hasUserFetched) {
     return (
       <>
         <BackButton />
@@ -78,13 +82,13 @@ const UserRoute: React.FC<UserRouteProps> = ({
   return null
 }
 
-export default connect(
-  (state: State) => ({
+export default connect<StateProps, DispatchProps, {}, State>(
+  state => ({
     user: getUserData(state),
-    isFetching: getUserIsFetching(state),
+    isUserFetching: isUserDataFetching(state),
     error: getUserError(state),
-    reposFetchStatus: getReposStatus(state),
+    reposFetchStatus: getReposFetchStatus(state),
     reposUsername: getReposUsername(state)
   }),
-  { fetchUserRequest, fetchReposStart }
+  { requestUserData, requestReposData }
 )(UserRoute)
