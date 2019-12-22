@@ -19,10 +19,18 @@ import {
 import React, { ChangeEvent, Component } from 'react'
 import { connect } from 'react-redux'
 
-import ArraySelect from '../common/ArraySelect'
-import { State, getReposItems, getReposProgress, getReposStatus, getReposError, getReposPerPage } from 'state'
+import ArraySelect from 'components/common/ArraySelect'
+import {
+  ReposFetchStatus,
+  ReposFetchProgress,
+  State,
+  getReposItems,
+  getReposProgress,
+  getReposStatus,
+  getReposError,
+  getReposPerPage
+} from 'state'
 import { Repo } from 'services/api'
-import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
 
 const styles = (theme: Theme) =>
   createStyles({

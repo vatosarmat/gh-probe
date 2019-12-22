@@ -10,7 +10,7 @@ import { State, ReposFetchStatus, userSelectors, userActions, reposSelectors, re
 import BackButton from './BackButton'
 import UserCard from './UserCard'
 import ReposProgress from './ReposProgress'
-import ReposList from './ReposList'
+import ReposView from './ReposView'
 
 const { getUserData, getUserError, isUserDataFetching } = userSelectors
 const { request: requestUserData } = userActions
