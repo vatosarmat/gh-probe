@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Container, createMuiTheme, createStyles, makeStyles, Paper, Theme } from '@material-ui/core'
+import { Container, createMuiTheme, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
@@ -13,15 +13,21 @@ import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
 
 const { getPrimaryColor } = layoutSelectors
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    container: {
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-      padding: 0
+const useStyles = makeStyles(theme => ({
+  container: {
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    padding: 0
+  },
+
+  '@global': {
+    'ul, li': {
+      padding: 0,
+      margin: 0,
+      listStyleType: 'none'
     }
-  })
-)
+  }
+}))
 
 type ThemeDict = Record<PrimaryColor, Theme>
 

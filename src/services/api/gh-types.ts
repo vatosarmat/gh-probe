@@ -1,6 +1,6 @@
-export const uerTypeTuple = ['User', 'Organization'] as const
+export const userTypeTuple = ['User', 'Organization'] as const
 
-export type UserType = typeof uerTypeTuple[number]
+export type UserType = typeof userTypeTuple[number]
 
 export interface UserBrief {
   id: number

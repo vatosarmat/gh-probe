@@ -2,7 +2,7 @@ import React from 'react'
 import { Typography, makeStyles } from '@material-ui/core'
 import { Group, LocationOn, Bookmark } from '@material-ui/icons'
 
-import IconWithCaption from './IconWithCaption'
+import IconWithText from './IconWithText'
 import { User } from 'services/api'
 
 const useStyles = makeStyles(theme => ({
@@ -64,9 +64,9 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
             </Typography>
           )}
           <div className={styles.info}>
-            {company && <IconWithCaption icon={Group} caption={company} />}
-            {location && <IconWithCaption icon={LocationOn} caption={location} />}
-            {blog && <IconWithCaption icon={Bookmark} caption={blog} link />}
+            {company && <IconWithText icon={Group} caption={company} />}
+            {location && <IconWithText icon={LocationOn} caption={location} />}
+            {blog && <IconWithText icon={Bookmark} caption={blog} link />}
           </div>
         </div>
       </div>

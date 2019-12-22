@@ -15,10 +15,7 @@ import {
   withStyles,
   WithStyles
 } from '@material-ui/core'
-import cuid from 'cuid'
-import dayjs from 'dayjs'
-import calendar from 'dayjs/plugin/calendar'
-import { Circle, SourceFork, Star } from 'mdi-material-ui'
+
 import React, { ChangeEvent, Component } from 'react'
 import { connect } from 'react-redux'
 
@@ -26,9 +23,6 @@ import ArraySelect from '../common/ArraySelect'
 import { State, getReposItems, getReposProgress, getReposStatus, getReposError, getReposPerPage } from 'state'
 import { Repo } from 'services/api'
 import { ReposFetchStatus, ReposFetchProgress } from 'services/repos'
-import getLangColor from 'services/lang-color'
-
-dayjs.extend(calendar)
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -40,42 +34,8 @@ const styles = (theme: Theme) =>
       marginBottom: theme.spacing(2)
     },
 
-    li: {
-      listStyleType: 'none'
-    },
-
-    capitalize: {
-      textTransform: 'capitalize'
-    },
-
-    card: {
-      marginLeft: theme.spacing(-2),
-      marginRight: theme.spacing(-2)
-    },
-
-    cardContent: {
-      paddingTop: theme.spacing(4),
-
-      '&:last-child': {
-        paddingBottom: theme.spacing(4)
-      }
-    },
-
-    archivedChip: {
-      borderRadius: 4,
-      marginLeft: theme.spacing(1)
-    },
-
     pagButtons: {
       flexGrow: 1
-    },
-
-    repoInfoIcon: {
-      marginRight: theme.spacing(0.5)
-    },
-
-    repoInfoCaption: {
-      marginRight: theme.spacing(3)
     },
 
     ownerAvatar: {
@@ -92,14 +52,12 @@ interface ReposListProps extends WithStyles<typeof styles> {
   readonly error: Error | null
 }
 
-//could be Symbol, but MenuItem requires string
-const ALL_LANGUAGES = cuid()
-const NO_LANGUAGE = cuid()
-type Language = string | typeof ALL_LANGUAGES | typeof NO_LANGUAGE
+const ALL_LANGUAGES = 'ALL_LANGUAGES'
+const NO_LANGUAGE = 'NO_LANGUAGE'
 
 interface ReposListState {
   page: number
-  language: Language
+  language: string
   starSort: boolean
 }
 
@@ -147,67 +105,6 @@ class ReposList extends Component<ReposListProps, ReposListState> {
 
   static hasNextPage(length: number, page: number, perPage: number) {
     return (page + 1) * perPage < length
-  }
-
-  renderRepoCard(rep: Repo) {
-    const { classes } = this.props
-    const { name, description, language, stargazers_count, forks_count, updated_at, html_url, archived } = rep
-
-    return (
-      <Card elevation={0} className={classes.card}>
-        <CardActionArea disableRipple component="a" href={html_url} target="_blank">
-          <CardContent className={classes.cardContent}>
-            <Box display="flex" alignItems="center">
-              <Typography variant="h6">{name}</Typography>
-              {archived && (
-                <Chip
-                  label="archived"
-                  className={classes.archivedChip}
-                  color="secondary"
-                  variant="outlined"
-                  size="small"
-                />
-              )}
-            </Box>
-            <Typography color="textSecondary">{description}</Typography>
-            <Box display="flex" alignItems="center" pt={2}>
-              {language && (
-                <>
-                  <Circle fontSize="inherit" className={classes.repoInfoIcon} htmlColor={getLangColor(language)} />
-                  <Typography variant="caption" className={classes.repoInfoCaption}>
-                    {language}
-                  </Typography>
-                </>
-              )}
-              {stargazers_count > 0 ? (
-                <>
-                  <Star fontSize="inherit" className={classes.repoInfoIcon} htmlColor="gray" />
-                  <Typography variant="caption" className={classes.repoInfoCaption}>
-                    {stargazers_count}
-                  </Typography>
-                </>
-              ) : null}
-              {forks_count > 0 ? (
-                <>
-                  <SourceFork fontSize="inherit" className={classes.repoInfoIcon} htmlColor="gray" />
-                  <Typography variant="caption" className={classes.repoInfoCaption}>
-                    {forks_count}
-                  </Typography>
-                </>
-              ) : null}
-              {
-                <Typography variant="caption" className={classes.repoInfoCaption}>
-                  Updated on{' '}
-                  {dayjs(updated_at).calendar(undefined, {
-                    sameElse: 'MMM D, YYYY'
-                  })}
-                </Typography>
-              }
-            </Box>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    )
   }
 
   renderRepoListControl(hasStars: boolean, languages: Language[], pagFrom: number, pagTo: number, total: number) {

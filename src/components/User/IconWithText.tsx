@@ -17,13 +17,13 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-interface IconWithCaptionProps {
+interface IconWithTextProps {
   icon: React.ComponentType<any>
   caption: string
   link?: true
 }
 
-const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, link }) => {
+const IconWithText: React.FC<IconWithTextProps> = ({ icon: Icon, caption, link }) => {
   const styles = useStyles()
 
   return (
@@ -42,4 +42,4 @@ const IconWithCaption: React.FC<IconWithCaptionProps> = ({ icon: Icon, caption, 
   )
 }
 
-export default IconWithCaption
+export default IconWithText
