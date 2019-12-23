@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { connect } from 'react-redux'
-import { Typography, FormControlLabel, Checkbox, makeStyles } from '@material-ui/core'
+import { Typography, Checkbox, makeStyles } from '@material-ui/core'
 
 import { State, ReposFetchStatus, ANY_LANGUAGE, NO_LANGUAGE, LanguageInfo, reposSelectors } from 'state'
 import ArraySelect from 'components/common/ArraySelect'
@@ -11,18 +11,29 @@ const { getReposFetchStatus, getReposError, getLanguageInfos, haveReposStars } =
 
 const useStyles = makeStyles(theme => ({
   root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(4),
+    paddingLeft: theme.spacing(2.5),
+    paddingRight: theme.spacing(2.5),
+    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(7)
   },
 
   languageSelect: {
-    marginBottom: theme.spacing(1)
+    marginRight: theme.spacing(5)
   },
 
   sortByStarsFormControl: {
-    marginBottom: theme.spacing(2)
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  additionalMessage: {
+    marginBottom: theme.spacing(1)
+  },
+
+  controls: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: theme.spacing(3)
   }
 }))
 
@@ -33,13 +44,14 @@ interface ErrorMessageProps {
   error?: string
 }
 
-const ErrorMessage = React.memo<ErrorMessageProps>(({ show, error }) =>
-  show ? (
-    <Typography variant="subtitle1" color="error" display="block">
+const ErrorMessage = React.memo<ErrorMessageProps>(({ show, error }) => {
+  const styles = useStyles()
+  return show ? (
+    <Typography variant="subtitle1" color="error" display="block" className={styles.additionalMessage}>
       {error ? <>{error.toString()}</> : 'Unknown error'}
     </Typography>
   ) : null
-)
+})
 
 //
 
@@ -48,9 +60,10 @@ interface WarningMessageProps {
   wasError: boolean
 }
 
-const WarningMessage = React.memo<WarningMessageProps>(({ wasAborted, wasError }) =>
-  wasAborted || wasError ? (
-    <Typography component="em" variant="caption" display="block" gutterBottom>
+const WarningMessage = React.memo<WarningMessageProps>(({ wasAborted, wasError }) => {
+  const styles = useStyles()
+  return wasAborted || wasError ? (
+    <Typography component="em" variant="caption" display="block" className={styles.additionalMessage}>
       {wasAborted
         ? 'Some data may be missing due to request interruption'
         : wasError
@@ -58,7 +71,7 @@ const WarningMessage = React.memo<WarningMessageProps>(({ wasAborted, wasError }
         : null}
     </Typography>
   ) : null
-)
+})
 
 //
 
@@ -103,25 +116,24 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
       <ErrorMessage show={reposFetchStatus === 'ERROR'} error={error} />
       <WarningMessage wasAborted={reposFetchStatus === 'ABORTED'} wasError={reposFetchStatus === 'ERROR'} />
 
-      <ArraySelect
-        className={styles.languageSelect}
-        prefix="Language"
-        suffix={`${repoCount} repos`}
-        value={selectedLanguageIdx}
-        array={languagesIndexes}
-        getLabel={getLabel}
-        onChange={setSelectedLanguageIdx}
-      />
-
-      {haveStars && (
-        <FormControlLabel
-          className={styles.sortByStarsFormControl}
-          control={
-            <Checkbox color="primary" checked={sortByStars} onChange={handleSortByStarsChange} value="sortByStars" />
-          }
-          label="Sort by stars"
+      <div className={styles.controls}>
+        <ArraySelect
+          className={styles.languageSelect}
+          prefix="Language"
+          suffix={`${repoCount} repos`}
+          value={selectedLanguageIdx}
+          array={languagesIndexes}
+          getLabel={getLabel}
+          onChange={setSelectedLanguageIdx}
         />
-      )}
+
+        {haveStars && (
+          <div className={styles.sortByStarsFormControl}>
+            <Checkbox color="primary" checked={sortByStars} onChange={handleSortByStarsChange} value="sortByStars" />
+            <Typography>Sort by stars</Typography>
+          </div>
+        )}
+      </div>
 
       <RepoList
         language={language}

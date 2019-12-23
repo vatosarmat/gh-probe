@@ -7,7 +7,7 @@ import { User } from 'services/api'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(4)
+    padding: theme.spacing(2.5)
   },
 
   content: {
