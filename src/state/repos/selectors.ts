@@ -43,6 +43,8 @@ export interface LanguageInfo {
 export interface ReposIdsPage {
   from: number
   to: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
   ids: number[]
 }
 
@@ -65,7 +67,7 @@ const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, Langu
         langItems.push({ language, repoCount })
         return langItems
       }, [])
-      .orderBy('count', 'desc') //order by count, ANY_LANGUAGE will be the first
+      .orderBy('repoCount', 'desc') //order by count, ANY_LANGUAGE should be the first
       .value()
   }
 )
@@ -104,8 +106,12 @@ const getReposIdsPage = createSelector<
 >([getReposByLanguage, getPage, getReposPerPage], (repos, page, reposPerPage) => {
   const from = page * reposPerPage
   const to = Math.min((page + 1) * reposPerPage, repos.length)
+  const hasPrevPage = page > 0
+  const hasNextPage = to < repos.length
 
   return {
+    hasPrevPage,
+    hasNextPage,
     from,
     to,
     ids: map(repos.slice(from, to), 'id')

@@ -2,12 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Typography, ButtonGroup, Button, Divider, makeStyles } from '@material-ui/core'
 
-import { State, RepoProps, ReposIdsPage, layoutSelectors, reposSelectors } from 'state'
+import { State, RepoProps, ReposIdsPage, reposSelectors } from 'state'
 
 import RepoCard from './RepoCard'
 
 const { getReposIdsPage } = reposSelectors
-const { getReposPerPage } = layoutSelectors
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -20,7 +19,6 @@ const useStyles = makeStyles(theme => ({
 }))
 
 interface StateProps {
-  reposPerPage: number
   idsPage: ReposIdsPage
 }
 
@@ -31,29 +29,31 @@ interface OwnProps extends RepoProps {
 
 type RepoListProps = StateProps & OwnProps
 
-const RepoList: React.FC<RepoListProps> = ({ reposPerPage, idsPage, page, onPrevClick, onNextClick }) => {
+const RepoList: React.FC<RepoListProps> = ({
+  idsPage: { ids, from, to, hasPrevPage, hasNextPage },
+  onPrevClick,
+  onNextClick
+}) => {
   const styles = useStyles()
 
-  const length = idsPage.ids.length
-  const hasPrevPage = page <= 0
-  const hasNextPage = (page + 1) * reposPerPage < length
+  const hasOtherPages = hasPrevPage || hasNextPage
 
   return (
     <>
-      {length > reposPerPage && (
+      {hasOtherPages && (
         <Typography variant="body2">
-          Showing {idsPage.from + 1} to {idsPage.to}
+          Showing {from + 1} to {to}
         </Typography>
       )}
       <ul className={styles.list}>
-        {idsPage.ids.map(repoId => (
+        {ids.map(repoId => (
           <li key={repoId}>
             <RepoCard id={repoId} />
             <Divider />
           </li>
         ))}
       </ul>
-      {length > reposPerPage && (
+      {hasOtherPages && (
         <ButtonGroup fullWidth={true} className={styles.buttonGroup}>
           <Button disabled={!hasPrevPage} onClick={hasPrevPage ? onPrevClick : undefined}>
             Previous
@@ -68,6 +68,5 @@ const RepoList: React.FC<RepoListProps> = ({ reposPerPage, idsPage, page, onPrev
 }
 
 export default connect<StateProps, {}, OwnProps, State>((state, props) => ({
-  reposPerPage: getReposPerPage(state),
   idsPage: getReposIdsPage(state, props)
 }))(RepoList)

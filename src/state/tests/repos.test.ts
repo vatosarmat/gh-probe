@@ -184,4 +184,39 @@ describe('Fetch repos by username', () => {
       ]
     })
   })
+
+  it('New request overrides results of the previous', () => {
+    const prevUsername = fx.usersArray[1].name!
+    const newUsername = fx.usersArray[0].name!
+    const expectedReposPage = fx.singleReposPage
+    const pager = new ReposPager('this is mock')
+
+    const nextResult: IteratorResult<ReposPage, ReposPage> = {
+      done: true,
+      value: expectedReposPage
+    }
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResult)
+    ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+
+    const initialState = fx.defaultState as Mutable<State>
+    initialState.repos.username = prevUsername
+    initialState.repos.items = {
+      ...keyBy(fx.reposPagesArray[0].repos, 'id'),
+      ...keyBy(fx.reposPagesArray[1].repos, 'id')
+    }
+
+    const expectedState = cloneDeep(initialState)
+    expectedState.repos.username = newUsername
+    expectedState.repos.items = keyBy(expectedReposPage.repos, 'id')
+    expectedState.repos.status = 'COMPLETE'
+
+    return expectSagaState({
+      initialState,
+      dispatchActions: [reposActions.start(newUsername)],
+      expectedState,
+      expectedEffects: [
+        [call(api.fetchRepos, newUsername), call(pager.next), put(reposActions.complete(expectedReposPage.repos))]
+      ]
+    })
+  })
 })

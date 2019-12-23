@@ -82,10 +82,7 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
       {
         ...state,
         status: 'COMPLETE' as const,
-        items: {
-          ...state.items,
-          ...keyBy(items, 'id')
-        }
+        items: keyBy(items, 'id')
       },
       ['progress', 'error']
     )
