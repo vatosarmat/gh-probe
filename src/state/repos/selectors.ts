@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { chain, orderBy, map } from 'lodash'
+import { some, chain, orderBy, map } from 'lodash'
 
 import { Repo } from 'services/api'
 
@@ -29,31 +29,48 @@ function getReposFetchProgress(state: IReposState) {
 }
 
 //
-export interface ReposListProps {
+export interface RepoProps {
   sortByStars: boolean
   language: string
   page: number
+}
+
+export interface LanguageInfo {
+  language: string
+  repoCount: number
+}
+
+export interface ReposIdsPage {
+  from: number
+  to: number
+  ids: number[]
 }
 
 export const NO_LANGUAGE = 'NO_LANGUAGE'
 export const ANY_LANGUAGE = 'ANY_LANGUAGE'
 
 const getReposRecord = (state: IReposState) => state.repos.items
-const isSortByStars = (state: IReposState, props: ReposListProps) => props.sortByStars
-const getLanguage = (state: IReposState, props: ReposListProps) => props.language
-const getPage = (state: IReposState, props: ReposListProps) => props.page
+const isSortByStars = (state: IReposState, props: RepoProps) => props.sortByStars
+const getLanguage = (state: IReposState, props: RepoProps) => props.language
+const getPage = (state: IReposState, props: RepoProps) => props.page
 
-const getReposLanguages = createSelector<IReposState, Record<number, Repo>, string[]>(getReposRecord, reposRecord =>
-  chain(reposRecord)
-    .countBy(repo => repo.language ?? NO_LANGUAGE)
-    .assign({ [ANY_LANGUAGE]: Infinity })
-    .entries() //[language, count]
-    .orderBy(1, 'desc') //order by count, ANY_LANGUAGE will be the first
-    .map(0) //take language
-    .value()
+const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, LanguageInfo[]>(
+  getReposRecord,
+  reposRecord => {
+    const length = Object.keys(reposRecord).length
+    return chain(reposRecord)
+      .countBy(repo => repo.language ?? NO_LANGUAGE)
+      .assign({ [ANY_LANGUAGE]: length })
+      .reduce<LanguageInfo[]>((langItems, repoCount, language) => {
+        langItems.push({ language, repoCount })
+        return langItems
+      }, [])
+      .orderBy('count', 'desc') //order by count, ANY_LANGUAGE will be the first
+      .value()
+  }
 )
 
-const getReposSorted = createSelector<IReposState, ReposListProps, Record<number, Repo>, boolean, Repo[]>(
+const getReposSorted = createSelector<IReposState, RepoProps, Record<number, Repo>, boolean, Repo[]>(
   [getReposRecord, isSortByStars],
   (reposRecord, sortByStars) =>
     sortByStars
@@ -61,7 +78,11 @@ const getReposSorted = createSelector<IReposState, ReposListProps, Record<number
       : orderBy(Object.values(reposRecord), 'name', 'asc')
 )
 
-const getReposByLanguage = createSelector<IReposState, ReposListProps, Repo[], string, Repo[]>(
+const haveReposStars = createSelector<IReposState, Record<number, Repo>, boolean>(getReposRecord, reposRecord =>
+  some(reposRecord, 'stargazers_count')
+)
+
+const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string, Repo[]>(
   [getReposSorted, getLanguage],
   (repos, language) =>
     language === ANY_LANGUAGE
@@ -69,22 +90,27 @@ const getReposByLanguage = createSelector<IReposState, ReposListProps, Repo[], s
       : repos.filter(repo => repo.language === language || (language === NO_LANGUAGE && !repo.language))
 )
 
-const getReposPage = createSelector<
+const getReposIdsPage = createSelector<
   IReposState,
   IReposState,
   ILayoutState,
-  ReposListProps,
-  ReposListProps,
+  RepoProps,
+  RepoProps,
   {},
   Repo[],
   number,
   number,
-  Repo[]
->([getReposByLanguage, getPage, getReposPerPage], (repos, page, reposPerPage) =>
-  repos.slice(page * reposPerPage, Math.min((page + 1) * reposPerPage, repos.length))
-)
+  ReposIdsPage
+>([getReposByLanguage, getPage, getReposPerPage], (repos, page, reposPerPage) => {
+  const from = page * reposPerPage
+  const to = Math.min((page + 1) * reposPerPage, repos.length)
 
-const getReposIds = createSelector(getReposPage, repos => map(repos, 'id'))
+  return {
+    from,
+    to,
+    ids: map(repos.slice(from, to), 'id')
+  }
+})
 
 function getRepoById(state: IReposState, { id }: { id: number }): Repo | undefined {
   return getReposRecord(state)[id]
@@ -95,7 +121,8 @@ export const reposSelectors = {
   getReposUsername,
   getReposError,
   getReposFetchProgress,
-  getReposIds,
-  getReposLanguages,
-  getRepoById
+  getReposIdsPage,
+  getLanguageInfos,
+  getRepoById,
+  haveReposStars
 }

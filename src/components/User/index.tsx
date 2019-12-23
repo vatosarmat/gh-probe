@@ -75,7 +75,7 @@ const UserRoute: React.FC<UserRouteProps> = ({
         <BackButton />
         <UserCard user={user} />
         <Divider />
-        {reposFetchStatus === 'IDLE' || reposFetchStatus === 'IN_PROGRESS' ? <ReposProgress /> : <ReposList />}
+        {reposFetchStatus === 'IDLE' || reposFetchStatus === 'IN_PROGRESS' ? <ReposProgress /> : <ReposView />}
       </>
     )
   }

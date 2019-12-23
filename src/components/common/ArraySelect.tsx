@@ -1,15 +1,7 @@
-import {
-  FormControl,
-  makeStyles,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  StandardProps,
-  Typography
-} from '@material-ui/core'
+import React, { ChangeEvent } from 'react'
+import { FormControl, makeStyles, MenuItem, OutlinedInput, Select, StandardProps, Typography } from '@material-ui/core'
 import { FormControlProps } from '@material-ui/core/FormControl'
 import clsx from 'clsx'
-import React, { ChangeEvent } from 'react'
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -31,8 +23,7 @@ const useStyles = makeStyles(theme => ({
 
 type Item = string | number
 
-interface ArraySelectProps<T extends Item>
-  extends StandardProps<FormControlProps, 'root', 'onChange'> {
+interface ArraySelectProps<T extends Item> extends StandardProps<FormControlProps, 'root', 'onChange'> {
   prefix?: string
   suffix?: string
 
@@ -40,6 +31,7 @@ interface ArraySelectProps<T extends Item>
   value: T
   onChange: (value: T) => void
   getLabel?: (value: T) => string
+  getKey?: (value: T) => string
 }
 
 export default function ArraySelect<T extends Item>({
@@ -47,15 +39,14 @@ export default function ArraySelect<T extends Item>({
   array,
   onChange,
   getLabel = v => v.toString(),
+  getKey = v => v.toString(),
   prefix,
   suffix,
   className
 }: ArraySelectProps<T>) {
   const classes = useStyles({})
 
-  function handleChange({
-    target: { value }
-  }: ChangeEvent<{ name?: string | undefined; value: unknown }>) {
+  function handleChange({ target: { value } }: ChangeEvent<{ name?: string | undefined; value: unknown }>) {
     onChange(value as T)
   }
 
@@ -68,8 +59,8 @@ export default function ArraySelect<T extends Item>({
         input={<OutlinedInput labelWidth={0} classes={{ input: classes.input }} />}
         className={classes.select}
       >
-        {array.map((item, idx) => (
-          <MenuItem key={idx} value={item}>
+        {array.map(item => (
+          <MenuItem key={getKey(item)} value={item}>
             {getLabel(item)}
           </MenuItem>
         ))}
