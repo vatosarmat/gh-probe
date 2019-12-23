@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Container, createMuiTheme, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 
 import TopBar from './TopBar'
 import SearchRoute from './Search'
@@ -60,7 +60,8 @@ const App: React.FC<AppProps> = ({ primaryColor }) => {
         <BrowserRouter basename={basename}>
           <Switch>
             <Route path="/users/:username" component={UserRoute} />
-            <Route component={SearchRoute} />
+            <Route path="/search" component={SearchRoute} />
+            <Redirect to="/search" />
           </Switch>
         </BrowserRouter>
       </Container>
