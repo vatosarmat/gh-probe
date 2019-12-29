@@ -2,7 +2,6 @@
   "name": "gh-probe",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://vatosarmat.github.io/gh-probe",
   "dependencies": {
     "@material-ui/core": "^4.8.0",
     "@material-ui/icons": "^4.5.1",
@@ -37,14 +36,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:coverage": "yarn test --coverage --watchAll=false",
     "test:coverage_report": "yarn test:coverage --coverageReporters=text-lcov | coveralls",
-    "build:surge": "PUBLIC_URL=http://gh-probe.surge.sh yarn build",
-    "deploy": "yarn build && gh-pages -d ./build",
-    "deploy:surge": "yarn build:surge && mv ./build/index.html ./build/200.html && surge ./build --domain gh-probe.surge.sh"
+    "build:gh-pages": "PUBLIC_URL=https://vatosarmat.github.io/gh-probe react-scripts build",
+    "build:surge": "PUBLIC_URL=http://gh-probe.surge.sh yarn build && mv ./build/index.html ./build/200.html",
+    "deploy:gh-pages": "yarn build:gh-pages && gh-pages -d ./build",
+    "deploy:surge": "yarn build:surge && surge ./build --domain gh-probe.surge.sh"
   },
   "eslintConfig": {
     "extends": "react-app"

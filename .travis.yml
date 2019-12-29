@@ -7,14 +7,11 @@ install:
   - yarn install
 
 script:
-  - yarn build
+  - yarn build:surge
   - yarn test:coverage_report
 
 deploy:
-  provider: pages
+  provider: surge
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  keep_history: true
-  local_dir: build
-  on:
-    branch: master
+  project: ./build
+  domain: gh-probe.surge.sh
