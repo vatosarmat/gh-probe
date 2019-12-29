@@ -42,9 +42,9 @@
     "eject": "react-scripts eject",
     "test:coverage": "yarn test --coverage --watchAll=false",
     "test:coverage_report": "yarn test:coverage --coverageReporters=text-lcov | coveralls",
-    "build:surge": "PUBLIC_URL=gh-pages.surge.sh yarn build",
+    "build:surge": "PUBLIC_URL=http://gh-probe.surge.sh yarn build",
     "deploy": "yarn build && gh-pages -d ./build",
-    "deploy:surge": "yarn build:surge && mv ./build/index.html ./build/200.html && surge ./build --domain gh-pages.surge.sh"
+    "deploy:surge": "yarn build:surge && mv ./build/index.html ./build/200.html && surge ./build --domain gh-probe.surge.sh"
   },
   "eslintConfig": {
     "extends": "react-app"
