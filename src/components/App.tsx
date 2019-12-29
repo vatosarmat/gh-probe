@@ -9,7 +9,7 @@ import TopBar from './TopBar'
 import SearchRoute from './Search'
 import UserRoute from './User'
 import { State, layoutSelectors } from 'state'
-import { appConfig, PrimaryColor, primaryColorTuple } from 'config'
+import { PrimaryColor, primaryColorTuple } from 'config'
 
 const { getPrimaryColor } = layoutSelectors
 
@@ -51,13 +51,12 @@ type AppProps = StateProps
 
 const App: React.FC<AppProps> = ({ primaryColor }) => {
   const classes = useStyles()
-  const { basename } = appConfig
 
   return (
     <MuiThemeProvider theme={theme[primaryColor]}>
       <Container component={Paper} maxWidth="sm" className={classes.container}>
         <TopBar />
-        <BrowserRouter basename={basename}>
+        <BrowserRouter>
           <Switch>
             <Route path="/users/:username" component={UserRoute} />
             <Route path="/search" component={SearchRoute} />

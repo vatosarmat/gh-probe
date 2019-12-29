@@ -8,6 +8,5 @@ export const defaultReposPerPage: ReposPerPage = 10
 
 export const appConfig = {
   exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
-  title: 'GitHub repos',
-  basename: '/gh-probe'
+  title: 'GitHub repos'
 }
