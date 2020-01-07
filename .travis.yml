@@ -7,7 +7,7 @@ install:
   - yarn install
 
 script:
-  - yarn build:surge
+  - yarn build
   - yarn test:coverage_report
 
 deploy:
