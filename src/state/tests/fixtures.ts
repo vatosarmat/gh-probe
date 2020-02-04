@@ -79,6 +79,7 @@ export default function() {
         stargazers_count: 12,
         forks_count: 2,
         updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
+        pushed_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
         html_url: 'github.com/vasiliy/tic-tac-toe',
         archived: false,
         fork: false
@@ -99,6 +100,7 @@ export default function() {
           stargazers_count: 1312,
           forks_count: 131,
           updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
+          pushed_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
           html_url: 'github.com/microsoft/typescript',
           archived: false,
           fork: false
@@ -117,6 +119,7 @@ export default function() {
           stargazers_count: 12000,
           forks_count: 2333,
           updated_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
+          pushed_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
           html_url: 'github.com/microsoft/vscode',
           archived: false,
           fork: false

@@ -69,7 +69,7 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
     return null
   }
 
-  const { name, description, language, stargazers_count, forks_count, updated_at, html_url, archived } = repo
+  const { name, description, language, stargazers_count, forks_count, pushed_at, html_url, archived } = repo
 
   return (
     <Card elevation={0} className={styles.card}>
@@ -115,8 +115,8 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
             ) : null}
             {
               <Typography variant="caption" className={styles.infoCaption}>
-                Updated on{' '}
-                {dayjs(updated_at).calendar(undefined, {
+                Pushed at{' '}
+                {dayjs(pushed_at).calendar(undefined, {
                   sameElse: 'MMM D, YYYY'
                 })}
               </Typography>

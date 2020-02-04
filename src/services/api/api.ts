@@ -20,6 +20,7 @@ function pickRepoFields(responseBody: any): Repo {
     'stargazers_count',
     'forks_count',
     'updated_at',
+    'pushed_at',
     'html_url',
     'archived',
     'fork'

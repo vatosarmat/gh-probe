@@ -40,8 +40,9 @@
     "eject": "react-scripts eject",
     "test:coverage": "yarn test --coverage --watchAll=false",
     "test:coverage_report": "yarn test:coverage --coverageReporters=text-lcov | coveralls",
+    "clean": "rm -rf ./build",
     "build": "PUBLIC_URL=https://gh-probe.surge.sh react-scripts build && mv ./build/index.html ./build/200.html",
-    "deploy": "yarn build && surge ./build --domain gh-probe.surge.sh"
+    "deploy": "surge ./build --domain https://gh-probe.surge.sh"
   },
   "eslintConfig": {
     "extends": "react-app"

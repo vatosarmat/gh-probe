@@ -1,17 +1,16 @@
 language: node_js
-
 node_js:
-  - '12'
-
+- '12'
 install:
-  - yarn install
-
+- yarn install
 script:
-  - yarn build
-  - yarn test:coverage_report
-
+- yarn build
+- yarn test:coverage_report
 deploy:
   provider: surge
   skip_cleanup: true
-  project: ./build
-  domain: gh-probe.surge.sh
+  project: "./build"
+  domain: https://gh-probe.surge.sh
+env:
+  global:
+    secure: e1ged3WwKSlLqHWTXOV78RgLvvsQLGXLfsPPPYvlooKIrih4LRKGrOKDuCYiOCi37uib0iriLiK0Aj9g72EVqTL8xfviEQr6PVMCGknX+kHTGsz4SiTO2v498/kkBJZ+ath9hKJXTDnPPCyfZtwM7NkrslJZMce0IEzExEl2n7f9govhDhuEIhrOprItn/8xnDyI13+Bbj0KPttXaFFhpeKqYGBZvCprp4q6ZQASfZY+faoD31GeHXzy4veWEFQk3z5OTzdqxAr0Waeqxr8VRjRoBRjvle1Ukc9FbUuni2OyO4RjJEm6XG5hd5L3O2md1etNdP95c67YTHrE8jUaTyU9hT39hfzX9egzIz8CquXVbznZgocEOQDzZsEx5K9iWlFF4aje5L0NXfJtM5zlwxEWcIfL3Q0yo7CfoLWUMI5oSNch8pyIBSthry+ie40vPLjLqqvNpwl3yAMjQVXQfRZIc+5WMyomkI541GodVVOypYDmfe8K+p+9HURk4ULDWt0YPFZ4RaC5Ryq9mKkVMeANsbR1qwFIv6Fyij3a1tSVDIarW9gZjTZZMgbQX0/elqvWfoeArbW44wecbYFWKqWh/KDZhYXYQwyA363DtWphQD0jwpGAYfy9Tem0+NgS7v9XH08qNovZ7Jfn5IwbL6vt3eK+cYLw5zFhdqjeybw=
