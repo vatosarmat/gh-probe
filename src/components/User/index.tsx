@@ -49,13 +49,13 @@ const UserRoute: React.FC<UserRouteProps> = ({
 
   useEffect(() => {
     if (paramUsername) {
-      if (!hasUserFetched) {
+      if (!hasUserFetched && !isUserFetching) {
         requestUserData(paramUsername)
       } else if (reposUsername !== paramUsername) {
         requestReposData(paramUsername)
       }
     }
-  }, [paramUsername, hasUserFetched, reposUsername, requestUserData, requestReposData])
+  }, [paramUsername, hasUserFetched, isUserFetching, reposUsername, requestUserData, requestReposData])
 
   if (!paramUsername) {
     return <ErrorBox error={'No such user'} />
