@@ -78,11 +78,14 @@ export default function() {
         language: 'Scheme',
         stargazers_count: 12,
         forks_count: 2,
+        created_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
         updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
         pushed_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
         html_url: 'github.com/vasiliy/tic-tac-toe',
+        branches_url: 'github.com/vasiliy/tic-tac-toe/branches',
         archived: false,
-        fork: false
+        fork: false,
+        default_branch: 'master'
       }
     ]
   }
@@ -99,11 +102,14 @@ export default function() {
           language: 'typescript',
           stargazers_count: 1312,
           forks_count: 131,
+          created_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
           updated_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
           pushed_at: 'Tue, 14 Nov 2019 13:25:45 GMT',
           html_url: 'github.com/microsoft/typescript',
+          branches_url: 'github.com/microsoft/typescript/branches',
           archived: false,
-          fork: false
+          fork: false,
+          default_branch: 'master'
         }
       ]
     },
@@ -118,11 +124,14 @@ export default function() {
           language: 'typescript',
           stargazers_count: 12000,
           forks_count: 2333,
+          created_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
           updated_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
           pushed_at: 'Tue, 11 Nov 2019 3:25:45 GMT',
           html_url: 'github.com/microsoft/vscode',
+          branches_url: 'github.com/microsoft/vscode/branches',
           archived: false,
-          fork: false
+          fork: false,
+          default_branch: 'master'
         }
       ]
     }

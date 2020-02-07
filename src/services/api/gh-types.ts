@@ -34,9 +34,13 @@ export interface Repo {
   language: string | null
   stargazers_count: number
   forks_count: number
+  created_at: string
   updated_at: string
   pushed_at: string
   html_url: string
+  branches_url: string
   archived: boolean
   fork: boolean
+  default_branch?: string
+  last_commit_date?: string
 }

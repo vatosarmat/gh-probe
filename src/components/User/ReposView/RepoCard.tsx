@@ -48,7 +48,12 @@ const useStyles = makeStyles(theme => ({
   },
 
   infoCaption: {
-    marginRight: theme.spacing(3)
+    marginRight: theme.spacing(3),
+
+    '&:last-child': {
+      flexGrow: 1,
+      textAlign: 'right'
+    }
   }
 }))
 

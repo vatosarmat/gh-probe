@@ -1,6 +1,6 @@
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
 import { Repo } from 'services/api'
-import { omit, keyBy } from 'lodash'
+import { keyBy } from 'lodash'
 
 import { DeepReadonly } from 'utils/common'
 
@@ -26,64 +26,34 @@ export const defaultReposState: ReposState = {
 
 export const reposActions = {
   start: createAction('repos/FETCH_START')<string>(),
-  pageReady: createAction('repos/FETCH_PAGE_READY')<ReposFetchProgress>(),
+  pageReady: createAction('repos/FETCH_PAGE_READY', (items: Repo[], current: number, total: number) => ({
+    items,
+    current,
+    total
+  }))(),
   abort: createAction('repos/FETCH_ABORT')(),
-
-  aborted: createAction('repos/FETCH_ABORTED')<Repo[]>(),
-  error: createAction('repos/FETCH_ERROR', (error: Error, items: Repo[]) => ({ error, items }))(),
-  complete: createAction('repos/FETCH_COMPLETE')<Repo[]>()
+  error: createAction('repos/FETCH_ERROR', (error: Error) => error.toString())()
 }
 
 export type ReposAction = ActionType<typeof reposActions>
 
 export default createReducer<ReposState, ReposAction>(defaultReposState, {
-  'repos/FETCH_START': (state, { payload: username }) =>
-    omit(
-      {
-        ...state,
-        username,
-        status: 'IN_PROGRESS' as const
-      },
-      ['progress', 'error']
-    ),
-  'repos/FETCH_PAGE_READY': (state, { payload }) => ({
-    ...state,
-    progress: payload
-  }),
-  'repos/FETCH_ABORT': state => state,
+  'repos/FETCH_START': (state, { payload: username }) => ({ ...defaultReposState, username, status: 'IN_PROGRESS' }),
 
-  'repos/FETCH_ABORTED': (state, { payload: items }) =>
-    omit(
-      {
-        ...state,
-        status: 'ABORTED' as const,
-        items: {
-          ...state.items,
-          ...keyBy(items, 'id')
+  'repos/FETCH_PAGE_READY': (state, { payload: { items, current, total } }) =>
+    state.status === 'IN_PROGRESS'
+      ? {
+          ...state,
+          items: {
+            ...state.items,
+            ...keyBy(items, 'id')
+          },
+          progress: { current, total },
+          status: current === total ? 'COMPLETE' : 'IN_PROGRESS'
         }
-      },
-      ['progress', 'error']
-    ),
-  'repos/FETCH_ERROR': (state, { payload: { error, items } }) =>
-    omit(
-      {
-        ...state,
-        status: 'ERROR' as const,
-        error: error.toString(),
-        items: {
-          ...state.items,
-          ...keyBy(items, 'id')
-        }
-      },
-      ['progress']
-    ),
-  'repos/FETCH_COMPLETE': (state, { payload: items }) =>
-    omit(
-      {
-        ...state,
-        status: 'COMPLETE' as const,
-        items: keyBy(items, 'id')
-      },
-      ['progress', 'error']
-    )
+      : state,
+
+  'repos/FETCH_ABORT': state => ({ ...state, status: 'ABORTED' }),
+
+  'repos/FETCH_ERROR': (state, { payload: error }) => ({ ...state, status: 'ERROR', error })
 })

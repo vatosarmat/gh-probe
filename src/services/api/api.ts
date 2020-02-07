@@ -19,11 +19,14 @@ function pickRepoFields(responseBody: any): Repo {
     'language',
     'stargazers_count',
     'forks_count',
+    'created_at',
     'updated_at',
     'pushed_at',
     'html_url',
+    'branches_url',
     'archived',
-    'fork'
+    'fork',
+    'default_branch'
   ])
 }
 
@@ -144,5 +147,28 @@ export class Api {
     }
 
     return new ReposPager(this.url(endpoint, params))
+  }
+
+  fetchLastCommitDate(repo: Repo): Promise<string | undefined> {
+    interface Branch {
+      commit?: {
+        commit?: {
+          author?: {
+            date?: string
+          }
+        }
+      }
+    }
+
+    const { branches_url, default_branch } = repo
+    if (!default_branch) {
+      return Promise.resolve(undefined)
+    }
+    const endpoint = new URL(branches_url).toString().replace('{/branch}', '/' + default_branch)
+    const params = {}
+
+    return fetch(this.url(endpoint, params))
+      .then(response => response.json())
+      .then((result: Branch) => result?.commit?.commit?.author?.date)
   }
 }
