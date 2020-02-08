@@ -5,7 +5,8 @@ import { Circle, SourceFork, Star } from 'mdi-material-ui'
 import dayjs from 'dayjs'
 import calendar from 'dayjs/plugin/calendar'
 
-import { State, reposSelectors, RepoExtended } from 'state'
+import { State, reposSelectors } from 'state'
+import { Repo } from 'services/api'
 import getLangColor from 'services/lang-color'
 
 const { getRepoById } = reposSelectors
@@ -38,8 +39,20 @@ const useStyles = makeStyles(theme => ({
 
   info: {
     display: 'flex',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    paddingTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
+
+    '& > *': {
+      lineHeight: 2
+    }
+  },
+
+  infoDate: {
+    flexShrink: 0,
+    flexGrow: 1,
+    textAlign: 'right',
+    marginLeft: theme.spacing(3)
   },
 
   infoIcon: {
@@ -47,19 +60,26 @@ const useStyles = makeStyles(theme => ({
   },
 
   infoCaption: {
-    marginRight: theme.spacing(3)
+    marginRight: theme.spacing(3),
+    flexShrink: 0
   },
 
   dateInfo: {
     display: 'flex',
     textAlign: 'right',
     alignItems: 'center',
-    paddingTop: theme.spacing(2)
+    justifyContent: 'flex-end',
+    '&:last-child': {
+      flexGrow: 1
+    },
+    '& > *': {
+      marginLeft: theme.spacing(3)
+    }
   }
 }))
 
 interface StateProps {
-  repo?: RepoExtended
+  repo?: Repo
 }
 
 interface OwnProps {
@@ -75,17 +95,7 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
     return null
   }
 
-  const {
-    name,
-    description,
-    language,
-    stargazers_count,
-    forks_count,
-    created_at,
-    last_commit_date,
-    html_url,
-    archived
-  } = repo
+  const { name, description, language, stargazers_count, forks_count, created_at, pushed_at, html_url, archived } = repo
 
   return (
     <Card elevation={0} className={styles.card}>
@@ -129,22 +139,18 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
                 </Typography>
               </>
             ) : null}
-            {
-              <div className={styles.dateInfo}>
-                <Typography variant="caption">
-                  Created{' '}
-                  {dayjs(created_at).calendar(undefined, {
-                    sameElse: 'MMM D, YYYY'
-                  })}
-                </Typography>
-                <Typography variant="caption">
-                  Last commit{' '}
-                  {dayjs(last_commit_date).calendar(undefined, {
-                    sameElse: 'MMM D, YYYY'
-                  })}
-                </Typography>
-              </div>
-            }
+            <Typography variant="caption" className={styles.infoDate}>
+              Created{' '}
+              {dayjs(created_at).calendar(undefined, {
+                sameElse: 'MMM D, YYYY'
+              })}
+            </Typography>
+            <Typography variant="caption" className={styles.infoDate}>
+              Pushed{' '}
+              {dayjs(pushed_at).calendar(undefined, {
+                sameElse: 'MMM D, YYYY'
+              })}
+            </Typography>
           </div>
         </CardContent>
       </CardActionArea>

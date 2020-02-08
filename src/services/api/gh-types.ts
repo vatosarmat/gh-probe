@@ -43,13 +43,3 @@ export interface Repo {
   fork: boolean
   default_branch: string
 }
-
-export interface Branch {
-  commit: {
-    commit: {
-      author: {
-        date: string
-      }
-    }
-  }
-}

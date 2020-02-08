@@ -1,7 +1,9 @@
 import { createSelector } from 'reselect'
 import { some, chain, orderBy, map } from 'lodash'
 
-import { ReposState, RepoExtended } from './reducer'
+import { Repo } from 'services/api'
+
+import { ReposState } from './reducer'
 import { ILayoutState, layoutSelectors } from '../layout'
 
 const { getReposPerPage } = layoutSelectors
@@ -54,7 +56,7 @@ const isSortByStars = (state: IReposState, props: RepoProps) => props.sortByStar
 const getLanguage = (state: IReposState, props: RepoProps) => props.language
 const getPage = (state: IReposState, props: RepoProps) => props.page
 
-const getLanguageInfos = createSelector<IReposState, Record<number, RepoExtended>, LanguageInfo[]>(
+const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, LanguageInfo[]>(
   getReposRecord,
   reposRecord => {
     const length = Object.keys(reposRecord).length
@@ -70,7 +72,7 @@ const getLanguageInfos = createSelector<IReposState, Record<number, RepoExtended
   }
 )
 
-const getReposSorted = createSelector<IReposState, RepoProps, Record<number, RepoExtended>, boolean, RepoExtended[]>(
+const getReposSorted = createSelector<IReposState, RepoProps, Record<number, Repo>, boolean, Repo[]>(
   [getReposRecord, isSortByStars],
   (reposRecord, sortByStars) =>
     sortByStars
@@ -78,11 +80,11 @@ const getReposSorted = createSelector<IReposState, RepoProps, Record<number, Rep
       : orderBy(Object.values(reposRecord), 'name', 'asc')
 )
 
-const haveReposStars = createSelector<IReposState, Record<number, RepoExtended>, boolean>(getReposRecord, reposRecord =>
+const haveReposStars = createSelector<IReposState, Record<number, Repo>, boolean>(getReposRecord, reposRecord =>
   some(reposRecord, 'stargazers_count')
 )
 
-const getReposByLanguage = createSelector<IReposState, RepoProps, RepoExtended[], string, RepoExtended[]>(
+const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string, Repo[]>(
   [getReposSorted, getLanguage],
   (repos, language) =>
     language === ANY_LANGUAGE
@@ -97,7 +99,7 @@ const getReposIdsPage = createSelector<
   RepoProps,
   RepoProps,
   {},
-  RepoExtended[],
+  Repo[],
   number,
   number,
   ReposIdsPage
@@ -116,7 +118,7 @@ const getReposIdsPage = createSelector<
   }
 })
 
-function getRepoById(state: IReposState, { id }: { id: number }): RepoExtended | undefined {
+function getRepoById(state: IReposState, { id }: { id: number }): Repo | undefined {
   return getReposRecord(state)[id]
 }
 

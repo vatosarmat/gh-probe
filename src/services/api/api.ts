@@ -3,7 +3,7 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import { pick } from 'lodash'
 
-import { User, UserBrief, SearchResult, SearchResultItem, Repo, Branch } from './gh-types'
+import { User, UserBrief, SearchResult, SearchResultItem, Repo } from './gh-types'
 
 export interface ReposPage<T extends Repo = Repo> {
   current: number
@@ -161,23 +161,5 @@ export class Api {
     }
 
     return new ReposPager(this.url(endpoint, params))
-  }
-
-  fetchLastCommitDate = (repo: Repo): Promise<string | undefined> => {
-    const { branches_url, default_branch } = repo
-    const endpoint = new URL(branches_url.replace('{/branch}', '/' + default_branch)).pathname.substr(1)
-    const params = {}
-
-    return fetch(this.url(endpoint, params))
-      .then(response => {
-        if (response.status === 404) {
-          return undefined
-        }
-        if (!response.ok) {
-          throw Error('fetchLastCommitDate error: ' + response.status)
-        }
-        return response.json()
-      })
-      .then((result?: Branch) => (result ? result.commit.commit.author.date : undefined))
   }
 }
