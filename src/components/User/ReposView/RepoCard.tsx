@@ -5,8 +5,7 @@ import { Circle, SourceFork, Star } from 'mdi-material-ui'
 import dayjs from 'dayjs'
 import calendar from 'dayjs/plugin/calendar'
 
-import { State, reposSelectors } from 'state'
-import { Repo } from 'services/api'
+import { State, reposSelectors, RepoExtended } from 'state'
 import getLangColor from 'services/lang-color'
 
 const { getRepoById } = reposSelectors
@@ -48,17 +47,19 @@ const useStyles = makeStyles(theme => ({
   },
 
   infoCaption: {
-    marginRight: theme.spacing(3),
+    marginRight: theme.spacing(3)
+  },
 
-    '&:last-child': {
-      flexGrow: 1,
-      textAlign: 'right'
-    }
+  dateInfo: {
+    display: 'flex',
+    textAlign: 'right',
+    alignItems: 'center',
+    paddingTop: theme.spacing(2)
   }
 }))
 
 interface StateProps {
-  repo?: Repo
+  repo?: RepoExtended
 }
 
 interface OwnProps {
@@ -74,7 +75,17 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
     return null
   }
 
-  const { name, description, language, stargazers_count, forks_count, pushed_at, html_url, archived } = repo
+  const {
+    name,
+    description,
+    language,
+    stargazers_count,
+    forks_count,
+    created_at,
+    last_commit_date,
+    html_url,
+    archived
+  } = repo
 
   return (
     <Card elevation={0} className={styles.card}>
@@ -119,12 +130,20 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
               </>
             ) : null}
             {
-              <Typography variant="caption" className={styles.infoCaption}>
-                Pushed at{' '}
-                {dayjs(pushed_at).calendar(undefined, {
-                  sameElse: 'MMM D, YYYY'
-                })}
-              </Typography>
+              <div className={styles.dateInfo}>
+                <Typography variant="caption">
+                  Created{' '}
+                  {dayjs(created_at).calendar(undefined, {
+                    sameElse: 'MMM D, YYYY'
+                  })}
+                </Typography>
+                <Typography variant="caption">
+                  Last commit{' '}
+                  {dayjs(last_commit_date).calendar(undefined, {
+                    sameElse: 'MMM D, YYYY'
+                  })}
+                </Typography>
+              </div>
             }
           </div>
         </CardContent>

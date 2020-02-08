@@ -61,6 +61,10 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
       signal: this.abortController.signal
     })
       .then(response => {
+        if (!response.ok) {
+          throw Error('fetchRepos error: ' + response.status)
+        }
+
         this.nextUrl = undefined
         const link = response.headers.get('link')
         if (link) {
@@ -124,7 +128,12 @@ export class Api {
     return fetch(this.url(endpoint, params), {
       signal: this.abortController.signal
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw Error('searchUser error: ' + response.status)
+        }
+        return response.json()
+      })
       .then((result: SearchResult<any>) => ({
         ...result,
         items: result.items.map(pickUsersSearchResultItemFields)
@@ -136,7 +145,12 @@ export class Api {
     const params = {}
 
     return fetch(this.url(endpoint, params))
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw Error('fetchUser error: ' + response.status)
+        }
+        return response.json()
+      })
       .then(pickUserFields)
   }
 
@@ -149,13 +163,21 @@ export class Api {
     return new ReposPager(this.url(endpoint, params))
   }
 
-  fetchLastCommitDate(repo: Repo): Promise<string | undefined> {
+  fetchLastCommitDate = (repo: Repo): Promise<string | undefined> => {
     const { branches_url, default_branch } = repo
-    const endpoint = new URL(branches_url).toString().replace('{/branch}', '/' + default_branch)
+    const endpoint = new URL(branches_url.replace('{/branch}', '/' + default_branch)).pathname.substr(1)
     const params = {}
 
     return fetch(this.url(endpoint, params))
-      .then(response => response.json())
-      .then((result: Branch) => result.commit.commit.author.date)
+      .then(response => {
+        if (response.status === 404) {
+          return undefined
+        }
+        if (!response.ok) {
+          throw Error('fetchLastCommitDate error: ' + response.status)
+        }
+        return response.json()
+      })
+      .then((result?: Branch) => (result ? result.commit.commit.author.date : undefined))
   }
 }

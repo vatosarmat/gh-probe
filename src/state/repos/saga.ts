@@ -17,11 +17,13 @@ function* processReposPage(reposPage: ReposPage) {
 
   const filteredRepos = reposPage.repos.filter(repo => !repo.fork)
 
-  const lcds: string[] = yield all(filteredRepos.map(repo => call(api.fetchLastCommitDate, repo)))
+  const lcds: string | undefined[] = yield all(filteredRepos.map(repo => call(api.fetchLastCommitDate, repo)))
 
   const extendedReposPage: ExtendedReposPage = {
     ...reposPage,
-    repos: zipWith(filteredRepos, lcds, (repo, lcd) => Object.assign(repo, { last_commit_date: lcd }))
+    repos: zipWith(filteredRepos, lcds, (repo, lcd) =>
+      Object.assign(repo, { last_commit_date: lcd ?? repo.created_at })
+    )
   }
 
   yield put(pageReady(extendedReposPage))
