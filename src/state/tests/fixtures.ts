@@ -1,7 +1,7 @@
 import { keyBy, cloneDeep } from 'lodash'
 
 import { User, SearchResult, UserBrief, ReposPage } from 'services/api'
-import { defaultState as _defaultState } from 'state'
+import { defaultState as _defaultState, ExtendedReposPage } from 'state'
 
 export default function() {
   const usersArray: User[] = [
@@ -137,7 +137,27 @@ export default function() {
     }
   ]
 
-  // IteratorResult<ReposPage, ReposPage>
+  const lastCommitDateByRepoId = {
+    [singleReposPage.repos[0].id]: 'Tue, 24 Nov 2019 13:25:45 GMT',
+    [reposPagesArray[0].repos[0].id]: 'Tue, 25 Nov 2019 13:25:45 GMT',
+    [reposPagesArray[1].repos[0].id]: 'Tue, 26 Nov 2019 13:25:45 GMT'
+  }
+
+  const singleReposPageExtended: ExtendedReposPage = {
+    ...singleReposPage,
+    repos: singleReposPage.repos.map(repo => ({
+      ...repo,
+      last_commit_date: lastCommitDateByRepoId[repo.id]
+    }))
+  }
+
+  const reposPagesArrayExtended: ExtendedReposPage[] = reposPagesArray.map(page => ({
+    ...page,
+    repos: page.repos.map(repo => ({
+      ...repo,
+      last_commit_date: lastCommitDateByRepoId[repo.id]
+    }))
+  }))
 
   const networkError = new Error('No internet connection')
 
@@ -151,6 +171,9 @@ export default function() {
     usersSearchResult,
     singleReposPage,
     reposPagesArray,
+    lastCommitDateByRepoId,
+    singleReposPageExtended,
+    reposPagesArrayExtended,
     networkError,
     defaultState
   }

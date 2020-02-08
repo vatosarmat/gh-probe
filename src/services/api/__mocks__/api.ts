@@ -4,6 +4,8 @@ export class Api {
   fetchUser = jest.fn()
 
   fetchRepos = jest.fn()
+
+  fetchLastCommitDate = jest.fn()
 }
 
 export class ReposPager {

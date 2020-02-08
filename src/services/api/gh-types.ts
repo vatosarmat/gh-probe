@@ -41,6 +41,15 @@ export interface Repo {
   branches_url: string
   archived: boolean
   fork: boolean
-  default_branch?: string
-  last_commit_date?: string
+  default_branch: string
+}
+
+export interface Branch {
+  commit: {
+    commit: {
+      author: {
+        date: string
+      }
+    }
+  }
 }

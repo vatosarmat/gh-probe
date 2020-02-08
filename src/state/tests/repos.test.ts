@@ -2,7 +2,7 @@ import { CANCEL } from 'redux-saga'
 import { call, put } from 'redux-saga/effects'
 import { cloneDeep, keyBy } from 'lodash'
 
-import { ReposPager, ReposPage } from 'services/api'
+import { ReposPager, ReposPage, Repo } from 'services/api'
 import { reposActions, State } from 'state'
 import { Mutable } from 'utils/common'
 import makeFx from './fixtures'
@@ -17,31 +17,40 @@ describe('Fetch repos by username', () => {
     jest.resetAllMocks()
   })
 
+  const callFetchLcd = (repo: Repo) => call(api.fetchLastCommitDate, repo)
+  const fetchLastCommitDateImpl = (repo: Repo) => Promise.resolve(fx.lastCommitDateByRepoId[repo.id])
+
   it('Success single page', () => {
     const username = fx.usersArray[0].name!
-    const expectedReposPage = fx.singleReposPage
     const pager = new ReposPager('this is mock')
 
-    const nextResult: IteratorResult<ReposPage, ReposPage> = {
+    const pagerNextResult: IteratorResult<ReposPage, ReposPage> = {
       done: true,
-      value: expectedReposPage
+      value: fx.singleReposPage
     }
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResult)
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResult)
     ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    ;(api.fetchLastCommitDate as jest.Mock).mockImplementation(fetchLastCommitDateImpl)
 
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = username
-    expectedState.repos.items = keyBy(expectedReposPage.repos, 'id')
+    expectedState.repos.items = keyBy(fx.singleReposPageExtended.repos, 'id')
     expectedState.repos.status = 'COMPLETE'
+    expectedState.repos.progress = { current: 1, total: 1 }
 
     return expectSagaState({
       initialState,
       dispatchActions: [reposActions.start(username)],
       expectedState,
       expectedEffects: [
-        [call(api.fetchRepos, username), call(pager.next), put(reposActions.complete(expectedReposPage.repos))]
+        [
+          call(api.fetchRepos, username),
+          call(pager.next),
+          ...pagerNextResult.value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.singleReposPageExtended))
+        ]
       ]
     })
   })
@@ -50,7 +59,7 @@ describe('Fetch repos by username', () => {
     const username = fx.usersArray[1].name!
     const pager = new ReposPager('this is mock')
 
-    const nextResults: IteratorResult<ReposPage, ReposPage>[] = [
+    const pagerNextResults: IteratorResult<ReposPage, ReposPage>[] = [
       {
         done: false,
         value: fx.reposPagesArray[0]
@@ -60,18 +69,20 @@ describe('Fetch repos by username', () => {
         value: fx.reposPagesArray[1]
       }
     ]
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResults[0]).mockResolvedValueOnce(nextResults[1])
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResults[0]).mockResolvedValueOnce(pagerNextResults[1])
     ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    ;(api.fetchLastCommitDate as jest.Mock).mockImplementation(fetchLastCommitDateImpl)
 
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = username
     expectedState.repos.items = {
-      ...keyBy(fx.reposPagesArray[0].repos, 'id'),
-      ...keyBy(fx.reposPagesArray[1].repos, 'id')
+      ...keyBy(fx.reposPagesArrayExtended[0].repos, 'id'),
+      ...keyBy(fx.reposPagesArrayExtended[1].repos, 'id')
     }
     expectedState.repos.status = 'COMPLETE'
+    expectedState.repos.progress = { current: 2, total: 2 }
 
     return expectSagaState({
       initialState,
@@ -81,14 +92,15 @@ describe('Fetch repos by username', () => {
         [
           call(api.fetchRepos, username),
           call(pager.next),
-          put(
-            reposActions.pageReady({
-              current: 1,
-              total: 2
-            })
-          ),
+          ...pagerNextResults[0].value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.reposPagesArrayExtended[0]))
+        ],
+        [
+          call(api.fetchRepos, username),
           call(pager.next),
-          put(reposActions.complete([...fx.reposPagesArray[0].repos, ...fx.reposPagesArray[1].repos]))
+          call(pager.next),
+          ...pagerNextResults[1].value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.reposPagesArrayExtended[1]))
         ]
       ]
     })
@@ -98,22 +110,24 @@ describe('Fetch repos by username', () => {
     const username = fx.usersArray[1].name!
     const pager = new ReposPager('this is mock')
 
-    const nextResults: IteratorResult<ReposPage, ReposPage>[] = [
+    const pagerNextResults: IteratorResult<ReposPage, ReposPage>[] = [
       {
         done: false,
         value: fx.reposPagesArray[0]
       }
     ]
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResults[0]).mockRejectedValueOnce(fx.networkError)
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResults[0]).mockRejectedValueOnce(fx.networkError)
     ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    ;(api.fetchLastCommitDate as jest.Mock).mockImplementation(fetchLastCommitDateImpl)
 
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = username
-    expectedState.repos.items = keyBy(fx.reposPagesArray[0].repos, 'id')
+    expectedState.repos.items = keyBy(fx.reposPagesArrayExtended[0].repos, 'id')
     expectedState.repos.status = 'ERROR'
     expectedState.repos.error = fx.networkError.toString()
+    expectedState.repos.progress = { current: 1, total: 2 }
 
     return expectSagaState({
       initialState,
@@ -123,15 +137,10 @@ describe('Fetch repos by username', () => {
         [
           call(api.fetchRepos, username),
           call(pager.next),
-          put(
-            reposActions.pageReady({
-              current: 1,
-              total: 2
-            })
-          ),
-          call(pager.next),
-          put(reposActions.error(fx.networkError, [...fx.reposPagesArray[0].repos]))
-        ]
+          ...pagerNextResults[0].value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.reposPagesArrayExtended[0]))
+        ],
+        [call(api.fetchRepos, username), call(pager.next), call(pager.next), put(reposActions.error(fx.networkError))]
       ]
     })
   })
@@ -140,13 +149,13 @@ describe('Fetch repos by username', () => {
     const username = fx.usersArray[1].name!
     const pager = new ReposPager('this is mock')
 
-    const nextResults: IteratorResult<ReposPage, ReposPage>[] = [
+    const pagerNextResults: IteratorResult<ReposPage, ReposPage>[] = [
       {
         done: false,
         value: fx.reposPagesArray[0]
       }
     ]
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResults[0]).mockImplementationOnce(() => {
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResults[0]).mockImplementationOnce(() => {
       let timeout: NodeJS.Timeout
       const prom = new Promise(resolve => {
         timeout = setTimeout(resolve, 2000)
@@ -156,13 +165,15 @@ describe('Fetch repos by username', () => {
       return prom
     })
     ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    ;(api.fetchLastCommitDate as jest.Mock).mockImplementation(fetchLastCommitDateImpl)
 
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = username
-    expectedState.repos.items = keyBy(fx.reposPagesArray[0].repos, 'id')
+    expectedState.repos.items = keyBy(fx.reposPagesArrayExtended[0].repos, 'id')
     expectedState.repos.status = 'ABORTED'
+    expectedState.repos.progress = { current: 1, total: 2 }
 
     return expectSagaState({
       initialState,
@@ -172,15 +183,14 @@ describe('Fetch repos by username', () => {
         [
           call(api.fetchRepos, username),
           call(pager.next),
-          put(
-            reposActions.pageReady({
-              current: 1,
-              total: 2
-            })
-          ),
-          call(pager.next),
-          put(reposActions.aborted([...fx.reposPagesArray[0].repos]))
-        ]
+          ...pagerNextResults[0].value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.reposPagesArrayExtended[0]))
+        ],
+        [call(api.fetchRepos, username), call(pager.next), call(pager.next)]
+      ],
+      unexpectedEffects: [
+        [put(reposActions.error(fx.networkError))],
+        [put(reposActions.pageReady(fx.reposPagesArrayExtended[1]))]
       ]
     })
   })
@@ -188,34 +198,40 @@ describe('Fetch repos by username', () => {
   it('New request overrides results of the previous', () => {
     const prevUsername = fx.usersArray[1].name!
     const newUsername = fx.usersArray[0].name!
-    const expectedReposPage = fx.singleReposPage
     const pager = new ReposPager('this is mock')
 
-    const nextResult: IteratorResult<ReposPage, ReposPage> = {
+    const pagerNextResult: IteratorResult<ReposPage, ReposPage> = {
       done: true,
-      value: expectedReposPage
+      value: fx.singleReposPage
     }
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(nextResult)
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResult)
     ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    ;(api.fetchLastCommitDate as jest.Mock).mockImplementation(fetchLastCommitDateImpl)
 
     const initialState = fx.defaultState as Mutable<State>
     initialState.repos.username = prevUsername
     initialState.repos.items = {
-      ...keyBy(fx.reposPagesArray[0].repos, 'id'),
-      ...keyBy(fx.reposPagesArray[1].repos, 'id')
+      ...keyBy(fx.reposPagesArrayExtended[0].repos, 'id'),
+      ...keyBy(fx.reposPagesArrayExtended[1].repos, 'id')
     }
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = newUsername
-    expectedState.repos.items = keyBy(expectedReposPage.repos, 'id')
+    expectedState.repos.items = keyBy(fx.singleReposPageExtended.repos, 'id')
     expectedState.repos.status = 'COMPLETE'
+    expectedState.repos.progress = { current: 1, total: 1 }
 
     return expectSagaState({
       initialState,
       dispatchActions: [reposActions.start(newUsername)],
       expectedState,
       expectedEffects: [
-        [call(api.fetchRepos, newUsername), call(pager.next), put(reposActions.complete(expectedReposPage.repos))]
+        [
+          call(api.fetchRepos, newUsername),
+          call(pager.next),
+          ...pagerNextResult.value.repos.map(callFetchLcd),
+          put(reposActions.pageReady(fx.singleReposPageExtended))
+        ]
       ]
     })
   })

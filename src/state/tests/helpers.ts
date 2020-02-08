@@ -43,8 +43,10 @@ export function expectSagaState({
   unexpectedEffects?: Effect[][]
 }) {
   let expectChain = expectSaga(runSagaTest, rootSaga).withReducer(rootReducer, initialState)
+  let totalDelay = 0
   expectChain = dispatchActions.reduce((chain, v) => {
     if (isNumber(v)) {
+      totalDelay += v
       return chain.delay(v)
     }
     return chain.dispatch(v)
@@ -52,7 +54,7 @@ export function expectSagaState({
 
   return expectChain
     .hasFinalState<State>(expectedState)
-    .delay(1)
+    .delay(totalDelay * 2 + 1)
     .dispatch(END)
     .run()
     .then(result => {

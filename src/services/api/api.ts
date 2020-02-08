@@ -3,12 +3,12 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import { pick } from 'lodash'
 
-import { User, UserBrief, SearchResult, SearchResultItem, Repo } from './gh-types'
+import { User, UserBrief, SearchResult, SearchResultItem, Repo, Branch } from './gh-types'
 
-export interface ReposPage {
+export interface ReposPage<T extends Repo = Repo> {
   current: number
   total: number
-  repos: Repo[]
+  repos: T[]
 }
 
 function pickRepoFields(responseBody: any): Repo {
@@ -150,25 +150,12 @@ export class Api {
   }
 
   fetchLastCommitDate(repo: Repo): Promise<string | undefined> {
-    interface Branch {
-      commit?: {
-        commit?: {
-          author?: {
-            date?: string
-          }
-        }
-      }
-    }
-
     const { branches_url, default_branch } = repo
-    if (!default_branch) {
-      return Promise.resolve(undefined)
-    }
     const endpoint = new URL(branches_url).toString().replace('{/branch}', '/' + default_branch)
     const params = {}
 
     return fetch(this.url(endpoint, params))
       .then(response => response.json())
-      .then((result: Branch) => result?.commit?.commit?.author?.date)
+      .then((result: Branch) => result.commit.commit.author.date)
   }
 }
