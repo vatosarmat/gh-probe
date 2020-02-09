@@ -12,25 +12,21 @@ export interface IReposState {
   readonly repos: ReposState
 }
 
-function getReposFetchStatus(state: IReposState) {
-  return state.repos.status
+export const repoSortingKeyTuple = ['name', 'stargazers_count', 'created_at', 'pushed_at'] as const
+export type RepoSortingKey = typeof repoSortingKeyTuple[number]
+export const repoSortingKeyName: Record<RepoSortingKey, string> = {
+  name: 'name',
+  stargazers_count: 'stars count',
+  created_at: 'creation date',
+  pushed_at: 'push date'
 }
 
-function getReposUsername(state: IReposState) {
-  return state.repos.username
-}
+export const repoSortingOrderTuple = ['desc', 'asc'] as const
+export type RepoSortingOrder = typeof repoSortingOrderTuple[number]
 
-function getReposError(state: IReposState) {
-  return state.repos.error
-}
-
-function getReposFetchProgress(state: IReposState) {
-  return state.repos.progress
-}
-
-//
 export interface RepoProps {
-  sortByStars: boolean
+  sortingKey: RepoSortingKey
+  sortingOrder: RepoSortingOrder
   language: string
   page: number
 }
@@ -51,10 +47,16 @@ export interface ReposIdsPage {
 export const NO_LANGUAGE = 'NO_LANGUAGE'
 export const ANY_LANGUAGE = 'ANY_LANGUAGE'
 
+const getReposUsername = (state: IReposState) => state.repos.username
+const getReposError = (state: IReposState) => state.repos.error
+const getReposFetchProgress = (state: IReposState) => state.repos.progress
+const getReposFetchStatus = (state: IReposState) => state.repos.status
 const getReposRecord = (state: IReposState) => state.repos.items
-const isSortByStars = (state: IReposState, props: RepoProps) => props.sortByStars
+
 const getLanguage = (state: IReposState, props: RepoProps) => props.language
 const getPage = (state: IReposState, props: RepoProps) => props.page
+const getRepoSortingKey = (state: IReposState, props: RepoProps) => props.sortingKey
+const getRepoSortingOrder = (state: IReposState, props: RepoProps) => props.sortingOrder
 
 const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, LanguageInfo[]>(
   getReposRecord,
@@ -72,12 +74,17 @@ const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, Langu
   }
 )
 
-const getReposSorted = createSelector<IReposState, RepoProps, Record<number, Repo>, boolean, Repo[]>(
-  [getReposRecord, isSortByStars],
-  (reposRecord, sortByStars) =>
-    sortByStars
-      ? orderBy(Object.values(reposRecord), 'stargazers_count', 'desc')
-      : orderBy(Object.values(reposRecord), 'name', 'asc')
+const getReposSorted = createSelector<
+  IReposState,
+  RepoProps,
+  Record<number, Repo>,
+  RepoSortingKey,
+  RepoSortingOrder,
+  Repo[]
+>([getReposRecord, getRepoSortingKey, getRepoSortingOrder], (reposRecord, key, order) =>
+  key === 'name'
+    ? orderBy(Object.values(reposRecord), repo => repo.name.toLocaleLowerCase(), order)
+    : orderBy(Object.values(reposRecord), key, order)
 )
 
 const haveReposStars = createSelector<IReposState, Record<number, Repo>, boolean>(getReposRecord, reposRecord =>

@@ -9,6 +9,9 @@ import RepoCard from './RepoCard'
 const { getReposIdsPage } = reposSelectors
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    padding: theme.spacing(2.5)
+  },
   list: {
     paddingBottom: theme.spacing(5)
   },
@@ -39,7 +42,7 @@ const RepoList: React.FC<RepoListProps> = ({
   const hasOtherPages = hasPrevPage || hasNextPage
 
   return (
-    <>
+    <div className={styles.root}>
       {hasOtherPages && (
         <Typography variant="body2">
           Showing {from + 1} to {to}
@@ -63,7 +66,7 @@ const RepoList: React.FC<RepoListProps> = ({
           </Button>
         </ButtonGroup>
       )}
-    </>
+    </div>
   )
 }
 

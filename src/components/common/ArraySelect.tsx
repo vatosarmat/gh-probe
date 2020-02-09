@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { FormControl, makeStyles, MenuItem, OutlinedInput, Select, StandardProps, Typography } from '@material-ui/core'
 import { FormControlProps } from '@material-ui/core/FormControl'
 import clsx from 'clsx'
@@ -21,20 +21,18 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-type Item = string | number
-
-interface ArraySelectProps<T extends Item> extends StandardProps<FormControlProps, 'root', 'onChange'> {
+interface ArraySelectProps<T extends Object> extends StandardProps<FormControlProps, 'root', 'onChange'> {
   prefix?: string
   suffix?: string
 
-  array: T[]
+  array: readonly T[]
   value: T
   onChange: (value: T) => void
   getLabel?: (value: T) => string
   getKey?: (value: T) => string
 }
 
-export default function ArraySelect<T extends Item>({
+export default function ArraySelect<T extends Object>({
   value,
   array,
   onChange,
@@ -45,22 +43,27 @@ export default function ArraySelect<T extends Item>({
   className
 }: ArraySelectProps<T>) {
   const classes = useStyles({})
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   function handleChange({ target: { value } }: ChangeEvent<{ name?: string | undefined; value: unknown }>) {
-    onChange(value as T)
+    const idx = value as number
+    setSelectedIndex(idx)
+    onChange(array[idx])
   }
+
+  const selectValue = array[selectedIndex] === value ? selectedIndex : array.indexOf(value)
 
   return (
     <FormControl className={clsx(classes.formControl, className)}>
       <Typography variant="body1">{prefix} </Typography>
       <Select
-        value={value}
+        value={selectValue}
         onChange={handleChange}
         input={<OutlinedInput labelWidth={0} classes={{ input: classes.input }} />}
         className={classes.select}
       >
-        {array.map(item => (
-          <MenuItem key={getKey(item)} value={item}>
+        {array.map((item, idx) => (
+          <MenuItem key={getKey(item)} value={idx}>
             {getLabel(item)}
           </MenuItem>
         ))}

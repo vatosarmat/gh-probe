@@ -18,7 +18,8 @@ function* fetchRepos({ payload: username }: RequestAction) {
     let done = false
     while (!done) {
       let result: IteratorResult<ReposPage, ReposPage> = yield call(fetcher.next)
-      yield put(pageReady(result.value))
+      const repos = result.value.repos.filter(repo => !repo.fork)
+      yield put(pageReady({ ...result.value, repos }))
 
       done = Boolean(result.done)
     }

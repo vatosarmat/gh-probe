@@ -1,8 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { Typography, Checkbox, makeStyles } from '@material-ui/core'
+import { Typography, makeStyles, Divider } from '@material-ui/core'
+import clsx from 'clsx'
 
-import { State, ReposFetchStatus, ANY_LANGUAGE, NO_LANGUAGE, LanguageInfo, reposSelectors } from 'state'
+import {
+  State,
+  ReposFetchStatus,
+  ANY_LANGUAGE,
+  NO_LANGUAGE,
+  LanguageInfo,
+  reposSelectors,
+  RepoSortingKey,
+  repoSortingKeyTuple,
+  repoSortingKeyName,
+  RepoSortingOrder,
+  repoSortingOrderTuple
+} from 'state'
 import ArraySelect from 'components/common/ArraySelect'
 
 import RepoList from './RepoList'
@@ -11,33 +24,27 @@ const { getReposFetchStatus, getReposError, getLanguageInfos, haveReposStars } =
 
 const useStyles = makeStyles(theme => ({
   root: {
-    paddingLeft: theme.spacing(2.5),
-    paddingRight: theme.spacing(2.5),
-    paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(7)
   },
 
-  languageSelect: {
-    marginRight: theme.spacing(5)
-  },
-
-  sortByStarsFormControl: {
-    display: 'flex',
-    alignItems: 'center'
+  controlBlock: {
+    padding: theme.spacing(2.5)
   },
 
   additionalMessage: {
     marginBottom: theme.spacing(1)
   },
 
-  controls: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: theme.spacing(3)
+  arraySelectBlock: {
+    '&:not(:last-child)': {
+      marginBottom: theme.spacing(2)
+    }
+  },
+
+  sortingBlock: {
+    display: 'flex'
   }
 }))
-
-//
 
 interface ErrorMessageProps {
   show: boolean
@@ -85,60 +92,81 @@ interface StateProps {
 type ReposViewProps = StateProps
 
 const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, languageInfos, haveStars }) => {
-  const [selectedLanguageIdx, setSelectedLanguageIdx] = useState<number>(0)
+  const [languageInfo, setLanguageInfo] = useState<LanguageInfo>(languageInfos[0])
   const [page, setPage] = useState<number>(0)
-  const [sortByStars, setSortByStars] = useState<boolean>(false)
-
-  useEffect(() => {
-    setSelectedLanguageIdx(0)
-  }, [languageInfos, setSelectedLanguageIdx])
-
-  useEffect(() => {
-    setPage(0)
-  }, [selectedLanguageIdx, setPage])
-
-  const languagesIndexes = useMemo(() => languageInfos.map((v, k) => k), [languageInfos])
+  const [sortingKey, setSortingKey] = useState<RepoSortingKey>('name')
+  const [sortingOrder, setSortingOrder] = useState<RepoSortingOrder>('asc')
 
   const styles = useStyles()
 
   const handlePrevClick = () => setPage(p => p - 1)
   const handleNextClick = () => setPage(p => p + 1)
-  const handleSortByStarsChange = () => setSortByStars(s => !s)
-  const getLabel = (idx: number) => {
-    const lang = languageInfos[idx].language
+
+  const handleLanguageInfoChange = (languageInfo: LanguageInfo) => {
+    setLanguageInfo(languageInfo)
+    setPage(0)
+  }
+
+  const handleSortingKeyChange = (sortingKey: RepoSortingKey) => {
+    setSortingKey(sortingKey)
+    setPage(0)
+  }
+
+  const handleSortingOrderChange = (sortingOrder: RepoSortingOrder) => {
+    setSortingOrder(sortingOrder)
+    setPage(0)
+  }
+
+  const getLanguageInfoLabel = (languageInfo: LanguageInfo) => {
+    const lang = languageInfo.language
     return lang === ANY_LANGUAGE ? 'All' : lang === NO_LANGUAGE ? 'None' : lang
   }
 
-  const { language, repoCount } = languageInfos[selectedLanguageIdx]
+  const getSortingKeyLabel = (key: RepoSortingKey) => repoSortingKeyName[key]
+
+  const { language, repoCount } = languageInfo
 
   return (
     <div className={styles.root}>
-      <ErrorMessage show={reposFetchStatus === 'ERROR'} error={error} />
-      <WarningMessage wasAborted={reposFetchStatus === 'ABORTED'} wasError={reposFetchStatus === 'ERROR'} />
+      <div className={styles.controlBlock}>
+        <ErrorMessage show={reposFetchStatus === 'ERROR'} error={error} />
+        <WarningMessage wasAborted={reposFetchStatus === 'ABORTED'} wasError={reposFetchStatus === 'ERROR'} />
 
-      <div className={styles.controls}>
         <ArraySelect
-          className={styles.languageSelect}
+          className={styles.arraySelectBlock}
           prefix="Language"
           suffix={`${repoCount} repos`}
-          value={selectedLanguageIdx}
-          array={languagesIndexes}
-          getLabel={getLabel}
-          onChange={setSelectedLanguageIdx}
+          value={languageInfo}
+          array={languageInfos}
+          getLabel={getLanguageInfoLabel}
+          onChange={handleLanguageInfoChange}
         />
+        <div className={clsx(styles.sortingBlock, styles.arraySelectBlock)}>
+          <ArraySelect
+            prefix="Sort by"
+            value={sortingKey}
+            array={repoSortingKeyTuple}
+            getLabel={getSortingKeyLabel}
+            onChange={handleSortingKeyChange}
+          />
 
-        {haveStars && (
-          <div className={styles.sortByStarsFormControl}>
-            <Checkbox color="primary" checked={sortByStars} onChange={handleSortByStarsChange} value="sortByStars" />
-            <Typography>Sort by stars</Typography>
-          </div>
-        )}
+          <ArraySelect
+            prefix="in"
+            suffix={`${sortingOrder}ing order`}
+            value={sortingOrder}
+            array={repoSortingOrderTuple}
+            onChange={handleSortingOrderChange}
+          />
+        </div>
       </div>
+
+      <Divider />
 
       <RepoList
         language={language}
         page={page}
-        sortByStars={sortByStars}
+        sortingKey={sortingKey}
+        sortingOrder={sortingOrder}
         onPrevClick={handlePrevClick}
         onNextClick={handleNextClick}
       />
