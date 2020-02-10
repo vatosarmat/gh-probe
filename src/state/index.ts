@@ -56,7 +56,7 @@ const transform = createTransform(undefined, (stateSlice: State[keyof State], ke
 
       return {
         ...repos,
-        status: repos.status === 'IN_PROGRESS' ? 'ABORTED' : repos.status
+        status: repos.status === 'IN_PROGRESS' ? 'STOPPED' : repos.status
       }
     }
     case 'user': {

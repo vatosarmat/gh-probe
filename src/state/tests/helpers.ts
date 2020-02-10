@@ -26,7 +26,7 @@ export function* runSagaTest<Fn extends (...args: any[]) => any>(fn: Fn, ...args
 }
 
 type AppUserDispatchableAction = ActionType<
-  typeof userActions.request | typeof usersSearchActions.request | typeof reposActions.start | typeof reposActions.abort
+  typeof userActions.request | typeof usersSearchActions.request | typeof reposActions.start | typeof reposActions.stop
 >
 
 export function expectSagaState({

@@ -4,7 +4,7 @@ import { keyBy } from 'lodash'
 
 import { DeepReadonly } from 'utils/common'
 
-export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'ABORTED' | 'ERROR' | 'COMPLETE'
+export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'STOPPED' | 'ERROR' | 'COMPLETE'
 
 export interface ReposFetchProgress {
   current: number
@@ -27,7 +27,7 @@ export const defaultReposState: ReposState = {
 export const reposActions = {
   start: createAction('repos/FETCH_START')<string>(),
   pageReady: createAction('repos/FETCH_PAGE_READY')<ReposPage>(),
-  abort: createAction('repos/FETCH_ABORT')(),
+  stop: createAction('repos/FETCH_STOP')(),
   error: createAction('repos/FETCH_ERROR', (error: Error) => error.toString())()
 }
 
@@ -49,7 +49,7 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
         }
       : state,
 
-  'repos/FETCH_ABORT': state => ({ ...state, status: 'ABORTED' }),
+  'repos/FETCH_STOP': state => ({ ...state, status: 'STOPPED' }),
 
   'repos/FETCH_ERROR': (state, { payload: error }) => ({ ...state, status: 'ERROR', error })
 })

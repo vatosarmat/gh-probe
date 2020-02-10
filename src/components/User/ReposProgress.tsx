@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { ProgressBox } from 'components/common'
 import { State, ReposFetchProgress, reposActions, reposSelectors } from 'state'
 
-const { abort: abortReposFetch } = reposActions
+const { stop: stopReposFetch } = reposActions
 const { getReposFetchProgress } = reposSelectors
 
 const useStyles = makeStyles(theme => ({
@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center'
   },
 
-  abortButton: {
+  stopButton: {
     marginTop: theme.spacing(2)
   }
 }))
@@ -24,16 +24,16 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  abortReposFetch: typeof abortReposFetch
+  stopReposFetch: typeof stopReposFetch
 }
 
 type ReposProgressProps = StateProps & DispatchProps
 
-const ReposProgress: React.FC<ReposProgressProps> = ({ progress, abortReposFetch }) => {
+const ReposProgress: React.FC<ReposProgressProps> = ({ progress, stopReposFetch }) => {
   const styles = useStyles()
 
-  function handleAbortClick() {
-    abortReposFetch()
+  function handleStopClick() {
+    stopReposFetch()
   }
 
   if (progress) {
@@ -43,8 +43,8 @@ const ReposProgress: React.FC<ReposProgressProps> = ({ progress, abortReposFetch
           Loading repos: {progress.current + '/' + progress.total}
         </Typography>
         <LinearProgress variant="determinate" value={(progress.current * 100) / progress.total} />
-        <Button size="small" variant="outlined" onClick={handleAbortClick} className={styles.abortButton}>
-          Abort
+        <Button size="small" variant="outlined" onClick={handleStopClick} className={styles.stopButton}>
+          Stop
         </Button>
       </div>
     )
@@ -57,5 +57,5 @@ export default connect<StateProps, DispatchProps, {}, State>(
   state => ({
     progress: getReposFetchProgress(state)
   }),
-  { abortReposFetch }
+  { stopReposFetch: stopReposFetch }
 )(ReposProgress)

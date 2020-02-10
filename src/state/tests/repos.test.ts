@@ -128,7 +128,7 @@ describe('Fetch repos by username', () => {
     })
   })
 
-  it('Abort by user in multi page', () => {
+  it('Stop by user in multi page', () => {
     const username = fx.usersArray[1].name!
     const pager = new ReposPager('this is mock')
 
@@ -154,12 +154,12 @@ describe('Fetch repos by username', () => {
     const expectedState = cloneDeep(initialState)
     expectedState.repos.username = username
     expectedState.repos.items = keyBy(fx.reposPagesArray[0].repos, 'id')
-    expectedState.repos.status = 'ABORTED'
+    expectedState.repos.status = 'STOPPED'
     expectedState.repos.progress = { current: 1, total: 2 }
 
     return expectSagaState({
       initialState,
-      dispatchActions: [reposActions.start(username), 100, reposActions.abort()],
+      dispatchActions: [reposActions.start(username), 100, reposActions.stop()],
       expectedState,
       expectedEffects: [
         [

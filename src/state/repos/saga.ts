@@ -6,7 +6,7 @@ import { SagaContext } from 'state/helpers'
 
 import { reposActions } from './reducer'
 
-const { start, pageReady, abort: abortAction, error: errorAction } = reposActions
+const { start, pageReady, stop, error: errorAction } = reposActions
 
 type RequestAction = ReturnType<typeof start>
 
@@ -32,6 +32,6 @@ export default function*() {
   while (true) {
     const action = yield take(getType(start))
 
-    yield race([call(fetchRepos, action), take(getType(abortAction))])
+    yield race([call(fetchRepos, action), take(getType(stop))])
   }
 }

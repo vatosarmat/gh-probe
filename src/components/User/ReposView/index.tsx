@@ -63,15 +63,15 @@ const ErrorMessage = React.memo<ErrorMessageProps>(({ show, error }) => {
 //
 
 interface WarningMessageProps {
-  wasAborted: boolean
+  wasStopped: boolean
   wasError: boolean
 }
 
-const WarningMessage = React.memo<WarningMessageProps>(({ wasAborted, wasError }) => {
+const WarningMessage = React.memo<WarningMessageProps>(({ wasStopped, wasError }) => {
   const styles = useStyles()
-  return wasAborted || wasError ? (
+  return wasStopped || wasError ? (
     <Typography component="em" variant="caption" display="block" className={styles.additionalMessage}>
-      {wasAborted
+      {wasStopped
         ? 'Some data may be missing due to request interruption'
         : wasError
         ? 'Some data may be missing due to request error'
@@ -130,7 +130,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
     <div className={styles.root}>
       <div className={styles.controlBlock}>
         <ErrorMessage show={reposFetchStatus === 'ERROR'} error={error} />
-        <WarningMessage wasAborted={reposFetchStatus === 'ABORTED'} wasError={reposFetchStatus === 'ERROR'} />
+        <WarningMessage wasStopped={reposFetchStatus === 'STOPPED'} wasError={reposFetchStatus === 'ERROR'} />
 
         <ArraySelect
           className={styles.arraySelectBlock}
