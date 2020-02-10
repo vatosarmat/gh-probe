@@ -1,7 +1,7 @@
 import { combineReducers, Action } from 'redux'
 import { all, call } from 'redux-saga/effects'
-// import { persistReducer } from 'redux-persist'
-// import storage from 'redux-persist/lib/storage'
+import { persistReducer, createTransform } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 
 import layout, { LayoutState, defaultLayoutState } from './layout'
 import repos, { ReposState, defaultReposState, reposSaga } from './repos'
@@ -46,23 +46,39 @@ export default function rootReducer(state: State | undefined, action: Action) {
   return fieldsReducer(state, action)
 }
 
-// function makePersistedReducer() {
-//   function persistSession() {
-//     const blacklist: (keyof SessionState)[] = ['authorize', 'logout']
+const transform = createTransform(undefined, (stateSlice: State[keyof State], key: keyof State, state: State) => {
+  console.log(key)
+  console.log(stateSlice)
 
-//     return persistReducer(
-//       {
-//         key: 'session',
-//         storage,
-//         blacklist
-//       },
-//       session
-//     )
-//   }
+  switch (key) {
+    case 'repos': {
+      const repos = stateSlice as ReposState
 
-//   const rootReducer = combineReducers({ session: persistSession(), posts, ui })
+      return {
+        ...repos,
+        status: repos.status === 'IN_PROGRESS' ? 'ABORTED' : repos.status
+      }
+    }
+    case 'user': {
+      const user = stateSlice as UserState
 
-//   return persistReducer({ key: 'root', storage }, rootReducer)
-// }
+      return user.isFetching ? { ...defaultUserState } : user
+    }
+    case 'usersSearch': {
+      const usersSearch = stateSlice as UsersSearchState
 
-// export const persistedReducer = makePersistedReducer()
+      return usersSearch.inProgress ? defaultUsersSearchState : usersSearch
+    }
+    default:
+      return stateSlice
+  }
+})
+
+export const persistedReducer = persistReducer(
+  {
+    key: 'root',
+    storage,
+    transforms: [transform]
+  },
+  rootReducer
+)

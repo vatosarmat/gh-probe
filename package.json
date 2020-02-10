@@ -45,7 +45,10 @@
     "deploy": "surge ./build --domain https://gh-probe.surge.sh"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "eslint:recommended"
+    ]
   },
   "browserslist": {
     "production": [
