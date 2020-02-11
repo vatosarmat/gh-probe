@@ -9,6 +9,7 @@ export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'STOPPED' | 'ERROR' | 'C
 export interface ReposFetchProgress {
   current: number
   total: number
+  nextUrl?: string
 }
 
 export type ReposState = DeepReadonly<{
@@ -28,6 +29,7 @@ export const reposActions = {
   start: createAction('repos/FETCH_START')<string>(),
   pageReady: createAction('repos/FETCH_PAGE_READY')<ReposPage>(),
   stop: createAction('repos/FETCH_STOP')(),
+  resume: createAction('repos/FETCH_RESUME')(),
   error: createAction('repos/FETCH_ERROR', (error: Error) => error.toString())()
 }
 
@@ -36,7 +38,7 @@ export type ReposAction = ActionType<typeof reposActions>
 export default createReducer<ReposState, ReposAction>(defaultReposState, {
   'repos/FETCH_START': (state, { payload: username }) => ({ ...defaultReposState, username, status: 'IN_PROGRESS' }),
 
-  'repos/FETCH_PAGE_READY': (state, { payload: { repos, current, total } }) =>
+  'repos/FETCH_PAGE_READY': (state, { payload: { repos, current, total, nextUrl } }) =>
     state.status === 'IN_PROGRESS'
       ? {
           ...state,
@@ -44,12 +46,14 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
             ...state.items,
             ...keyBy(repos, 'id')
           },
-          progress: { current, total },
+          progress: nextUrl ? { current, total, nextUrl } : { current, total },
           status: current === total ? 'COMPLETE' : 'IN_PROGRESS'
         }
       : state,
 
   'repos/FETCH_STOP': state => ({ ...state, status: 'STOPPED' }),
+
+  'repos/FETCH_RESUME': state => ({ ...state, status: 'IN_PROGRESS' }),
 
   'repos/FETCH_ERROR': (state, { payload: error }) => ({ ...state, status: 'ERROR', error })
 })

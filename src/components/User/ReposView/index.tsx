@@ -19,6 +19,7 @@ import {
 import ArraySelect from 'components/common/ArraySelect'
 
 import RepoList from './RepoList'
+import WarningMessage from './WarningMessage'
 
 const { getReposFetchStatus, getReposError, getLanguageInfos, haveReposStars } = reposSelectors
 
@@ -49,38 +50,17 @@ const useStyles = makeStyles(theme => ({
 interface ErrorMessageProps {
   show: boolean
   error?: string
+
+  className?: string
 }
 
-const ErrorMessage = React.memo<ErrorMessageProps>(({ show, error }) => {
-  const styles = useStyles()
+const ErrorMessage = React.memo<ErrorMessageProps>(({ show, error, className }) => {
   return show ? (
-    <Typography variant="subtitle1" color="error" display="block" className={styles.additionalMessage}>
+    <Typography variant="subtitle1" color="error" display="block" className={className}>
       {error ? <>{error.toString()}</> : 'Unknown error'}
     </Typography>
   ) : null
 })
-
-//
-
-interface WarningMessageProps {
-  wasStopped: boolean
-  wasError: boolean
-}
-
-const WarningMessage = React.memo<WarningMessageProps>(({ wasStopped, wasError }) => {
-  const styles = useStyles()
-  return wasStopped || wasError ? (
-    <Typography component="em" variant="caption" display="block" className={styles.additionalMessage}>
-      {wasStopped
-        ? 'Some data may be missing due to request interruption'
-        : wasError
-        ? 'Some data may be missing due to request error'
-        : null}
-    </Typography>
-  ) : null
-})
-
-//
 
 interface StateProps {
   reposFetchStatus: ReposFetchStatus
@@ -129,8 +109,12 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
   return (
     <div className={styles.root}>
       <div className={styles.controlBlock}>
-        <ErrorMessage show={reposFetchStatus === 'ERROR'} error={error} />
-        <WarningMessage wasStopped={reposFetchStatus === 'STOPPED'} wasError={reposFetchStatus === 'ERROR'} />
+        <ErrorMessage className={styles.additionalMessage} show={reposFetchStatus === 'ERROR'} error={error} />
+        <WarningMessage
+          className={styles.additionalMessage}
+          wasStopped={reposFetchStatus === 'STOPPED'}
+          wasError={reposFetchStatus === 'ERROR'}
+        />
 
         <ArraySelect
           className={styles.arraySelectBlock}

@@ -9,6 +9,7 @@ export interface ReposPage<T extends Repo = Repo> {
   current: number
   total: number
   repos: T[]
+  nextUrl?: string
 }
 
 function pickRepoFields(responseBody: any): Repo {
@@ -83,12 +84,13 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
         return response.json()
       })
       .then(data => ({
-        done: !Boolean(this.nextUrl),
+        done: !this.nextUrl,
 
         value: {
           repos: data.map(pickRepoFields),
           current: this.current,
-          total: this.total
+          total: this.total,
+          nextUrl: this.nextUrl
         }
       }))
     ;(prom as any)[CANCEL] = this.abort

@@ -15,12 +15,14 @@ dayjs.extend(calendar)
 
 const useStyles = makeStyles(theme => ({
   card: {
-    marginLeft: theme.spacing(-2),
-    marginRight: theme.spacing(-2)
+    marginLeft: theme.spacing(-2.5),
+    marginRight: theme.spacing(-2.5)
   },
 
   cardContent: {
     paddingTop: theme.spacing(4),
+    paddingLeft: theme.spacing(2.5),
+    paddingRight: theme.spacing(2.5),
 
     '&:last-child': {
       paddingBottom: theme.spacing(4)

@@ -1,23 +1,29 @@
-import { call, put, take, race, getContext } from 'redux-saga/effects'
+import { call, put, take, race, getContext, select } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 
-import { ReposPage } from 'services/api'
+import { ReposPage, ReposPager } from 'services/api'
 import { SagaContext } from 'state/helpers'
 
-import { reposActions } from './reducer'
+import { reposActions, ReposState } from './reducer'
 
-const { start, pageReady, stop, error: errorAction } = reposActions
+const { start, pageReady, stop, resume, error: errorAction } = reposActions
 
 type RequestAction = ReturnType<typeof start>
 
-function* fetchRepos({ payload: username }: RequestAction) {
-  const api: SagaContext['api'] = yield getContext('api')
-  const fetcher = yield call(api.fetchRepos, username)
+const getNextUrl = ({ repos }: { repos: ReposState }) => repos.progress?.nextUrl
 
+function* resumeFetch(reposPager?: ReposPager) {
   try {
+    if (!reposPager) {
+      reposPager = new ReposPager(yield select(getNextUrl))
+      if (!reposPager) {
+        throw Error('Invalid state')
+      }
+    }
+
     let done = false
     while (!done) {
-      let result: IteratorResult<ReposPage, ReposPage> = yield call(fetcher.next)
+      let result: IteratorResult<ReposPage, ReposPage> = yield call(reposPager.next)
       const repos = result.value.repos.filter(repo => !repo.fork)
       yield put(pageReady({ ...result.value, repos }))
 
@@ -28,10 +34,24 @@ function* fetchRepos({ payload: username }: RequestAction) {
   }
 }
 
+function* startFetch({ payload: username }: RequestAction) {
+  const api: SagaContext['api'] = yield getContext('api')
+  const reposPager: ReposPager = yield call(api.fetchRepos, username)
+
+  yield call(resumeFetch, reposPager)
+}
+
 export default function*() {
   while (true) {
-    const action = yield take(getType(start))
+    const action = yield take([getType(start), getType(resume)])
 
-    yield race([call(fetchRepos, action), take(getType(stop))])
+    switch (action.type) {
+      case getType(start):
+        yield race([call(startFetch, action), take(getType(stop))])
+        break
+      case getType(resume):
+        yield race([call(resumeFetch), take(getType(stop))])
+        break
+    }
   }
 }
