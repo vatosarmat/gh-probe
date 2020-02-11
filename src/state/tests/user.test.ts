@@ -20,13 +20,14 @@ describe('Fetch user data', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.user.query = expectedUser.login
     expectedState.user.data = expectedUser
 
     return expectSagaState({
       initialState,
-      dispatchActions: [userActions.request(expectedUser.name!)],
+      dispatchActions: [userActions.request(expectedUser.login!)],
       expectedState,
-      expectedEffects: [[call(api.fetchUser, expectedUser.name!), put(userActions.success(expectedUser))]]
+      expectedEffects: [[call(api.fetchUser, expectedUser.login!), put(userActions.success(expectedUser))]]
     })
   })
 
@@ -37,13 +38,14 @@ describe('Fetch user data', () => {
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
+    expectedState.user.query = user.login
     expectedState.user.error = fx.networkError.toString()
 
     return expectSagaState({
       initialState,
-      dispatchActions: [userActions.request(user.name!)],
+      dispatchActions: [userActions.request(user.login!)],
       expectedState,
-      expectedEffects: [[call(api.fetchUser, user.name!), put(userActions.failure(fx.networkError))]]
+      expectedEffects: [[call(api.fetchUser, user.login!), put(userActions.failure(fx.networkError))]]
     })
   })
 })

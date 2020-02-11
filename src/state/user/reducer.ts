@@ -5,6 +5,7 @@ import { DeepReadonly } from 'utils/common'
 import { User } from 'services/api'
 
 export type UserState = DeepReadonly<{
+  query?: string
   data?: User
   isFetching: boolean
   error?: string
@@ -19,8 +20,9 @@ export const userActions = createAsyncAction('user/REQUEST', 'user/SUCCESS', 'us
 export type UserAction = ActionType<typeof userActions>
 
 export default createReducer<UserState, UserAction>(defaultUserState, {
-  'user/REQUEST': () => ({
+  'user/REQUEST': (state, { payload: query }) => ({
     ...defaultUserState,
+    query,
     isFetching: true
   }),
 

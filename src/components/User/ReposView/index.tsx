@@ -136,7 +136,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
 
           <ArraySelect
             prefix="in"
-            suffix={`${sortingOrder}ing order`}
+            suffix={'ending order'}
             value={sortingOrder}
             array={repoSortingOrderTuple}
             onChange={handleSortingOrderChange}

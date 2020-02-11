@@ -4,6 +4,10 @@ interface IUserState {
   user: UserState
 }
 
+export function getUserQuery(state: IUserState) {
+  return state.user.query
+}
+
 export function getUserData(state: IUserState) {
   return state.user.data
 }
@@ -17,6 +21,7 @@ export function getUserError(state: IUserState) {
 }
 
 export const userSelectors = {
+  getUserQuery,
   getUserData,
   isUserDataFetching,
   getUserError

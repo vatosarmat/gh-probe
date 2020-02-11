@@ -12,14 +12,15 @@ import UserCard from './UserCard'
 import ReposProgress from './ReposProgress'
 import ReposView from './ReposView'
 
-const { getUserData, getUserError, isUserDataFetching } = userSelectors
+const { getUserQuery, getUserData, getUserError, isUserDataFetching } = userSelectors
 const { request: requestUserData } = userActions
 const { getReposFetchStatus, getReposUsername } = reposSelectors
 const { start: requestReposData } = reposActions
 
 interface StateProps {
-  user?: User
-  isUserFetching: boolean
+  userQuery?: string
+  userData?: User
+  isUserDataFetching: boolean
   error?: string
 
   reposFetchStatus: ReposFetchStatus
@@ -34,8 +35,9 @@ interface DispatchProps {
 type UserRouteProps = StateProps & DispatchProps
 
 const UserRoute: React.FC<UserRouteProps> = ({
-  user,
-  isUserFetching,
+  userQuery,
+  userData,
+  isUserDataFetching,
   error,
   reposFetchStatus,
   reposUsername,
@@ -45,47 +47,52 @@ const UserRoute: React.FC<UserRouteProps> = ({
 }) => {
   const { username: paramUsername } = useParams<{ username: string }>()
 
-  const hasUserFetched = user && user.login === paramUsername
+  const wasUserRequested = userQuery === paramUsername
+  const hasUserFetched = wasUserRequested && userData && userData.login === userQuery
 
   useEffect(() => {
-    if (paramUsername) {
-      if (!hasUserFetched && !isUserFetching) {
-        requestUserData(paramUsername)
-      } else if (reposUsername !== paramUsername) {
-        requestReposData(paramUsername)
-      }
+    if (!paramUsername) {
+      return
     }
-  }, [paramUsername, hasUserFetched, isUserFetching, reposUsername, requestUserData, requestReposData])
+
+    if (!wasUserRequested) {
+      requestUserData(paramUsername)
+    } else if (hasUserFetched && reposUsername !== paramUsername) {
+      requestReposData(paramUsername)
+    }
+  }, [paramUsername, reposUsername, wasUserRequested, hasUserFetched, requestUserData, requestReposData])
+
+  let content = null
 
   if (!paramUsername) {
-    return <ErrorBox error={'No such user'} />
-  }
-
-  if (error) {
-    return <ErrorBox error={error} />
-  }
-
-  if (isUserFetching) {
-    return <ProgressBox />
-  }
-
-  if (hasUserFetched) {
-    return (
+    content = <ErrorBox error={'No such user'} />
+  } else if (error) {
+    content = <ErrorBox error={error} />
+  } else if (isUserDataFetching) {
+    content = <ProgressBox />
+  } else if (hasUserFetched) {
+    content = (
       <>
-        <BackButton />
-        <UserCard user={user} />
+        <UserCard user={userData} />
         <Divider />
         {reposFetchStatus === 'IDLE' || reposFetchStatus === 'IN_PROGRESS' ? <ReposProgress /> : <ReposView />}
       </>
     )
   }
-  return null
+
+  return content ? (
+    <>
+      <BackButton />
+      {content}
+    </>
+  ) : null
 }
 
 export default connect<StateProps, DispatchProps, {}, State>(
   state => ({
-    user: getUserData(state),
-    isUserFetching: isUserDataFetching(state),
+    userQuery: getUserQuery(state),
+    userData: getUserData(state),
+    isUserDataFetching: isUserDataFetching(state),
     error: getUserError(state),
     reposFetchStatus: getReposFetchStatus(state),
     reposUsername: getReposUsername(state)
