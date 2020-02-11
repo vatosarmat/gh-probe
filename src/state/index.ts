@@ -54,6 +54,10 @@ const transform = createTransform(undefined, (stateSlice: State[keyof State], ke
     case 'repos': {
       const repos = stateSlice as ReposState
 
+      if (repos.error) {
+        return defaultReposState
+      }
+
       return {
         ...repos,
         status: repos.status === 'IN_PROGRESS' ? 'STOPPED' : repos.status
@@ -62,12 +66,20 @@ const transform = createTransform(undefined, (stateSlice: State[keyof State], ke
     case 'user': {
       const user = stateSlice as UserState
 
-      return user.isFetching ? { ...defaultUserState } : user
+      if (user.error || user.isFetching) {
+        return defaultUserState
+      }
+
+      return user
     }
     case 'usersSearch': {
       const usersSearch = stateSlice as UsersSearchState
 
-      return usersSearch.inProgress ? defaultUsersSearchState : usersSearch
+      if (usersSearch.error || usersSearch.inProgress) {
+        return defaultUsersSearchState
+      }
+
+      return usersSearch
     }
     default:
       return stateSlice
