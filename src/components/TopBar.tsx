@@ -130,7 +130,7 @@ const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <AppBar position="static" color="primary" className={classes.appBar}>
-      <IconButton edge="start" color="inherit" aria-label="Menu" onClick={handleDialogOpen}>
+      <IconButton edge="start" color="inherit" aria-label="Settings" onClick={handleDialogOpen}>
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>

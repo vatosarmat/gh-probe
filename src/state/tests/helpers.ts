@@ -10,7 +10,6 @@ import { reposActions } from 'state/repos'
 import { SagaContext } from 'state/helpers'
 import { Api } from 'services/api'
 import { isNumber } from 'utils/common'
-import 'utils/testing'
 
 jest.mock('services/api')
 
