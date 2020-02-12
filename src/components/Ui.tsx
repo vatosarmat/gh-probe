@@ -52,9 +52,9 @@ interface OwnProps {
   history: History
 }
 
-type AppProps = StateProps & OwnProps
+type UiProps = StateProps & OwnProps
 
-const App: React.FC<AppProps> = ({ primaryColor, history }) => {
+const Ui: React.FC<UiProps> = ({ primaryColor, history }) => {
   const classes = useStyles()
 
   return (
@@ -75,4 +75,4 @@ const App: React.FC<AppProps> = ({ primaryColor, history }) => {
 
 export default connect<StateProps, {}, OwnProps, State>(state => ({
   primaryColor: getPrimaryColor(state)
-}))(App)
+}))(Ui)

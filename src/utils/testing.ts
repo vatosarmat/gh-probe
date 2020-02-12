@@ -70,9 +70,8 @@ export function mockAndResolve<V>(delay: number = 5) {
 }
 
 declare global {
-  //eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
-    interface Matchers<R> {
+    interface Matchers<R, T> {
       toIncludeAllMembersOrdered(members: any[]): R
     }
   }

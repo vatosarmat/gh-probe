@@ -1,8 +1,13 @@
-import { combineReducers, Action } from 'redux'
+import { applyMiddleware, createStore, combineReducers, Action } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import { all, call } from 'redux-saga/effects'
-import { persistReducer, createTransform } from 'redux-persist'
+import createSagaMiddleware from 'redux-saga'
+import { persistReducer, persistStore, createTransform } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import { History } from 'history'
 
+import { Api } from 'services/api'
+import { SagaContext } from './helpers'
 import layout, { LayoutState, defaultLayoutState } from './layout'
 import repos, { ReposState, defaultReposState, reposSaga } from './repos'
 import user, { UserState, defaultUserState, userSaga } from './user'
@@ -94,3 +99,20 @@ export const persistedReducer = persistReducer(
   },
   rootReducer
 )
+
+export function createPersistentStore(api: Api, history: History) {
+  const context: SagaContext = { api }
+  const sagaMiddleware = createSagaMiddleware({ context })
+  const store = createStore(persistedReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
+  const persistor = persistStore(store, null, () => {
+    const state = store.getState()
+    const login = state.user.data?.login
+    if (login) {
+      history.replace(`/users/${login}`)
+    }
+  })
+
+  sagaMiddleware.run(rootSaga)
+
+  return { store, persistor }
+}
