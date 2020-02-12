@@ -5,7 +5,7 @@ import { cloneDeep, keyBy } from 'lodash'
 import { ReposPager, ReposPage } from 'services/api'
 import { reposActions, State } from 'state'
 import { Mutable } from 'utils/common'
-import makeFx from './fixtures'
+import makeFx from '../../services/api/fixtures'
 import { expectSagaState, api } from './helpers'
 
 jest.mock('services/api')

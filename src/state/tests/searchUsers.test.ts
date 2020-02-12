@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash'
 
 import { usersSearchActions, State } from 'state'
 import { Mutable } from 'utils/common'
-import makeFx from './fixtures'
+import makeFx from '../../services/api/fixtures'
 import { expectSagaState, api } from './helpers'
 
 describe('Fetch user data', () => {
@@ -34,6 +34,7 @@ describe('Fetch user data', () => {
   })
 
   it('Network error', () => {
+    // eslint-disable-next-line no-extra-semi
     ;(api.searchUser as jest.Mock).mockRejectedValueOnce(fx.networkError)
 
     const initialState = fx.defaultState as Mutable<State>
