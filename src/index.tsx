@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import createSagaMiddleware from 'redux-saga'
 import { createBrowserHistory } from 'history'
 
-import App from 'components/App'
+import Ui from 'components/Ui'
 import AppError from 'components/AppError'
 import { rootSaga, SagaContext, persistedReducer } from 'state'
 import { Api } from 'services/api'
@@ -41,7 +41,7 @@ try {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <CssBaseline />
-        <App history={history} />
+        <Ui history={history} />
       </PersistGate>
     </Provider>,
     document.getElementById('root')
