@@ -18,7 +18,7 @@ try {
   const history = createBrowserHistory()
   const { store, persistor } = createPersistentStore(api, history)
 
-  ReactDOM.render(<App store={store} persistor={persistor} history={history} />, document.getElementById('root'))
+  ReactDOM.render(React.createElement(App, { store, persistor, history }), document.getElementById('root'))
 } catch (error) {
-  ReactDOM.render(<AppError error={error} />, document.getElementById('root'))
+  ReactDOM.render(React.createElement(AppError, { error }), document.getElementById('root'))
 }
