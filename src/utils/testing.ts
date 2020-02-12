@@ -42,33 +42,6 @@ expect.extend({
   }
 })
 
-type AsyncPair<V> = [(...args: any) => Promise<V>, V]
-
-export function mockAndResolve<V>(delay: number = 5) {
-  return function<T extends AsyncPair<V>[]>(...pairs: T) {
-    const resolves: [Function, V][] = []
-
-    function resolveIfReady() {
-      if (resolves.length === pairs.length) {
-        for (const [resolve, value] of resolves) {
-          setTimeout(() => {
-            resolve(value)
-          }, delay)
-        }
-      }
-    }
-
-    for (const [func, value] of pairs) {
-      ;((func as unknown) as jest.Mock).mockImplementationOnce(() => {
-        return new Promise(resolve => {
-          resolves.push([resolve, value])
-          resolveIfReady()
-        })
-      })
-    }
-  }
-}
-
 declare global {
   namespace jest {
     interface Matchers<R, T> {
