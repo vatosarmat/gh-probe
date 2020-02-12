@@ -50,3 +50,13 @@ declare global {
     }
   }
 }
+
+// @ts-ignore
+global.document.createRange = () => ({
+  setStart: () => {},
+  setEnd: () => {},
+  commonAncestorContainer: {
+    nodeName: 'BODY',
+    ownerDocument: document
+  }
+})

@@ -1,11 +1,13 @@
 import React, { ReactElement } from 'react'
 import { createBrowserHistory } from 'history'
 
-import { render, fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, fireEvent, screen, waitForElement, waitForElementToBeRemoved } from '@testing-library/react'
 
 import { createPersistentStore } from 'state'
 import { Api } from 'services/api'
 import App from 'components/App'
+
+import makeFx from 'services/api/fixtures'
 
 jest.mock('services/api')
 
@@ -16,11 +18,17 @@ describe('App basic functionality', () => {
   let persistor
   let store
   let app: ReactElement
+  let fx: ReturnType<typeof makeFx>
 
   beforeAll(() => {
     history = createBrowserHistory()
     ;({ persistor, store } = createPersistentStore(api, history))
     app = React.createElement(App, { history, store, persistor })
+    fx = makeFx()
+  })
+
+  beforeEach(() => {
+    jest.resetAllMocks()
   })
 
   it('Successfully renders', () => {
@@ -51,7 +59,18 @@ describe('App basic functionality', () => {
     waitForElementToBeRemoved(() => settingsHeader)
   })
 
-  // it('Inputs and searchs users', () => {
+  it('Searches users', () => {
+    render(app)
+    const usersSearchResultRB = fx.usersSearchResultResponseBody
+    ;(api.searchUser as jest.Mock).mockResolvedValueOnce(usersSearchResultRB)
 
-  // })
+    const searchInput = screen.getByLabelText('Search user') as HTMLInputElement
+    const searchButton = screen.getByText(/^search$/i)
+
+    searchInput.value = fx.usersSearchQuery
+    fireEvent.change(searchInput)
+    fireEvent.click(searchButton)
+
+    waitForElement(() => usersSearchResultRB.items.map(item => screen.getByText(item.login)))
+  })
 })

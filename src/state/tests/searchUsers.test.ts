@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash'
 
 import { usersSearchActions, State } from 'state'
 import { Mutable } from 'utils/common'
-import makeFx from '../../services/api/fixtures'
+import makeFx from 'services/api/fixtures'
 import { expectSagaState, api } from './helpers'
 
 describe('Fetch user data', () => {
