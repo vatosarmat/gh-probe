@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react'
 import { createBrowserHistory } from 'history'
 
-import { render, fireEvent, screen, waitForElement, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, fireEvent, waitForElement, waitForElementToBeRemoved } from '@testing-library/react'
 
 import { createPersistentStore } from 'state'
-import { Api } from 'services/api'
+import { Api, ReposPage, ReposPager } from 'services/api'
 import App from 'components/App'
 
 import makeFx from 'services/api/fixtures'
@@ -32,45 +32,62 @@ describe('App basic functionality', () => {
   })
 
   it('Successfully renders', () => {
-    render(app)
+    const { getByText, getByLabelText } = render(app)
 
-    expect(screen.getByText('GitHub repos')).toBeVisible()
-    expect(screen.getByLabelText('Settings')).toBeEnabled()
-    expect(screen.getByLabelText('Search user')).toBeEnabled()
-    expect(screen.getByText('Search')).toBeEnabled()
+    expect(getByText('GitHub repos')).toBeVisible()
+    expect(getByLabelText('Settings')).toBeEnabled()
+    expect(getByLabelText('Search user')).toBeEnabled()
+    expect(getByText('Search')).toBeEnabled()
   })
 
-  it('Opens and closes settings dialog', () => {
-    render(app)
+  it('Opens and closes settings dialog', async () => {
+    const { getByText, getByLabelText, queryByText } = render(app)
+    expect(queryByText('Settings')).toBeNull()
 
-    expect(screen.queryByText('Settings')).toBeNull()
-
-    fireEvent.click(screen.getByLabelText('Settings'))
-    const settingsHeader = screen.getByText('Settings')
-    const closeButton = screen.getByText(/close/i)
-
-    expect(settingsHeader).toBeVisible()
-    expect(screen.getByText('Color scheme')).toBeVisible()
-    expect(screen.getByText(/repos per page/i)).toBeVisible()
-    expect(screen.getByText(/reset application state/i)).toBeEnabled()
+    fireEvent.click(getByLabelText('Settings'))
+    const closeButton = getByText(/close/i)
+    expect(getByText('Settings')).toBeVisible()
+    expect(getByText('Color scheme')).toBeVisible()
+    expect(getByText(/repos per page/i)).toBeVisible()
+    expect(getByText(/reset application state/i)).toBeEnabled()
     expect(closeButton).toBeEnabled()
 
     fireEvent.click(closeButton)
-    waitForElementToBeRemoved(() => settingsHeader)
+    await waitForElementToBeRemoved(() => queryByText('Settings'))
   })
 
-  it('Searches users', () => {
-    render(app)
-    const usersSearchResultRB = fx.usersSearchResultResponseBody
-    ;(api.searchUser as jest.Mock).mockResolvedValueOnce(usersSearchResultRB)
+  it('Searches users and shows repos', async () => {
+    const searchQuery = fx.usersSearchQuery
+    const queryResult = fx.usersSearchResultResponseBody
+    const { login: userLogin, id: userId } = fx.usersSearchResultResponseBody.items[0]
+    const userData = fx.users[userId]
+    const { name: userName, bio: userBio } = fx.users[userId]
+    const userReposPage = fx.singleReposPage
 
-    const searchInput = screen.getByLabelText('Search user') as HTMLInputElement
-    const searchButton = screen.getByText(/^search$/i)
+      //eslint-disable-next-line no-extra-semi
+    ;(api.searchUser as jest.Mock).mockResolvedValueOnce(queryResult)
+    ;(api.fetchUser as jest.Mock).mockResolvedValueOnce(userData)
+    const pager = new ReposPager('this is mock')
+    const pagerNextResult: IteratorResult<ReposPage, ReposPage> = {
+      done: true,
+      value: userReposPage
+    }
+    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResult)
+    ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
 
-    searchInput.value = fx.usersSearchQuery
-    fireEvent.change(searchInput)
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+    const { getByLabelText, getByText, debug } = render(app)
+    const searchInput = getByLabelText('Search user')
+    const searchButton = getByText(/^search$/i)
+    fireEvent.change(searchInput, {
+      target: {
+        value: searchQuery
+      }
+    })
     fireEvent.click(searchButton)
+    await waitForElement(() => queryResult.items.map(item => getByText(item.login)))
 
-    waitForElement(() => usersSearchResultRB.items.map(item => screen.getByText(item.login)))
+    fireEvent.click(getByText(userLogin))
+    await waitForElement(() => [getByText(userName!), getByText(userBio!)])
   })
 })
