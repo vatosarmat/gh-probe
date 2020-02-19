@@ -15,10 +15,11 @@ const getNextUrl = ({ repos }: { repos: ReposState }) => repos.progress?.nextUrl
 function* resumeFetch(reposPager?: ReposPager) {
   try {
     if (!reposPager) {
-      reposPager = new ReposPager(yield select(getNextUrl))
-      if (!reposPager) {
+      const nextUrl: ReturnType<typeof getNextUrl> = yield select(getNextUrl)
+      if (!nextUrl) {
         throw Error('Invalid state')
       }
+      reposPager = new ReposPager(nextUrl)
     }
 
     let done = false

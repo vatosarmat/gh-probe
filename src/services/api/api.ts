@@ -3,6 +3,7 @@ import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
 import { pick } from 'lodash'
 
+import { appConfig } from 'config'
 import { User, UserBrief, SearchResult, SearchResultItem, Repo } from './gh-types'
 
 export interface ReposPage<T extends Repo = Repo> {
@@ -42,6 +43,7 @@ function pickUsersSearchResultItemFields(responseBody: any): SearchResultItem<Us
 export class ReposPager implements AsyncIterableIterator<ReposPage> {
   private abortController?: AbortController
   private nextUrl?: string
+  private readonly baseUrl = appConfig.ghApiBaseUrl
   private current: number = 1
   private total: number = 1
 
@@ -107,8 +109,7 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
 
 export class Api {
   private abortController?: AbortController
-
-  constructor(private readonly baseUrl: string) {}
+  private readonly baseUrl = appConfig.ghApiBaseUrl
 
   private url(endpoint: string, params: { [key: string]: any }): string {
     return `${this.baseUrl}/${endpoint}?${qs(params)}`
