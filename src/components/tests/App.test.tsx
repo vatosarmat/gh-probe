@@ -11,7 +11,7 @@ import makeFx from 'services/api/fixtures'
 
 jest.mock('services/api')
 
-export const api = new Api('THIS IS MOCK')
+export const api = new Api()
 
 describe('App basic functionality', () => {
   let history

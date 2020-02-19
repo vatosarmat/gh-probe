@@ -13,7 +13,7 @@ import { isNumber } from 'utils/common'
 
 jest.mock('services/api')
 
-export const api = new Api('THIS IS MOCK')
+export const api = new Api()
 
 export function* runSagaTest<Fn extends (...args: any[]) => any>(fn: Fn, ...args: Parameters<Fn>) {
   const sagaContext: SagaContext = {
