@@ -9,5 +9,5 @@ export const defaultReposPerPage: ReposPerPage = 10
 export const appConfig = {
   exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
   title: 'GitHub repos',
-  ghApiBaseUrl: process.env.REACT_APP_GITHUB_API_BASE_URL ?? 'http://localhost/gh-api'
+  ghApiBaseUrl: (process.env.REACT_APP_GITHUB_API_BASE_URL ?? (window as any).REACT_APP_GITHUB_API_BASE_URL) as string
 }
