@@ -52,9 +52,6 @@ export default function rootReducer(state: State | undefined, action: Action) {
 }
 
 const transform = createTransform(undefined, (stateSlice: State[keyof State], key: keyof State, state: State) => {
-  console.log(key)
-  console.log(stateSlice)
-
   switch (key) {
     case 'repos': {
       const repos = stateSlice as ReposState
