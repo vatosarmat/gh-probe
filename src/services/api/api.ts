@@ -45,6 +45,7 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
   private abortController?: AbortController
   private nextUrl?: string
   private readonly baseUrlObj = new URL(appConfig.ghApiBaseUrl)
+  private readonly token? = appConfig.ghToken
   private current: number = 1
   private total: number = 1
 
@@ -62,7 +63,12 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
     this.abortController = new AbortController()
 
     const prom = fetch(this.nextUrl, {
-      signal: this.abortController.signal
+      signal: this.abortController.signal,
+      headers: this.token
+        ? {
+            Authorization: `token ${this.token}`
+          }
+        : {}
     })
       .then(response => {
         if (!response.ok) {
@@ -116,6 +122,7 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
 export class Api {
   private abortController?: AbortController
   private readonly baseUrl = appConfig.ghApiBaseUrl
+  private readonly token? = appConfig.ghToken
 
   private url(endpoint: string, params: { [key: string]: any }): string {
     return `${this.baseUrl}/${endpoint}?${qs(params)}`
@@ -135,7 +142,12 @@ export class Api {
     this.abortController = new AbortController()
 
     return fetch(this.url(endpoint, params), {
-      signal: this.abortController.signal
+      signal: this.abortController.signal,
+      headers: this.token
+        ? {
+            Authorization: `token ${this.token}`
+          }
+        : {}
     })
       .then(response => {
         if (!response.ok) {
@@ -153,7 +165,16 @@ export class Api {
     const endpoint = `users/${username}`
     const params = {}
 
-    return fetch(this.url(endpoint, params))
+    return fetch(
+      this.url(endpoint, params),
+      this.token
+        ? {
+            headers: {
+              Authorization: `token ${this.token}`
+            }
+          }
+        : undefined
+    )
       .then(response => {
         if (!response.ok) {
           throw Error('fetchUser error: ' + response.status)
