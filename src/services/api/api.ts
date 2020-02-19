@@ -1,3 +1,4 @@
+import path from 'path'
 import { CANCEL } from 'redux-saga'
 import { stringify as qs } from 'query-string'
 import parseLinkHeader from 'parse-link-header'
@@ -43,7 +44,7 @@ function pickUsersSearchResultItemFields(responseBody: any): SearchResultItem<Us
 export class ReposPager implements AsyncIterableIterator<ReposPage> {
   private abortController?: AbortController
   private nextUrl?: string
-  private readonly baseUrl = appConfig.ghApiBaseUrl
+  private readonly baseUrlObj = new URL(appConfig.ghApiBaseUrl)
   private current: number = 1
   private total: number = 1
 
@@ -73,7 +74,12 @@ export class ReposPager implements AsyncIterableIterator<ReposPage> {
         if (link) {
           const linkHeader = parseLinkHeader(link)
           if (linkHeader && linkHeader.next) {
-            this.nextUrl = linkHeader.next.url
+            const nextUrlObj = new URL(linkHeader.next.url)
+            nextUrlObj.protocol = this.baseUrlObj.protocol
+            nextUrlObj.host = this.baseUrlObj.host
+            nextUrlObj.pathname = path.join(this.baseUrlObj.pathname, nextUrlObj.pathname)
+
+            this.nextUrl = nextUrlObj.toString()
 
             this.total = parseInt(linkHeader.last.page)
             this.current = parseInt(linkHeader.next.page) - 1
