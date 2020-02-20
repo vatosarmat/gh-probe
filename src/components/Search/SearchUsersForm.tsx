@@ -8,7 +8,6 @@ import {
   Theme,
   withStyles,
   WithStyles,
-  Grid,
   Typography,
   Link,
   Tooltip,
@@ -26,13 +25,17 @@ const { request: searchRequest } = usersSearchActions
 
 const styles = (theme: Theme) =>
   createStyles({
-    gridContainer: {
-      padding: theme.spacing(4)
+    form: {
+      padding: theme.spacing(2),
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(4)
+      }
     },
 
-    gridInputItem: {
+    searchInputRow: {
       display: 'flex',
-      alignItems: 'flex-end'
+      alignItems: 'flex-end',
+      marginBottom: theme.spacing(4)
     },
 
     textField: {
@@ -167,15 +170,9 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
     const examples = appConfig.exampleUsers
 
     return (
-      <Grid
-        container
-        component="form"
-        className={classes.gridContainer}
-        onSubmit={(evt: FormEvent) => evt.preventDefault()}
-        spacing={6}
-      >
+      <form className={classes.form} onSubmit={(evt: FormEvent) => evt.preventDefault()}>
         <ClickAwayListener onClickAway={this.handleClickAway}>
-          <Grid item xs={12} className={classes.gridInputItem}>
+          <div className={classes.searchInputRow}>
             <AccountSearch fontSize="large" className={classes.icon} />
 
             <Tooltip title="Query must be non-empty" open={!!error} placement="top">
@@ -220,32 +217,30 @@ class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormSta
             <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
               Search
             </Button>
-          </Grid>
+          </div>
         </ClickAwayListener>
-        <Grid item xs={12}>
-          <Typography>
-            Add modifier:{' '}
-            <span className={classes.searchModifiers}>
-              <Link
-                component="span"
-                className={classes.searchModifier}
-                onClick={this.handleSearchModifierClick}
-                data-modifier="in:login"
-              >
-                in:login
-              </Link>{' '}
-              <Link
-                component="span"
-                className={classes.searchModifier}
-                onClick={this.handleSearchModifierClick}
-                data-modifier="type:organization"
-              >
-                type:organization
-              </Link>
-            </span>
-          </Typography>
-        </Grid>
-      </Grid>
+        <Typography>
+          Add modifier:{' '}
+          <span className={classes.searchModifiers}>
+            <Link
+              component="span"
+              className={classes.searchModifier}
+              onClick={this.handleSearchModifierClick}
+              data-modifier="in:login"
+            >
+              in:login
+            </Link>{' '}
+            <Link
+              component="span"
+              className={classes.searchModifier}
+              onClick={this.handleSearchModifierClick}
+              data-modifier="type:organization"
+            >
+              type:organization
+            </Link>
+          </span>
+        </Typography>
+      </form>
     )
   }
 }

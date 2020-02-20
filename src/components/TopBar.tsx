@@ -33,8 +33,7 @@ const useStyles = makeStyles(theme => ({
   },
 
   appBar: {
-    flexDirection: 'row',
-    paddingLeft: theme.spacing(2)
+    flexDirection: 'row'
   },
 
   toolbarTitle: {
@@ -130,7 +129,7 @@ const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <AppBar position="static" color="primary" className={classes.appBar}>
-      <IconButton edge="start" color="inherit" aria-label="Settings" onClick={handleDialogOpen}>
+      <IconButton color="inherit" aria-label="Settings" onClick={handleDialogOpen}>
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>

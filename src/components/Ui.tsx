@@ -16,7 +16,7 @@ const { getPrimaryColor } = layoutSelectors
 
 const useStyles = makeStyles(theme => ({
   container: {
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('md')]: {
       marginTop: theme.spacing(3),
       marginBottom: theme.spacing(3)
     },
