@@ -16,11 +16,15 @@ import {
   Typography
 } from '@material-ui/core'
 import { teal, indigo, purple } from '@material-ui/core/colors'
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
+import { CSSProperties } from '@material-ui/styles'
 import { Menu as MenuIcon } from '@material-ui/icons'
 import { connect } from 'react-redux'
+import { reduce } from 'lodash'
 
 import ArraySelect from './common/ArraySelect'
 import { appConfig, ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'config'
+
 import { State, layoutSelectors, layoutActions, rootActions } from 'state'
 
 const { getPrimaryColor, getReposPerPage } = layoutSelectors
@@ -32,14 +36,38 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2)
   },
 
-  appBar: {
-    flexDirection: 'row'
-  },
+  appBar: reduce(
+    appConfig.sidePadding,
+    (css: CSSProperties, value, breakpoint) => ({
+      ...css,
+      [theme.breakpoints.up(breakpoint as Breakpoint)]: {
+        padding: theme.spacing(value),
+        '& > *': {
+          padding: 0,
+          marginRight: theme.spacing(value)
+        }
+      }
+    }),
+    {
+      flexDirection: 'row'
+    }
+  ),
+
+  menuButton: reduce(
+    appConfig.sidePadding,
+    (css: CSSProperties, value, breakpoint) => ({
+      ...css,
+      [theme.breakpoints.up(breakpoint as Breakpoint)]: {
+        padding: theme.spacing(value),
+        margin: -theme.spacing(value),
+        marginRight: 0
+      }
+    }),
+    {}
+  ),
 
   toolbarTitle: {
-    flexGrow: 1,
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+    lineHeight: 1
   },
 
   tabsIndicator: {
@@ -129,7 +157,7 @@ const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <AppBar position="static" color="primary" className={classes.appBar}>
-      <IconButton color="inherit" aria-label="Settings" onClick={handleDialogOpen}>
+      <IconButton color="inherit" aria-label="Settings" onClick={handleDialogOpen} className={classes.menuButton}>
         <MenuIcon />
       </IconButton>
       <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>
