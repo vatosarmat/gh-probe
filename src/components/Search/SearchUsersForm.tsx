@@ -53,24 +53,20 @@ const useStyles = makeStyles(theme => ({
 
   searchInputRow: {
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'baseline',
     '& > *': {
       marginRight: theme.spacing(1)
     },
-    marginBottom: theme.spacing(4)
+    marginBottom: theme.spacing(1)
   },
 
   accountSearchIcon: {
-    marginBottom: theme.spacing(-0.25)
+    position: 'relative',
+    top: theme.spacing(2)
   },
 
   searchInput: {
     wordSpacing: '.4rem'
-  },
-
-  helperText: {
-    position: 'absolute',
-    top: '100%'
   },
 
   exampleSpan: {
@@ -79,15 +75,16 @@ const useStyles = makeStyles(theme => ({
   },
 
   searchButton: {
+    marginRight: 0,
+    position: 'relative',
     [theme.breakpoints.down('xs')]: {
-      minWidth: 40
+      minWidth: 40,
+      top: theme.spacing(1)
     },
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1)
-    },
-
-    marginRight: 0,
-    marginBottom: theme.spacing(-0.25)
+      marginLeft: theme.spacing(1),
+      top: theme.spacing(0.5)
+    }
   },
 
   searchModifiers: {
@@ -201,7 +198,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
               />
-              <FormHelperText component="em" className={styles.helperText} error={false}>
+              <FormHelperText component="em" error={false}>
                 Examples:{' '}
                 {exampleUsers.slice(0, -1).map(example => (
                   <Fragment key={example}>
@@ -230,7 +227,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
           </Button>
         </div>
       </ClickAwayListener>
-      <Typography>
+      <Typography variant="body2">
         Add modifier:{' '}
         <span className={styles.searchModifiers}>
           <Link
