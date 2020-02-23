@@ -1,250 +1,260 @@
 import {
   Button,
-  createStyles,
   FormControl,
   FormHelperText,
   Input,
   InputLabel,
-  Theme,
-  withStyles,
-  WithStyles,
   Typography,
   Link,
   Tooltip,
-  ClickAwayListener
+  ClickAwayListener,
+  useMediaQuery,
+  makeStyles
 } from '@material-ui/core'
+import { useTheme } from '@material-ui/core/styles'
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
+import { CSSProperties } from '@material-ui/styles'
 import { AccountSearch } from 'mdi-material-ui'
-import cuid from 'cuid'
-import React, { Fragment, ChangeEvent, Component, MouseEvent, FormEvent, KeyboardEvent, RefObject } from 'react'
+import React, {
+  Fragment,
+  useState,
+  ChangeEvent,
+  MouseEvent,
+  FormEvent,
+  KeyboardEvent,
+  RefObject,
+  useRef,
+  useEffect
+} from 'react'
 import { connect } from 'react-redux'
+import { reduce } from 'lodash'
 
 import { usersSearchActions } from 'state'
 import { appConfig } from 'config'
 
 const { request: searchRequest } = usersSearchActions
 
-const styles = (theme: Theme) =>
-  createStyles({
-    form: {
-      padding: theme.spacing(2),
-      [theme.breakpoints.up('md')]: {
-        padding: theme.spacing(4)
-      }
-    },
-
-    searchInputRow: {
-      display: 'flex',
-      alignItems: 'flex-end',
-      marginBottom: theme.spacing(4)
-    },
-
-    textField: {
-      marginLeft: theme.spacing(1),
-      marginRight: theme.spacing(2)
-    },
-
-    searchInput: {
-      wordSpacing: '.4rem'
-    },
-
-    icon: {
-      marginBottom: -4
-    },
-
-    helperText: {
-      position: 'absolute',
-      top: '100%'
-    },
-
-    exampleSpan: {
-      cursor: 'pointer',
-      textDecoration: 'underline dotted'
-    },
-
-    searchModifiers: {
-      wordSpacing: '.8rem',
-      marginLeft: '.8rem'
-    },
-
-    searchModifier: {
-      cursor: 'pointer'
+const useStyles = makeStyles(theme => ({
+  form: {
+    ...reduce(
+      appConfig.sidePadding,
+      (css: CSSProperties, value, breakpoint) => ({
+        ...css,
+        [theme.breakpoints.up(breakpoint as Breakpoint)]: {
+          padding: theme.spacing(value)
+        }
+      }),
+      {}
+    ),
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(4)
     }
-  })
+  },
+
+  searchInputRow: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    '& > *': {
+      marginRight: theme.spacing(1)
+    },
+    marginBottom: theme.spacing(4)
+  },
+
+  accountSearchIcon: {
+    marginBottom: theme.spacing(-0.25)
+  },
+
+  searchInput: {
+    wordSpacing: '.4rem'
+  },
+
+  helperText: {
+    position: 'absolute',
+    top: '100%'
+  },
+
+  exampleSpan: {
+    cursor: 'pointer',
+    textDecoration: 'underline dotted'
+  },
+
+  searchButton: {
+    [theme.breakpoints.down('xs')]: {
+      minWidth: 40
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1)
+    },
+
+    marginRight: 0,
+    marginBottom: theme.spacing(-0.25)
+  },
+
+  searchModifiers: {
+    wordSpacing: '.8rem',
+    marginLeft: '.8rem'
+  },
+
+  searchModifier: {
+    cursor: 'pointer'
+  }
+}))
 
 interface DispatchProps {
   searchRequest: typeof searchRequest
 }
 
-type OwnProps = WithStyles<typeof styles>
+type SearchUsersFormProps = DispatchProps
 
-type SearchUsersFormProps = DispatchProps & OwnProps
+const SEARCH_INPUT_ID = '23852db036abed4725193c1663bcecca'
 
-interface SearchUsersFormState {
-  input: string
-  error: boolean
-}
+const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
+  const [input, setInput] = useState('')
+  const [inputError, setInputError] = useState(false)
+  const inputElementRef: RefObject<HTMLInputElement> = useRef(null)
 
-class SearchUsersForm extends Component<SearchUsersFormProps, SearchUsersFormState> {
-  state = {
-    input: '',
-    error: false
+  const focusInput = () => {
+    const { current } = inputElementRef
+    if (current) {
+      current.focus()
+    }
   }
 
-  inputElementId = cuid()
-  inputElementRef: RefObject<HTMLInputElement> = React.createRef()
+  useEffect(focusInput, [])
 
-  handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { value: input } = evt.target
+  const handleInputChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setInput(evt.target.value)
 
-    this.setState({
-      input,
-      error: false
+  const handleButtonClick = () => {
+    setInput(value => {
+      const query = value.toString().trim()
+      if (query) {
+        searchRequest(query)
+        return query
+      } else {
+        setInputError(true)
+        return ''
+      }
     })
   }
 
-  handleButtonClick = () => {
-    const { searchRequest } = this.props
-    const { input } = this.state
-
-    const query = input.toString().trim()
-
-    if (query) {
-      this.setState(
-        {
-          input: query
-        },
-        () => searchRequest(query)
-      )
-    } else {
-      this.setState({ input: '', error: true })
-    }
-  }
-
-  handleKeyDown = (evt: KeyboardEvent) => {
+  const handleKeyDown = (evt: KeyboardEvent) => {
     if (evt.key === 'Enter') {
-      this.handleButtonClick()
+      handleButtonClick()
     }
   }
 
-  handleExampleClick = (evt: MouseEvent<HTMLSpanElement>) => {
+  const handleExampleClick = (evt: MouseEvent<HTMLSpanElement>) => {
     const {
-      currentTarget: { dataset }
+      currentTarget: {
+        dataset: { text }
+      }
     } = evt
 
-    if (dataset.text) {
-      this.setState(
-        {
-          input: dataset.text
-        },
-        () => this.inputElementRef.current!.focus()
-      )
+    if (text) {
+      setInput(text)
+      focusInput()
     }
   }
 
-  handleSearchModifierClick = (evt: MouseEvent<HTMLElement>) => {
+  const handleClickAway = () => {
+    setInputError(false)
+  }
+
+  const handleSearchModifierClick = (evt: MouseEvent<HTMLElement>) => {
     const {
-      currentTarget: { dataset }
+      currentTarget: {
+        dataset: { modifier }
+      }
     } = evt
 
-    if (dataset.modifier) {
-      this.setState(
-        state => ({
-          input: state.input + ' ' + dataset.modifier
-        }),
-        () => this.inputElementRef.current!.focus()
-      )
+    if (modifier) {
+      setInput(value => `${value} ${modifier}`)
+      focusInput()
     }
   }
 
-  handleClickAway = () => {
-    this.setState({ error: false })
-  }
+  const theme = useTheme()
+  const smallScreen = useMediaQuery(theme.breakpoints.down('xs'))
+  const styles = useStyles()
+  const { exampleUsers } = appConfig
+  const lastExample = exampleUsers[exampleUsers.length - 1]
 
-  componentDidMount() {
-    this.inputElementRef.current!.focus()
-  }
+  return (
+    <form className={styles.form} onSubmit={(evt: FormEvent) => evt.preventDefault()}>
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <div className={styles.searchInputRow}>
+          {smallScreen ? null : <AccountSearch fontSize="large" className={styles.accountSearchIcon} />}
+          <Tooltip title="Query must be non-empty" open={inputError} placement="top">
+            <FormControl fullWidth error={!input}>
+              <InputLabel htmlFor={SEARCH_INPUT_ID}>Search user</InputLabel>
 
-  render() {
-    const { input, error } = this.state
-    const { classes } = this.props
-    const examples = appConfig.exampleUsers
-
-    return (
-      <form className={classes.form} onSubmit={(evt: FormEvent) => evt.preventDefault()}>
-        <ClickAwayListener onClickAway={this.handleClickAway}>
-          <div className={classes.searchInputRow}>
-            <AccountSearch fontSize="large" className={classes.icon} />
-
-            <Tooltip title="Query must be non-empty" open={!!error} placement="top">
-              <FormControl className={classes.textField} fullWidth error={!input}>
-                <InputLabel htmlFor={this.inputElementId}>Search user</InputLabel>
-
-                <Input
-                  error={!!error}
-                  name="input"
-                  spellCheck={false}
-                  id={this.inputElementId}
-                  classes={{
-                    input: classes.searchInput
-                  }}
-                  value={input}
-                  inputRef={this.inputElementRef}
-                  onChange={this.handleInputChange}
-                  onKeyDown={this.handleKeyDown}
-                />
-                <FormHelperText component="em" className={classes.helperText} error={false}>
-                  Examples:{' '}
-                  {examples.slice(0, -1).map(example => (
-                    <Fragment key={example}>
-                      <span className={classes.exampleSpan} onClick={this.handleExampleClick} data-text={example}>
-                        {example}
-                      </span>
-                      {', '}
-                    </Fragment>
-                  ))}
-                  {
-                    <span
-                      className={classes.exampleSpan}
-                      onClick={this.handleExampleClick}
-                      data-text={examples[examples.length - 1]}
-                    >
-                      {examples[examples.length - 1]}
+              <Input
+                error={inputError}
+                name="input"
+                spellCheck={false}
+                id={SEARCH_INPUT_ID}
+                classes={{
+                  input: styles.searchInput
+                }}
+                value={input}
+                inputRef={inputElementRef}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+              />
+              <FormHelperText component="em" className={styles.helperText} error={false}>
+                Examples:{' '}
+                {exampleUsers.slice(0, -1).map(example => (
+                  <Fragment key={example}>
+                    <span className={styles.exampleSpan} onClick={handleExampleClick} data-text={example}>
+                      {example}
                     </span>
-                  }
-                </FormHelperText>
-              </FormControl>
-            </Tooltip>
-            <Button size="small" variant="outlined" color="primary" onClick={this.handleButtonClick}>
-              Search
-            </Button>
-          </div>
-        </ClickAwayListener>
-        <Typography>
-          Add modifier:{' '}
-          <span className={classes.searchModifiers}>
-            <Link
-              component="span"
-              className={classes.searchModifier}
-              onClick={this.handleSearchModifierClick}
-              data-modifier="in:login"
-            >
-              in:login
-            </Link>{' '}
-            <Link
-              component="span"
-              className={classes.searchModifier}
-              onClick={this.handleSearchModifierClick}
-              data-modifier="type:organization"
-            >
-              type:organization
-            </Link>
-          </span>
-        </Typography>
-      </form>
-    )
-  }
+                    {', '}
+                  </Fragment>
+                ))}
+                {
+                  <span className={styles.exampleSpan} onClick={handleExampleClick} data-text={lastExample}>
+                    {lastExample}
+                  </span>
+                }
+              </FormHelperText>
+            </FormControl>
+          </Tooltip>
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={handleButtonClick}
+            className={styles.searchButton}
+          >
+            {smallScreen ? <AccountSearch fontSize="small" /> : 'Search'}
+          </Button>
+        </div>
+      </ClickAwayListener>
+      <Typography>
+        Add modifier:{' '}
+        <span className={styles.searchModifiers}>
+          <Link
+            component="span"
+            className={styles.searchModifier}
+            onClick={handleSearchModifierClick}
+            data-modifier="in:login"
+          >
+            in:login
+          </Link>{' '}
+          <Link
+            component="span"
+            className={styles.searchModifier}
+            onClick={handleSearchModifierClick}
+            data-modifier="type:organization"
+          >
+            type:organization
+          </Link>
+        </span>
+      </Typography>
+    </form>
+  )
 }
 
 export default connect(() => ({}), {
   searchRequest
-})(withStyles(styles)(SearchUsersForm))
+})(SearchUserForm)
