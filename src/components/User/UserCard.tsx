@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   content: {
     display: 'flex',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing(2)
+    marginBottom: 0
   },
 
   textContainer: {

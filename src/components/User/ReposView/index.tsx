@@ -24,10 +24,6 @@ import WarningMessage from './WarningMessage'
 const { getReposFetchStatus, getReposError, getLanguageInfos, haveReposStars } = reposSelectors
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    paddingBottom: theme.spacing(7)
-  },
-
   controlBlock: {
     padding: theme.spacing(appConfig.padding.repoListControl)
   },
@@ -109,7 +105,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
   const { language, repoCount } = languageInfo
 
   return (
-    <div className={styles.root}>
+    <div>
       <div className={styles.controlBlock}>
         <ErrorMessage className={styles.additionalMessage} show={reposFetchStatus === 'ERROR'} error={error} />
         <WarningMessage

@@ -51,7 +51,12 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
         }
       : state,
 
-  'repos/FETCH_STOP': state => ({ ...state, status: 'STOPPED' }),
+  'repos/FETCH_STOP': state =>
+    state.status === 'IN_PROGRESS'
+      ? state.progress
+        ? { ...state, status: 'STOPPED' }
+        : { ...defaultReposState }
+      : state,
 
   'repos/FETCH_RESUME': state => ({ ...state, status: 'IN_PROGRESS' }),
 

@@ -16,9 +16,10 @@ dayjs.extend(calendar)
 
 const useStyles = makeStyles(theme => ({
   cardContent: {
-    paddingTop: theme.spacing(4),
     paddingLeft: theme.spacing(appConfig.padding.repoListItem),
     paddingRight: theme.spacing(appConfig.padding.repoListItem),
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
 
     '&:last-child': {
       paddingBottom: theme.spacing(4)
@@ -44,7 +45,6 @@ const useStyles = makeStyles(theme => ({
   infoRow: {
     marginTop: theme.spacing(0.5),
     marginBottom: theme.spacing(0.5),
-    marginRight: theme.spacing(4),
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -53,6 +53,9 @@ const useStyles = makeStyles(theme => ({
       marginTop: theme.spacing(0.5),
       marginBottom: theme.spacing(0.5),
       marginRight: theme.spacing(2)
+    },
+    '&:not(:last-child)': {
+      marginRight: theme.spacing(4)
     }
   },
 

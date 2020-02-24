@@ -13,13 +13,15 @@ const useStyles = makeStyles(theme => ({
   paginationInfo: {
     padding: theme.spacing(appConfig.padding.repoListItem)
   },
-  list: {
-    paddingBottom: theme.spacing(5)
-  },
   buttonGroup: {
-    margin: 'auto'
-    // paddingLeft: '30%',
-    // paddingRight: '30%'
+    paddingLeft: '25%',
+    paddingRight: '25%',
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    [theme.breakpoints.down('xs')]: {
+      paddingLeft: '20%',
+      paddingRight: '20%'
+    }
   }
 }))
 
@@ -50,7 +52,7 @@ const RepoList: React.FC<RepoListProps> = ({
           Showing {from + 1} to {to}
         </Typography>
       )}
-      <ul className={styles.list}>
+      <ul>
         {ids.map(repoId => (
           <li key={repoId}>
             <RepoCard id={repoId} />
@@ -59,7 +61,7 @@ const RepoList: React.FC<RepoListProps> = ({
         ))}
       </ul>
       {hasOtherPages && (
-        <ButtonGroup fullWidth={true} className={styles.buttonGroup}>
+        <ButtonGroup fullWidth={true} size="small" className={styles.buttonGroup}>
           <Button disabled={!hasPrevPage} onClick={hasPrevPage ? onPrevClick : undefined}>
             Previous
           </Button>
