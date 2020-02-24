@@ -15,7 +15,7 @@ import ReposView from './ReposView'
 const { getUserQuery, getUserData, getUserError, isUserDataFetching } = userSelectors
 const { request: requestUserData } = userActions
 const { getReposFetchStatus, getReposUsername } = reposSelectors
-const { start: requestReposData } = reposActions
+const { start: requestReposData, stop: stopReposDataLoading } = reposActions
 
 interface StateProps {
   userQuery?: string
@@ -30,6 +30,7 @@ interface StateProps {
 interface DispatchProps {
   requestUserData: typeof requestUserData
   requestReposData: typeof requestReposData
+  stopReposDataLoading: typeof stopReposDataLoading
 }
 
 type UserRouteProps = StateProps & DispatchProps
@@ -43,7 +44,8 @@ const UserRoute: React.FC<UserRouteProps> = ({
   reposUsername,
 
   requestUserData,
-  requestReposData
+  requestReposData,
+  stopReposDataLoading
 }) => {
   const { username: paramUsername } = useParams<{ username: string }>()
 
@@ -61,6 +63,13 @@ const UserRoute: React.FC<UserRouteProps> = ({
       requestReposData(paramUsername)
     }
   }, [paramUsername, reposUsername, wasUserRequested, hasUserFetched, requestUserData, requestReposData])
+
+  useEffect(
+    () => () => {
+      stopReposDataLoading()
+    },
+    [stopReposDataLoading]
+  )
 
   let content = null
 
@@ -97,5 +106,5 @@ export default connect<StateProps, DispatchProps, {}, State>(
     reposFetchStatus: getReposFetchStatus(state),
     reposUsername: getReposUsername(state)
   }),
-  { requestUserData, requestReposData }
+  { requestUserData, requestReposData, stopReposDataLoading }
 )(UserRoute)
