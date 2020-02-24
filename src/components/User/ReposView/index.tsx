@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Typography, makeStyles, Divider } from '@material-ui/core'
-import clsx from 'clsx'
 
 import {
   State,
@@ -36,14 +35,19 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1)
   },
 
-  arraySelectBlock: {
-    '&:not(:last-child)': {
-      marginBottom: theme.spacing(2)
+  arraySelect: {
+    marginBottom: theme.spacing(1.5),
+    [theme.breakpoints.down('xs')]: {
+      marginBottom: theme.spacing(1)
     }
   },
 
   sortingBlock: {
-    display: 'flex'
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      flexShrink: 0
+    }
   }
 }))
 
@@ -117,7 +121,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
         />
 
         <ArraySelect
-          className={styles.arraySelectBlock}
+          className={styles.arraySelect}
           prefix="Language"
           suffix={`${repoCount} repos`}
           value={languageInfo}
@@ -125,8 +129,9 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
           getLabel={getLanguageInfoLabel}
           onChange={handleLanguageInfoChange}
         />
-        <div className={clsx(styles.sortingBlock, styles.arraySelectBlock)}>
+        <div className={styles.sortingBlock}>
           <ArraySelect
+            className={styles.arraySelect}
             prefix="Sort by"
             value={sortingKey}
             array={repoSortingKeyTuple}
@@ -135,6 +140,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
           />
 
           <ArraySelect
+            className={styles.arraySelect}
             prefix="in"
             suffix={'ending order'}
             value={sortingOrder}
