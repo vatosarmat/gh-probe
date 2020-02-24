@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
   },
 
   appBar: reduce(
-    appConfig.sidePadding,
+    appConfig.padding.topBar,
     (css: CSSProperties, value, breakpoint) => ({
       ...css,
       [theme.breakpoints.up(breakpoint as Breakpoint)]: {
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   ),
 
   menuButton: reduce(
-    appConfig.sidePadding,
+    appConfig.padding.topBar,
     (css: CSSProperties, value, breakpoint) => ({
       ...css,
       [theme.breakpoints.up(breakpoint as Breakpoint)]: {

@@ -11,8 +11,23 @@ export const appConfig = {
   title: 'GitHub repos',
   ghApiBaseUrl: (process.env.REACT_APP_GITHUB_API_BASE_URL ?? (window as any).REACT_APP_GITHUB_API_BASE_URL) as string,
   ghToken: process.env.REACT_APP_GITHUB_TOKEN,
-  sidePadding: {
-    xs: 1,
-    sm: 1.5
+  padding: {
+    topBar: {
+      xs: 1.5
+    },
+    searchUserForm: {
+      xs: 2,
+      md: 4
+    },
+    searchResultItem: {
+      xs: {
+        horizontal: 2,
+        vertical: 1
+      },
+      md: {
+        horizontal: 4,
+        vertical: 1.5
+      }
+    }
   }
 }

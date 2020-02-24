@@ -35,22 +35,16 @@ import { appConfig } from 'config'
 const { request: searchRequest } = usersSearchActions
 
 const useStyles = makeStyles(theme => ({
-  form: {
-    ...reduce(
-      appConfig.sidePadding,
-      (css: CSSProperties, value, breakpoint) => ({
-        ...css,
-        [theme.breakpoints.up(breakpoint as Breakpoint)]: {
-          padding: theme.spacing(value)
-        }
-      }),
-      {}
-    ),
-    [theme.breakpoints.up('md')]: {
-      padding: theme.spacing(4)
-    }
-  },
-
+  form: reduce(
+    appConfig.padding.searchUserForm,
+    (css: CSSProperties, value, breakpoint) => ({
+      ...css,
+      [theme.breakpoints.up(breakpoint as Breakpoint)]: {
+        padding: theme.spacing(value)
+      }
+    }),
+    {}
+  ),
   searchInputRow: {
     display: 'flex',
     alignItems: 'baseline',
@@ -171,7 +165,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
   }
 
   const theme = useTheme()
-  const smallScreen = useMediaQuery(theme.breakpoints.down('xs'))
+  const isScreenSmall = useMediaQuery(theme.breakpoints.down('xs'))
   const styles = useStyles()
   const { exampleUsers } = appConfig
   const lastExample = exampleUsers[exampleUsers.length - 1]
@@ -180,7 +174,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
     <form className={styles.form} onSubmit={(evt: FormEvent) => evt.preventDefault()}>
       <ClickAwayListener onClickAway={handleClickAway}>
         <div className={styles.searchInputRow}>
-          {smallScreen ? null : <AccountSearch fontSize="large" className={styles.accountSearchIcon} />}
+          {isScreenSmall ? null : <AccountSearch fontSize="large" className={styles.accountSearchIcon} />}
           <Tooltip title="Query must be non-empty" open={inputError} placement="top">
             <FormControl fullWidth error={!input}>
               <InputLabel htmlFor={SEARCH_INPUT_ID}>Search user</InputLabel>
@@ -223,11 +217,11 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
             onClick={handleButtonClick}
             className={styles.searchButton}
           >
-            {smallScreen ? <AccountSearch fontSize="small" /> : 'Search'}
+            {isScreenSmall ? <AccountSearch fontSize="small" /> : 'Search'}
           </Button>
         </div>
       </ClickAwayListener>
-      <Typography variant="body2">
+      <Typography variant={isScreenSmall ? 'body2' : 'body1'}>
         Add modifier:{' '}
         <span className={styles.searchModifiers}>
           <Link

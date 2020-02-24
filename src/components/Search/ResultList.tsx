@@ -10,12 +10,8 @@ import ResultItem from './ResultItem'
 const { getSearchQuery, getSearchError, getSearchResultIds, isSearchInProgress } = usersSearchSelectors
 
 const useStyles = makeStyles(theme => ({
-  contentList: {
+  noResults: {
     padding: theme.spacing(2)
-  },
-
-  contentEmpty: {
-    padding: theme.spacing(4)
   },
 
   queryText: {
@@ -45,21 +41,19 @@ const SearchUsersResult: React.FC<SearchUsersResultProps> = ({ query, resultIds,
 
   if (resultIds.length) {
     return (
-      <div className={styles.contentList}>
-        <List>
-          {resultIds.map(id => (
-            <ResultItem key={id} id={id} />
-          ))}
-        </List>
-      </div>
+      <List disablePadding>
+        {resultIds.map(id => (
+          <ResultItem key={id} id={id} />
+        ))}
+      </List>
     )
   }
 
   if (query) {
     return (
-      <div className={styles.contentEmpty}>
+      <div className={styles.noResults}>
         <Typography variant="subtitle1" color="error" display="block">
-          No results found for query <span className={styles.queryText}>"{query}"</span>
+          No results found for query <span className={styles.queryText}>'{query}'</span>
         </Typography>
       </div>
     )
