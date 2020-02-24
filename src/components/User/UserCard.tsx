@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography, makeStyles } from '@material-ui/core'
+import { Typography, makeStyles, useTheme, useMediaQuery } from '@material-ui/core'
 import { Group, LocationOn, Bookmark } from '@material-ui/icons'
 
 import IconWithText from './IconWithText'
@@ -44,12 +44,23 @@ interface UserCardProps {
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
   const styles = useStyles()
+  const theme = useTheme()
+  const isScreenSmall = useMediaQuery(theme.breakpoints.down('xs'))
+
   if (!user) {
     return null
   }
   let { login, name, bio, avatar_url, location, company, blog } = user
 
   name = name || login
+
+  const info = (
+    <div className={styles.info}>
+      {company && <IconWithText icon={Group} caption={company} />}
+      {location && <IconWithText icon={LocationOn} caption={location} />}
+      {blog && <IconWithText icon={Bookmark} caption={blog} link />}
+    </div>
+  )
 
   return (
     <div className={styles.root}>
@@ -64,13 +75,10 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
               {login}
             </Typography>
           )}
-          <div className={styles.info}>
-            {company && <IconWithText icon={Group} caption={company} />}
-            {location && <IconWithText icon={LocationOn} caption={location} />}
-            {blog && <IconWithText icon={Bookmark} caption={blog} link />}
-          </div>
+          {isScreenSmall ? null : info}
         </div>
       </div>
+      {isScreenSmall && info}
       {bio && <Typography>{bio}</Typography>}
     </div>
   )
