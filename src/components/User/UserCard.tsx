@@ -24,7 +24,10 @@ const useStyles = makeStyles(theme => ({
 
   info: {
     display: 'flex',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    '& > *:not(:last-child)': {
+      marginRight: theme.spacing(2)
+    }
   },
 
   img: {

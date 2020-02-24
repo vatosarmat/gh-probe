@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
   ),
   searchInputRow: {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'flex-start',
     '& > *': {
       marginRight: theme.spacing(1)
     },
@@ -73,11 +73,11 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     [theme.breakpoints.down('xs')]: {
       minWidth: 40,
-      top: theme.spacing(1)
+      top: theme.spacing(2.75)
     },
     [theme.breakpoints.up('sm')]: {
       marginLeft: theme.spacing(1),
-      top: theme.spacing(0.5)
+      top: theme.spacing(2.5)
     }
   },
 

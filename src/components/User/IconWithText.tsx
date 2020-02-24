@@ -9,11 +9,11 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(0.5)
   },
   icon: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(0.5)
   },
 
   caption: {
-    marginRight: theme.spacing(3)
+    wordBreak: 'break-all'
   }
 }))
 
