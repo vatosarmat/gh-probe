@@ -16,6 +16,7 @@ import {
   repoSortingOrderTuple
 } from 'state'
 import ArraySelect from 'components/common/ArraySelect'
+import { appConfig } from 'config'
 
 import RepoList from './RepoList'
 import WarningMessage from './WarningMessage'
@@ -28,25 +29,22 @@ const useStyles = makeStyles(theme => ({
   },
 
   controlBlock: {
-    padding: theme.spacing(2.5)
+    padding: theme.spacing(appConfig.padding.repoListControl)
   },
 
   additionalMessage: {
     marginBottom: theme.spacing(1)
   },
 
-  arraySelect: {
-    marginBottom: theme.spacing(1.5),
-    [theme.breakpoints.down('xs')]: {
-      marginBottom: theme.spacing(1)
-    }
-  },
-
   sortingBlock: {
     display: 'flex',
     flexWrap: 'wrap',
     '& > *': {
-      flexShrink: 0
+      flexShrink: 0,
+      marginTop: theme.spacing(1.5),
+      [theme.breakpoints.down('xs')]: {
+        marginTop: theme.spacing(1)
+      }
     }
   }
 }))
@@ -121,7 +119,6 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
         />
 
         <ArraySelect
-          className={styles.arraySelect}
           prefix="Language"
           suffix={`${repoCount} repos`}
           value={languageInfo}
@@ -131,7 +128,6 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
         />
         <div className={styles.sortingBlock}>
           <ArraySelect
-            className={styles.arraySelect}
             prefix="Sort by"
             value={sortingKey}
             array={repoSortingKeyTuple}
@@ -140,7 +136,6 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
           />
 
           <ArraySelect
-            className={styles.arraySelect}
             prefix="in"
             suffix={'ending order'}
             value={sortingOrder}

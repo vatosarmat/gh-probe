@@ -28,6 +28,9 @@ export const appConfig = {
         horizontal: 4,
         vertical: 1.5
       }
-    }
+    },
+    userCard: 2,
+    repoListControl: 2,
+    repoListItem: 2
   }
 }

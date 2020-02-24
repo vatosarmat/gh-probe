@@ -4,10 +4,11 @@ import { Group, LocationOn, Bookmark } from '@material-ui/icons'
 
 import IconWithText from './IconWithText'
 import { User } from 'services/api'
+import { appConfig } from 'config'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(2.5)
+    padding: theme.spacing(appConfig.padding.userCard)
   },
 
   content: {

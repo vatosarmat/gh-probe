@@ -8,21 +8,17 @@ import calendar from 'dayjs/plugin/calendar'
 import { State, reposSelectors } from 'state'
 import { Repo } from 'services/api'
 import getLangColor from 'services/lang-color'
+import { appConfig } from 'config'
 
 const { getRepoById } = reposSelectors
 
 dayjs.extend(calendar)
 
 const useStyles = makeStyles(theme => ({
-  card: {
-    marginLeft: theme.spacing(-2.5),
-    marginRight: theme.spacing(-2.5)
-  },
-
   cardContent: {
     paddingTop: theme.spacing(4),
-    paddingLeft: theme.spacing(2.5),
-    paddingRight: theme.spacing(2.5),
+    paddingLeft: theme.spacing(appConfig.padding.repoListItem),
+    paddingRight: theme.spacing(appConfig.padding.repoListItem),
 
     '&:last-child': {
       paddingBottom: theme.spacing(4)
@@ -100,7 +96,7 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
   const { name, description, language, stargazers_count, forks_count, created_at, pushed_at, html_url, archived } = repo
 
   return (
-    <Card elevation={0} className={styles.card}>
+    <Card elevation={0}>
       <CardActionArea disableRipple component="a" href={html_url} target="_blank">
         <CardContent className={styles.cardContent}>
           <div className={styles.name}>

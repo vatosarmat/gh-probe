@@ -3,21 +3,23 @@ import { connect } from 'react-redux'
 import { Typography, ButtonGroup, Button, Divider, makeStyles } from '@material-ui/core'
 
 import { State, RepoProps, ReposIdsPage, reposSelectors } from 'state'
+import { appConfig } from 'config'
 
 import RepoCard from './RepoCard'
 
 const { getReposIdsPage } = reposSelectors
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(2.5)
+  paginationInfo: {
+    padding: theme.spacing(appConfig.padding.repoListItem)
   },
   list: {
     paddingBottom: theme.spacing(5)
   },
   buttonGroup: {
-    paddingLeft: '30%',
-    paddingRight: '30%'
+    margin: 'auto'
+    // paddingLeft: '30%',
+    // paddingRight: '30%'
   }
 }))
 
@@ -42,9 +44,9 @@ const RepoList: React.FC<RepoListProps> = ({
   const hasOtherPages = hasPrevPage || hasNextPage
 
   return (
-    <div className={styles.root}>
+    <>
       {hasOtherPages && (
-        <Typography variant="body2">
+        <Typography variant="body2" className={styles.paginationInfo}>
           Showing {from + 1} to {to}
         </Typography>
       )}
@@ -66,7 +68,7 @@ const RepoList: React.FC<RepoListProps> = ({
           </Button>
         </ButtonGroup>
       )}
-    </div>
+    </>
   )
 }
 

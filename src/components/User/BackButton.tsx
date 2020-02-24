@@ -5,9 +5,9 @@ import { ArrowBack } from '@material-ui/icons'
 
 const useStyles = makeStyles(theme => ({
   backButton: {
-    marginLeft: theme.spacing(1),
+    // marginLeft: theme.spacing(1),
     marginTop: theme.spacing(2),
-    paddingLeft: theme.spacing(1)
+    paddingLeft: theme.spacing(1.5)
   },
 
   backIcon: {
