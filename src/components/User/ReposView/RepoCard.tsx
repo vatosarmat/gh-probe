@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
 
-  name: {
+  repoName: {
     display: 'flex',
     alignItems: 'center'
   },
@@ -35,43 +35,30 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(1)
   },
 
-  info: {
+  infoBlock: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center'
+  },
+
+  infoRow: {
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5),
+    marginRight: theme.spacing(4),
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
-    marginTop: theme.spacing(2),
-
     '& > *': {
-      lineHeight: 2
+      flexShrink: 0,
+      marginTop: theme.spacing(0.5),
+      marginBottom: theme.spacing(0.5),
+      marginRight: theme.spacing(2)
     }
   },
 
-  infoDate: {
-    flexShrink: 0,
-    flexGrow: 1,
-    textAlign: 'right',
-    marginLeft: theme.spacing(3)
-  },
-
-  infoIcon: {
-    marginRight: theme.spacing(0.5)
-  },
-
-  infoCaption: {
-    marginRight: theme.spacing(3),
-    flexShrink: 0
-  },
-
-  dateInfo: {
-    display: 'flex',
-    textAlign: 'right',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    '&:last-child': {
-      flexGrow: 1
-    },
+  itemWithIcon: {
     '& > *': {
-      marginLeft: theme.spacing(3)
+      verticalAlign: 'middle'
     }
   }
 }))
@@ -99,7 +86,7 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
     <Card elevation={0}>
       <CardActionArea disableRipple component="a" href={html_url} target="_blank">
         <CardContent className={styles.cardContent}>
-          <div className={styles.name}>
+          <div className={styles.repoName}>
             <Typography variant="h6">{name}</Typography>
             {archived && (
               <Chip
@@ -112,43 +99,41 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
             )}
           </div>
           <Typography color="textSecondary">{description}</Typography>
-          <div className={styles.info}>
-            {language && (
-              <>
-                <Circle fontSize="inherit" className={styles.infoIcon} htmlColor={getLangColor(language)} />
-                <Typography variant="caption" className={styles.infoCaption}>
-                  {language}
-                </Typography>
-              </>
-            )}
-            {stargazers_count > 0 ? (
-              <>
-                <Star fontSize="inherit" className={styles.infoIcon} htmlColor="gray" />
-                <Typography variant="caption" className={styles.infoCaption}>
-                  {stargazers_count}
-                </Typography>
-              </>
-            ) : null}
-            {forks_count > 0 ? (
-              <>
-                <SourceFork fontSize="inherit" className={styles.infoIcon} htmlColor="gray" />
-                <Typography variant="caption" className={styles.infoCaption}>
-                  {forks_count}
-                </Typography>
-              </>
-            ) : null}
-            <Typography variant="caption" className={styles.infoDate}>
-              Created{' '}
-              {dayjs(created_at).calendar(undefined, {
-                sameElse: 'MMM D, YYYY'
-              })}
-            </Typography>
-            <Typography variant="caption" className={styles.infoDate}>
-              Pushed{' '}
-              {dayjs(pushed_at).calendar(undefined, {
-                sameElse: 'MMM D, YYYY'
-              })}
-            </Typography>
+          <div className={styles.infoBlock}>
+            <div className={styles.infoRow}>
+              {language && (
+                <div className={styles.itemWithIcon}>
+                  <Circle fontSize="inherit" htmlColor={getLangColor(language)} />{' '}
+                  <Typography variant="caption">{language}</Typography>
+                </div>
+              )}
+              {stargazers_count > 0 ? (
+                <div className={styles.itemWithIcon}>
+                  <Star fontSize="inherit" htmlColor="gray" />{' '}
+                  <Typography variant="caption">{stargazers_count}</Typography>
+                </div>
+              ) : null}
+              {forks_count > 0 ? (
+                <div className={styles.itemWithIcon}>
+                  <SourceFork fontSize="inherit" htmlColor="gray" />{' '}
+                  <Typography variant="caption">{forks_count}</Typography>
+                </div>
+              ) : null}
+            </div>
+            <div className={styles.infoRow}>
+              <Typography variant="caption">
+                Created{' '}
+                {dayjs(created_at).calendar(undefined, {
+                  sameElse: 'MMM D, YYYY'
+                })}
+              </Typography>
+              <Typography variant="caption">
+                Pushed{' '}
+                {dayjs(pushed_at).calendar(undefined, {
+                  sameElse: 'MMM D, YYYY'
+                })}
+              </Typography>
+            </div>
           </div>
         </CardContent>
       </CardActionArea>
