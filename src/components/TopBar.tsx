@@ -13,7 +13,9 @@ import {
   makeStyles,
   Radio,
   RadioGroup,
-  Typography
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@material-ui/core'
 import { teal, indigo, purple } from '@material-ui/core/colors'
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
@@ -33,7 +35,12 @@ const { reset: resetState } = rootActions
 
 const useStyles = makeStyles(theme => ({
   perPageSelect: {
-    marginBottom: theme.spacing(2)
+    [theme.breakpoints.up('xs')]: {
+      marginBottom: theme.spacing(1)
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginBottom: theme.spacing(2)
+    }
   },
 
   appBar: reduce(
@@ -65,6 +72,13 @@ const useStyles = makeStyles(theme => ({
     }),
     {}
   ),
+
+  settingsDialogContent: {
+    [theme.breakpoints.down('xs')]: {
+      padding: theme.spacing(2),
+      paddingBottom: 0
+    }
+  },
 
   toolbarTitle: {
     lineHeight: 1
@@ -129,7 +143,9 @@ const TopBar: React.FC<TopBarProps> = ({
   setPrimaryColor,
   resetState
 }) => {
-  const classes = useStyles()
+  const styles = useStyles()
+  const theme = useTheme()
+  const isScreenSmall = useMediaQuery(theme.breakpoints.down('xs'))
 
   const [open, setOpen] = useState(false)
 
@@ -156,18 +172,18 @@ const TopBar: React.FC<TopBarProps> = ({
   const { title } = appConfig
 
   return (
-    <AppBar position="static" color="primary" className={classes.appBar}>
-      <IconButton color="inherit" aria-label="Settings" onClick={handleDialogOpen} className={classes.menuButton}>
+    <AppBar position="static" color="primary" className={styles.appBar}>
+      <IconButton color="inherit" aria-label="Settings" onClick={handleDialogOpen} className={styles.menuButton}>
         <MenuIcon />
       </IconButton>
-      <Typography variant="h6" color="inherit" className={classes.toolbarTitle}>
+      <Typography variant="h6" color="inherit" className={styles.toolbarTitle}>
         {title}
       </Typography>
       <Dialog open={open} onClose={handleDialogClose}>
-        <DialogTitle>Settings</DialogTitle>
-        <DialogContent>
+        {isScreenSmall ? null : <DialogTitle>Settings</DialogTitle>}
+        <DialogContent className={styles.settingsDialogContent}>
           <ArraySelect
-            className={classes.perPageSelect}
+            className={styles.perPageSelect}
             value={reposPerPage}
             prefix="Show"
             suffix="repos per page"
@@ -175,29 +191,39 @@ const TopBar: React.FC<TopBarProps> = ({
             onChange={handleReposPerPageChange}
           />
           <Divider />
-          <FormControl component="fieldset" margin="normal">
+          <FormControl component="fieldset" margin={isScreenSmall ? 'dense' : 'normal'}>
             <Typography variant="body1" component="legend">
               Color scheme
             </Typography>
-            <RadioGroup name="gender1" value={primaryColor} onChange={handlePrimaryColorChange}>
+            <RadioGroup value={primaryColor} onChange={handlePrimaryColorChange}>
               {primaryColorTuple.map(color => (
                 <FormControlLabel
                   key={color}
                   value={color}
-                  control={<Radio classes={{ root: classes[color], checked: classes.checked }} />}
+                  control={
+                    <Radio
+                      classes={{ root: styles[color], checked: styles.checked }}
+                      size={isScreenSmall ? 'small' : 'medium'}
+                    />
+                  }
                   label={color}
                 />
               ))}
             </RadioGroup>
           </FormControl>
           <Divider />
-          <Button color="secondary" className={classes.resetButton} onClick={handleResetClick}>
+          <Button
+            color="secondary"
+            className={styles.resetButton}
+            onClick={handleResetClick}
+            size={isScreenSmall ? 'small' : 'medium'}
+          >
             Reset application state
           </Button>
           <Divider />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+        <DialogActions disableSpacing={isScreenSmall}>
+          <Button onClick={handleDialogClose} color="primary" size={isScreenSmall ? 'small' : 'medium'}>
             Close
           </Button>
         </DialogActions>
