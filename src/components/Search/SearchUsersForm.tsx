@@ -65,7 +65,8 @@ const useStyles = makeStyles(theme => ({
 
   exampleSpan: {
     cursor: 'pointer',
-    textDecoration: 'underline dotted'
+    textDecoration: 'underline dotted',
+    '-webkit-text-decoration': 'underline dotted'
   },
 
   searchButton: {
