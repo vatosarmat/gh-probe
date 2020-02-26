@@ -11,7 +11,7 @@ fi
 
 origin=$(echo ${ORIGIN} | sed 's/\\/\\\\/g; s/\//\\\//g; s/&/\\\&/g')
 sed -i "s/<body>/<body><script>REACT_APP_GITHUB_API_BASE_URL=\'${origin}\/gh-api\'<\/script>/i" "/usr/share/nginx/gh-probe/index.html"
-
-sed -i "/^#/d; s/__GITHUB_TOKEN__/${GITHUB_TOKEN}/g;" "/etc/nginx/conf.d/gh-probe.conf"
+sed -i "/^\s*pid/c\pid /run/nginx_gh-probe.pid;" "/etc/nginx/nginx.conf"
+sed -i "/^\s*#/d; s/__GITHUB_TOKEN__/${GITHUB_TOKEN}/g;" "/etc/nginx/conf.d/gh-probe.conf"
 
 rm -r /etc/nginx/conf.d/default.conf /usr/share/nginx/html /tmp/gh-probe_setup.sh

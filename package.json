@@ -41,7 +41,7 @@
     "test:coverage": "yarn test --coverage --watchAll=false",
     "test:coverage_report": "yarn test:coverage --coverageReporters=text-lcov | coveralls",
     "clean": "rm -rf ./build",
-    "build": "react-scripts build"
+    "build": "GENERATE_SOURCEMAP=false react-scripts build"
   },
   "eslintConfig": {
     "extends": [
