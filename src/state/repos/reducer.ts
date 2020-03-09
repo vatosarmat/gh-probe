@@ -17,14 +17,14 @@ export interface ReposFetchProgress {
 export type ReposState = DeepReadonly<{
   requestedUserLogin?: string
   userData?: User
-  repos: Record<string, Repo>
+  items: Record<string, Repo>
   status: ReposFetchStatus
   progress?: ReposFetchProgress
   error?: string
 }>
 
 export const defaultReposState: ReposState = {
-  repos: {},
+  items: {},
   status: 'IDLE'
 }
 
@@ -52,8 +52,8 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
     state.status === 'IN_PROGRESS'
       ? {
           ...state,
-          repos: {
-            ...state.repos,
+          items: {
+            ...state.items,
             ...keyBy(repos, 'id')
           },
           progress: {

@@ -12,13 +12,13 @@ export interface IReposState {
   readonly repos: ReposState
 }
 
-export const repoSortingKeyTuple = ['name', 'stargazers_count', 'created_at', 'pushed_at'] as const
+export const repoSortingKeyTuple = ['name', 'starsCount', 'createdAt', 'pushedAt'] as const
 export type RepoSortingKey = typeof repoSortingKeyTuple[number]
 export const repoSortingKeyName: Record<RepoSortingKey, string> = {
   name: 'name',
-  stargazers_count: 'stars count',
-  created_at: 'creation date',
-  pushed_at: 'push date'
+  starsCount: 'stars count',
+  createdAt: 'creation date',
+  pushedAt: 'push date'
 }
 
 export const repoSortingOrderTuple = ['desc', 'asc'] as const
@@ -47,7 +47,7 @@ export interface ReposIdsPage {
 export const NO_LANGUAGE = 'NO_LANGUAGE'
 export const ANY_LANGUAGE = 'ANY_LANGUAGE'
 
-const getReposUsername = (state: IReposState) => state.repos.username
+const getReposUsername = (state: IReposState) => state.repos.userData?.login
 const getReposError = (state: IReposState) => state.repos.error
 const getReposFetchProgress = (state: IReposState) => state.repos.progress
 const getReposFetchStatus = (state: IReposState) => state.repos.status
@@ -88,7 +88,7 @@ const getReposSorted = createSelector<
 )
 
 const haveReposStars = createSelector<IReposState, Record<number, Repo>, boolean>(getReposRecord, reposRecord =>
-  some(reposRecord, 'stargazers_count')
+  some(reposRecord, 'starsCount')
 )
 
 const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string, Repo[]>(
