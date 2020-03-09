@@ -9,6 +9,7 @@ export const defaultReposPerPage: ReposPerPage = 10
 export const appConfig = {
   exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
   searchResultsCount: 20,
+  reposPageLength: 100,
   title: 'GitHub repos',
   ghApiBaseUrl: (process.env.REACT_APP_GITHUB_API_BASE_URL ?? (window as any).REACT_APP_GITHUB_API_BASE_URL) as string,
   ghToken: process.env.REACT_APP_GITHUB_TOKEN,

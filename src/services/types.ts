@@ -44,6 +44,7 @@ export interface Repo {
 
 export interface ReposPage {
   repos: Repo[]
-  cursor: string
+  lastRepoCursor: string
+  hasNextPage: boolean
   totalReposCount: number
 }

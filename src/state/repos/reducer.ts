@@ -1,32 +1,36 @@
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
-import { Repo, ReposPage } from 'services/api'
+import { User, Repo, ReposPage } from 'services/api'
 import { keyBy } from 'lodash'
 
 import { DeepReadonly } from 'utils/common'
+import { appConfig } from 'config'
+const { reposPageLength } = appConfig
 
 export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'STOPPED' | 'ERROR' | 'COMPLETE'
 
 export interface ReposFetchProgress {
-  current: number
-  total: number
-  nextUrl?: string
+  currentPage: number
+  totalPages: number
+  lastRepoCursor: string
 }
 
 export type ReposState = DeepReadonly<{
-  username?: string
-  items: Record<number, Repo>
+  requestedUserLogin?: string
+  userData?: User
+  repos: Record<string, Repo>
   status: ReposFetchStatus
   progress?: ReposFetchProgress
   error?: string
 }>
 
 export const defaultReposState: ReposState = {
-  items: {},
+  repos: {},
   status: 'IDLE'
 }
 
 export const reposActions = {
   start: createAction('repos/FETCH_START')<string>(),
+  userDataReady: createAction('repos/FETCH_USER_DATA_READY')<User>(),
   pageReady: createAction('repos/FETCH_PAGE_READY')<ReposPage>(),
   stop: createAction('repos/FETCH_STOP')(),
   resume: createAction('repos/FETCH_RESUME')(),
@@ -36,18 +40,28 @@ export const reposActions = {
 export type ReposAction = ActionType<typeof reposActions>
 
 export default createReducer<ReposState, ReposAction>(defaultReposState, {
-  'repos/FETCH_START': (state, { payload: username }) => ({ ...defaultReposState, username, status: 'IN_PROGRESS' }),
+  'repos/FETCH_START': (state, { payload: requestedUserLogin }) => ({
+    ...defaultReposState,
+    requestedUserLogin,
+    status: 'IN_PROGRESS'
+  }),
 
-  'repos/FETCH_PAGE_READY': (state, { payload: { repos, current, total, nextUrl } }) =>
+  'repos/FETCH_USER_DATA_READY': (state, { payload: userData }) => ({ ...state, userData }),
+
+  'repos/FETCH_PAGE_READY': (state, { payload: { repos, lastRepoCursor, totalReposCount, hasNextPage } }) =>
     state.status === 'IN_PROGRESS'
       ? {
           ...state,
-          items: {
-            ...state.items,
+          repos: {
+            ...state.repos,
             ...keyBy(repos, 'id')
           },
-          progress: nextUrl ? { current, total, nextUrl } : { current, total },
-          status: current === total ? 'COMPLETE' : 'IN_PROGRESS'
+          progress: {
+            lastRepoCursor,
+            totalPages: Math.ceil(totalReposCount / reposPageLength),
+            currentPage: state.progress ? state.progress.currentPage + 1 : 1
+          },
+          status: hasNextPage ? 'COMPLETE' : 'IN_PROGRESS'
         }
       : state,
 

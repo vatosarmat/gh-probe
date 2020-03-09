@@ -1,45 +1,50 @@
-import { call, put, take, race, getContext, select } from 'redux-saga/effects'
+import { call, put, take, race, select } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 
-import { ReposPage, ReposPager } from 'services/api'
-import { SagaContext } from 'state/helpers'
+import { ReposPage, User, fetchUserAndRepos, fetchReposAfterCursor } from 'services/api'
 
 import { reposActions, ReposState } from './reducer'
 
-const { start, pageReady, stop, resume, error: errorAction } = reposActions
+const { start, userDataReady, pageReady, stop, resume, error: errorAction } = reposActions
 
 type RequestAction = ReturnType<typeof start>
 
-const getNextUrl = ({ repos }: { repos: ReposState }) => repos.progress?.nextUrl
+const getLastRepoCursor = ({ repos }: { repos: ReposState }) => repos.progress?.lastRepoCursor
+const getRequestedUserLogin = ({ repos }: { repos: ReposState }) => repos.requestedUserLogin
 
-function* resumeFetch(reposPager?: ReposPager) {
+function* startFetch({ payload: login }: RequestAction) {
+  let reposPage
+  let user
   try {
-    if (!reposPager) {
-      const nextUrl: ReturnType<typeof getNextUrl> = yield select(getNextUrl)
-      if (!nextUrl) {
-        throw Error('Invalid state')
-      }
-      reposPager = new ReposPager(nextUrl)
-    }
+    const data: [User, ReposPage] = yield call(fetchUserAndRepos, login)
+    ;[user, reposPage] = data
 
-    let done = false
-    while (!done) {
-      let result: IteratorResult<ReposPage, ReposPage> = yield call(reposPager.next)
-      const repos = result.value.repos.filter(repo => !repo.fork)
-      yield put(pageReady({ ...result.value, repos }))
-
-      done = Boolean(result.done)
-    }
+    yield put(userDataReady(user))
+    yield put(pageReady(reposPage))
   } catch (error) {
     yield put(errorAction(error))
   }
+
+  if (reposPage?.hasNextPage) {
+    yield call(resumeFetch)
+  }
 }
 
-function* startFetch({ payload: username }: RequestAction) {
-  const api: SagaContext['api'] = yield getContext('api')
-  const reposPager: ReposPager = yield call(api.fetchRepos, username)
+function* resumeFetch() {
+  try {
+    const login: string = yield select(getRequestedUserLogin)
+    let lastRepoCursor: string = yield select(getLastRepoCursor)
+    let reposPage: ReposPage
 
-  yield call(resumeFetch, reposPager)
+    do {
+      reposPage = yield call(fetchReposAfterCursor, login, lastRepoCursor)
+      lastRepoCursor = reposPage.lastRepoCursor
+
+      yield put(pageReady(reposPage))
+    } while (reposPage.hasNextPage)
+  } catch (error) {
+    yield put(errorAction(error))
+  }
 }
 
 export default function*() {
