@@ -1,8 +1,7 @@
-import { chain } from 'lodash'
 import { createSelector } from 'reselect'
 
 import { UsersSearchState } from './reducer'
-import { SearchResultItem, UserBrief } from 'services/api'
+import { SearchUserResultItem } from 'services/api'
 
 export interface IUsersSearchState {
   readonly usersSearch: UsersSearchState
@@ -16,17 +15,9 @@ function getSearchResult(state: IUsersSearchState) {
   return state.usersSearch.result
 }
 
-const getSearchResultIds = createSelector(getSearchResult, result =>
-  chain(Object.values(result))
-    .orderBy('score', 'desc')
-    .map('id')
-    .value()
-)
+const getSearchResultIds = createSelector(getSearchResult, result => Object.keys(result))
 
-function getSearchResultById(
-  state: IUsersSearchState,
-  { id }: { id: number }
-): SearchResultItem<UserBrief> | undefined {
+function getSearchResultById(state: IUsersSearchState, { id }: { id: number }): SearchUserResultItem | undefined {
   return getSearchResult(state)[id]
 }
 

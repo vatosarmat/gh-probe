@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { createBrowserHistory } from 'history'
 
 import { createPersistentStore } from 'state'
-import { Api } from 'services/api'
 import App from 'components/App'
 import AppError from 'components/AppError'
 import { appConfig } from 'config'
@@ -15,9 +14,8 @@ try {
   //throw if string is not a URL
   new URL(appConfig.ghApiBaseUrl)
 
-  const api = new Api()
   const history = createBrowserHistory()
-  const { store, persistor } = createPersistentStore(api, history)
+  const { store, persistor } = createPersistentStore(history)
 
   ReactDOM.render(React.createElement(App, { store, persistor, history }), document.getElementById('root'))
 } catch (error) {

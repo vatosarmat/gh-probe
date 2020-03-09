@@ -1,8 +1,7 @@
-import { call, put, takeLatest, getContext } from 'redux-saga/effects'
+import { call, put, takeLatest } from 'redux-saga/effects'
 import { getType } from 'typesafe-actions'
 
-import { SearchResult, UserBrief } from 'services/api'
-import { SagaContext } from 'state/helpers'
+import { searchUser, SearchUserResultItem } from 'services/api'
 
 import { usersSearchActions } from './reducer'
 
@@ -11,12 +10,10 @@ const { request, success, failure } = usersSearchActions
 type RequestAction = ReturnType<typeof request>
 
 function* usersSearch({ payload: query }: RequestAction) {
-  const api: SagaContext['api'] = yield getContext('api')
-
   try {
-    const searchResult: SearchResult<UserBrief> = yield call(api.searchUser, query)
+    const searchResult: SearchUserResultItem[] = yield call(searchUser, query)
 
-    yield put(success(searchResult.items))
+    yield put(success(searchResult))
   } catch (error) {
     yield put(failure(error))
   }

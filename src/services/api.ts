@@ -1,8 +1,10 @@
 import { CANCEL } from 'redux-saga'
 import { pick } from 'lodash'
 
-import { UserSearchResultItem, User, Repo, ReposPage } from './types'
+import { SearchUserResultItem, User, Repo, ReposPage } from './types'
 import { appConfig } from 'config'
+
+export * from './types'
 
 const { ghApiBaseUrl, ghToken, searchResultsCount } = appConfig
 
@@ -45,7 +47,16 @@ const pickReposPage = (repositories?: { totalReposCount: number; edges?: any[] }
         repos: repositories.edges.map(
           ({ node }: any): Repo =>
             Object.assign(
-              pick(node, ['name', 'description', 'primaryLanguage', 'createdAt', 'pushedAt', 'isArchived', 'url']),
+              pick(node, [
+                'id',
+                'name',
+                'description',
+                'primaryLanguage',
+                'createdAt',
+                'pushedAt',
+                'isArchived',
+                'url'
+              ]),
               {
                 starsCount: node.stargazers.totalCount,
                 forksCount: node.stargazers.totalCount
@@ -59,13 +70,14 @@ const pickReposPage = (repositories?: { totalReposCount: number; edges?: any[] }
         repos: []
       }
 
-export const searchUser = (query: string): Promise<UserSearchResultItem[]> =>
+export const searchUser = (query: string): Promise<SearchUserResultItem[]> =>
   gqlFetch(`
   {
     search(type: USER, query: "${query}", first: ${searchResultsCount}) {
       nodes {
         type: __typename
         ... on RepositoryOwner {
+          id
           login
           avatarUrl
         }
@@ -80,6 +92,7 @@ export const fetchUserAndRepos = (ownerLogin: string): Promise<[User, ReposPage]
   repositoryOwner(login: "${ownerLogin}") {
     type: __typename
     ... on ProfileOwner {
+      id
       login
       name
       location
@@ -99,6 +112,7 @@ export const fetchUserAndRepos = (ownerLogin: string): Promise<[User, ReposPage]
       edges {
         cursor
         node {
+          id
           name
           description
           primaryLanguage {
@@ -129,6 +143,7 @@ export const fetchUserAndRepos = (ownerLogin: string): Promise<[User, ReposPage]
     }
 
     const user: User = pick(repositoryOwner, [
+      'id',
       'type',
       'login',
       'name',
@@ -152,6 +167,7 @@ export const fetchReposAfterCursor = (ownerLogin: string, cursor: string): Promi
         edges {
           cursor
           node {
+            id
             name
             description
             primaryLanguage {

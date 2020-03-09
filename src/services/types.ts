@@ -2,13 +2,14 @@ export const userTypeTuple = ['User', 'Organization'] as const
 
 export type UserType = typeof userTypeTuple[number]
 
-export interface UserSearchResultItem {
+export interface SearchUserResultItem {
+  id: string
   type: UserType
   login: string
   avatarUrl: string
 }
 
-export interface User extends UserSearchResultItem {
+export interface User extends SearchUserResultItem {
   name: string | null
   location: string | null
   websiteUrl: string | null
@@ -22,11 +23,13 @@ export interface User extends UserSearchResultItem {
 }
 
 export interface Language {
+  id: string
   color: string | null
   name: string
 }
 
 export interface Repo {
+  id: string
   name: string
   description: string | null
   primaryLanguage: Language | null

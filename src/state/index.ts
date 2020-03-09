@@ -6,14 +6,11 @@ import { persistReducer, persistStore, createTransform } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { History } from 'history'
 
-import { Api } from 'services/api'
-import { SagaContext } from './helpers'
 import layout, { LayoutState, defaultLayoutState } from './layout'
 import repos, { ReposState, defaultReposState, reposSaga } from './repos'
 import user, { UserState, defaultUserState, userSaga } from './user'
 import usersSearch, { UsersSearchState, defaultUsersSearchState, usersSearchSaga } from './usersSearch'
 
-export * from './helpers'
 export * from './layout'
 export * from './user'
 export * from './usersSearch'
@@ -97,9 +94,8 @@ export const persistedReducer = persistReducer(
   rootReducer
 )
 
-export function createPersistentStore(api: Api, history: History) {
-  const context: SagaContext = { api }
-  const sagaMiddleware = createSagaMiddleware({ context })
+export function createPersistentStore(history: History) {
+  const sagaMiddleware = createSagaMiddleware()
   const store = createStore(persistedReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))
   const persistor = persistStore(store, null, () => {
     const state = store.getState()
