@@ -23,7 +23,6 @@ export interface User extends SearchUserResultItem {
 }
 
 export interface Language {
-  id: string
   color: string | null
   name: string
 }

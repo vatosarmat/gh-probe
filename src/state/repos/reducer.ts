@@ -56,12 +56,18 @@ export default createReducer<ReposState, ReposAction>(defaultReposState, {
             ...state.items,
             ...keyBy(repos, 'id')
           },
-          progress: {
-            lastRepoCursor,
-            totalPages: Math.ceil(totalReposCount / reposPageLength),
-            currentPage: state.progress ? state.progress.currentPage + 1 : 1
-          },
-          status: hasNextPage ? 'COMPLETE' : 'IN_PROGRESS'
+          progress: state.progress
+            ? {
+                ...state.progress,
+                lastRepoCursor,
+                currentPage: state.progress.currentPage + 1
+              }
+            : {
+                lastRepoCursor,
+                totalPages: Math.ceil(totalReposCount / repos.length),
+                currentPage: 1
+              },
+          status: hasNextPage ? 'IN_PROGRESS' : 'COMPLETE'
         }
       : state,
 

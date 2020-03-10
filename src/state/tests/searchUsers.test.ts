@@ -1,10 +1,13 @@
 import { call, put } from 'redux-saga/effects'
 import { cloneDeep } from 'lodash'
 
+import { searchUser } from 'services/api'
 import { usersSearchActions, State } from 'state'
 import { Mutable } from 'utils/common'
 import makeFx from 'services/api/fixtures'
-import { expectSagaState, api } from './helpers'
+import { expectSagaState } from './helpers'
+
+jest.mock('services/api')
 
 describe('Fetch user data', () => {
   let fx: ReturnType<typeof makeFx>
@@ -14,8 +17,8 @@ describe('Fetch user data', () => {
   })
 
   it('Success', () => {
-    const usersSearchResultRB = fx.usersSearchResultResponseBody
-    ;(api.searchUser as jest.Mock).mockResolvedValueOnce(usersSearchResultRB)
+    // eslint-disable-next-line no-extra-semi
+    ;(searchUser as jest.Mock).mockResolvedValueOnce(fx.usersSearchResultItems)
 
     const initialState = fx.defaultState as Mutable<State>
 
@@ -28,14 +31,14 @@ describe('Fetch user data', () => {
       dispatchActions: [usersSearchActions.request(fx.usersSearchQuery)],
       expectedState,
       expectedEffects: [
-        [call(api.searchUser, fx.usersSearchQuery), put(usersSearchActions.success(usersSearchResultRB.items))]
+        [call(searchUser, fx.usersSearchQuery), put(usersSearchActions.success(fx.usersSearchResultItems))]
       ]
     })
   })
 
   it('Network error', () => {
     // eslint-disable-next-line no-extra-semi
-    ;(api.searchUser as jest.Mock).mockRejectedValueOnce(fx.networkError)
+    ;(searchUser as jest.Mock).mockRejectedValueOnce(fx.networkError)
 
     const initialState = fx.defaultState as Mutable<State>
 
@@ -47,7 +50,7 @@ describe('Fetch user data', () => {
       initialState,
       dispatchActions: [usersSearchActions.request(fx.usersSearchQuery)],
       expectedState,
-      expectedEffects: [[call(api.searchUser, fx.usersSearchQuery), put(usersSearchActions.failure(fx.networkError))]]
+      expectedEffects: [[call(searchUser, fx.usersSearchQuery), put(usersSearchActions.failure(fx.networkError))]]
     })
   })
 })

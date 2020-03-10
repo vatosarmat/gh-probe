@@ -27,7 +27,7 @@ export type RepoSortingOrder = typeof repoSortingOrderTuple[number]
 export interface RepoProps {
   sortingKey: RepoSortingKey
   sortingOrder: RepoSortingOrder
-  language: string
+  languageName: string
   page: number
 }
 
@@ -41,7 +41,7 @@ export interface ReposIdsPage {
   to: number
   hasPrevPage: boolean
   hasNextPage: boolean
-  ids: number[]
+  ids: string[]
 }
 
 export const NO_LANGUAGE = 'NO_LANGUAGE'
@@ -53,7 +53,7 @@ const getReposFetchProgress = (state: IReposState) => state.repos.progress
 const getReposFetchStatus = (state: IReposState) => state.repos.status
 const getReposRecord = (state: IReposState) => state.repos.items
 
-const getLanguage = (state: IReposState, props: RepoProps) => props.language
+const getLanguage = (state: IReposState, props: RepoProps) => props.languageName
 const getPage = (state: IReposState, props: RepoProps) => props.page
 const getRepoSortingKey = (state: IReposState, props: RepoProps) => props.sortingKey
 const getRepoSortingOrder = (state: IReposState, props: RepoProps) => props.sortingOrder
@@ -63,7 +63,7 @@ const getLanguageInfos = createSelector<IReposState, Record<number, Repo>, Langu
   reposRecord => {
     const length = Object.keys(reposRecord).length
     return chain(reposRecord)
-      .countBy(repo => repo.language ?? NO_LANGUAGE)
+      .countBy(repo => repo.primaryLanguage?.name ?? NO_LANGUAGE)
       .assign({ [ANY_LANGUAGE]: length })
       .reduce<LanguageInfo[]>((langItems, repoCount, language) => {
         langItems.push({ language, repoCount })
@@ -93,10 +93,13 @@ const haveReposStars = createSelector<IReposState, Record<number, Repo>, boolean
 
 const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string, Repo[]>(
   [getReposSorted, getLanguage],
-  (repos, language) =>
-    language === ANY_LANGUAGE
+  (repos, languageName) =>
+    languageName === ANY_LANGUAGE
       ? repos
-      : repos.filter(repo => repo.language === language || (language === NO_LANGUAGE && !repo.language))
+      : repos.filter(
+          repo =>
+            repo.primaryLanguage?.name === languageName || (languageName === NO_LANGUAGE && !repo.primaryLanguage?.name)
+        )
 )
 
 const getReposIdsPage = createSelector<

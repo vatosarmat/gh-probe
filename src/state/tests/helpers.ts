@@ -1,31 +1,15 @@
 import { ActionType } from 'typesafe-actions'
 import { END } from 'redux-saga'
-import { call, setContext, Effect } from 'redux-saga/effects'
+import { Effect } from 'redux-saga/effects'
 import { expectSaga } from 'redux-saga-test-plan'
 
 import rootReducer, { State, rootSaga } from 'state'
-import { userActions } from 'state/user'
 import { usersSearchActions } from 'state/usersSearch'
 import { reposActions } from 'state/repos'
-import { SagaContext } from 'state/helpers'
-import { Api } from 'services/api'
 import { isNumber } from 'utils/common'
 
-jest.mock('services/api')
-
-export const api = new Api()
-
-export function* runSagaTest<Fn extends (...args: any[]) => any>(fn: Fn, ...args: Parameters<Fn>) {
-  const sagaContext: SagaContext = {
-    api
-  }
-
-  yield setContext(sagaContext)
-  yield call(fn, ...args)
-}
-
 type AppUserDispatchableAction = ActionType<
-  typeof userActions.request | typeof usersSearchActions.request | typeof reposActions.start | typeof reposActions.stop
+  typeof usersSearchActions.request | typeof reposActions.start | typeof reposActions.stop | typeof reposActions.resume
 >
 
 export function expectSagaState({
@@ -41,7 +25,7 @@ export function expectSagaState({
   expectedEffects?: Effect[][]
   unexpectedEffects?: Effect[][]
 }) {
-  let expectChain = expectSaga(runSagaTest, rootSaga).withReducer(rootReducer, initialState)
+  let expectChain = expectSaga(rootSaga).withReducer(rootReducer, initialState)
   let totalDelay = 0
   expectChain = dispatchActions.reduce((chain, v) => {
     if (isNumber(v)) {
