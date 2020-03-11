@@ -168,7 +168,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
   const theme = useTheme()
   const isScreenSmall = useMediaQuery(theme.breakpoints.down('xs'))
   const styles = useStyles()
-  const { exampleUsers } = appConfig
+  const { exampleUsers, searchUserLabel, emptySearchQueryTooltip } = appConfig
   const lastExample = exampleUsers[exampleUsers.length - 1]
 
   return (
@@ -176,9 +176,9 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
       <ClickAwayListener onClickAway={handleClickAway}>
         <div className={styles.searchInputRow}>
           {isScreenSmall ? null : <AccountSearch fontSize="large" className={styles.accountSearchIcon} />}
-          <Tooltip title="Query must be non-empty" open={inputError} placement="top">
+          <Tooltip title={emptySearchQueryTooltip} open={inputError} placement="top">
             <FormControl fullWidth error={!input}>
-              <InputLabel htmlFor={SEARCH_INPUT_ID}>Search user</InputLabel>
+              <InputLabel htmlFor={SEARCH_INPUT_ID}>{searchUserLabel}</InputLabel>
 
               <Input
                 error={inputError}

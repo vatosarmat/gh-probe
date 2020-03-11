@@ -8,6 +8,8 @@ export const defaultReposPerPage: ReposPerPage = 10
 
 export const appConfig = {
   exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
+  searchUserLabel: 'Search user',
+  emptySearchQueryTooltip: 'Query must be non-empty',
   searchResultsCount: 20,
   reposPageLength: 100,
   title: 'GitHub repos',

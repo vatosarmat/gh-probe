@@ -7,6 +7,7 @@ import { render, fireEvent, waitForElement } from '@testing-library/react'
 import { createTestStore } from 'state'
 import { searchUser } from 'services/api'
 import Search from 'components/Search'
+import { appConfig } from 'config'
 
 import makeFx from 'services/api/fixtures'
 
@@ -47,5 +48,31 @@ describe('Search page', () => {
     })
     fireEvent.click(searchButton)
     return waitForElement(() => fx.usersSearchResult.map(item => getByText(item.login)))
+  })
+
+  it('Examples and search modifiers', () => {
+    const exampleUser = appConfig.exampleUsers[0]
+
+    const { getByLabelText, getByText } = render(searchPage)
+    const searchInput = getByLabelText(appConfig.searchUserLabel)
+    const exampleCaption = getByText(exampleUser)
+    const modifierLink = getByText('in:login')
+
+    fireEvent.click(exampleCaption)
+    fireEvent.click(modifierLink)
+    expect(searchInput).toHaveValue(`${exampleUser} in:login`)
+  })
+
+  it('Show tooltip if empty input', () => {
+    const { getByLabelText, getByText } = render(searchPage)
+    const searchInput = getByLabelText(appConfig.searchUserLabel)
+    fireEvent.change(searchInput, {
+      target: {
+        value: '    '
+      }
+    })
+    fireEvent.keyDown(searchInput, { key: 'Enter', code: 13 })
+
+    return waitForElement(() => getByText(appConfig.emptySearchQueryTooltip))
   })
 })
