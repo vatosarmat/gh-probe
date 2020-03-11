@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 
 interface StateProps {
   query?: string
-  resultIds: number[]
+  resultIds: string[]
   inProgress: boolean
   error?: string
 }

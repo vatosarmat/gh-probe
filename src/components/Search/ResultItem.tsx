@@ -44,7 +44,7 @@ interface StateProps {
 }
 
 interface OwnProps {
-  id: number
+  id: string
 }
 
 type ResultItemProps = StateProps & OwnProps

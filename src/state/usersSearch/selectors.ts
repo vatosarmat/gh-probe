@@ -17,7 +17,7 @@ function getSearchResult(state: IUsersSearchState) {
 
 const getSearchResultIds = createSelector(getSearchResult, result => Object.keys(result))
 
-function getSearchResultById(state: IUsersSearchState, { id }: { id: number }): SearchUserResultItem | undefined {
+function getSearchResultById(state: IUsersSearchState, { id }: { id: string }): SearchUserResultItem | undefined {
   return getSearchResult(state)[id]
 }
 

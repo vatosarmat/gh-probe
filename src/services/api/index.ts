@@ -119,7 +119,7 @@ export const fetchUserAndRepos = (ownerLogin: string): Promise<[User, ReposPage]
           hasNextPage
         }
         edges {
-          lastRepoCursor:cursor
+          cursor
           node {
             id
             name
@@ -173,11 +173,11 @@ export const fetchReposAfterCursor = (ownerLogin: string, cursor: string): Promi
     repositoryOwner(login: "${ownerLogin}") {
       repositories(ownerAffiliations: [OWNER], privacy: PUBLIC, isFork: false, first: ${reposPageLength}, after: "${cursor}") {
         totalReposCount: totalCount
+        pageInfo{
+          hasNextPage
+        }
         edges {
-          lastRepoCursor:cursor
-          pageInfo{
-            hasNextPage
-          }
+          cursor
           node {
             id
             name
