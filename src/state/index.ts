@@ -81,6 +81,14 @@ export const persistedReducer = persistReducer(
   rootReducer
 )
 
+export function createTestStore() {
+  const sagaMiddleware = createSagaMiddleware()
+  const store = createStore(rootReducer, applyMiddleware(sagaMiddleware))
+  sagaMiddleware.run(rootSaga)
+
+  return store
+}
+
 export function createPersistentStore(history: History) {
   const sagaMiddleware = createSagaMiddleware()
   const store = createStore(persistedReducer, composeWithDevTools(applyMiddleware(sagaMiddleware)))

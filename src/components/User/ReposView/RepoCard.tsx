@@ -7,7 +7,6 @@ import calendar from 'dayjs/plugin/calendar'
 
 import { State, reposSelectors } from 'state'
 import { Repo } from 'services/api'
-import getLangColor from 'services/lang-color'
 import { appConfig } from 'config'
 
 const { getRepoById } = reposSelectors
@@ -71,7 +70,7 @@ interface StateProps {
 }
 
 interface OwnProps {
-  id: number
+  id: string
 }
 
 type RepoCardProps = StateProps & OwnProps
@@ -83,15 +82,15 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
     return null
   }
 
-  const { name, description, language, stargazers_count, forks_count, created_at, pushed_at, html_url, archived } = repo
+  const { name, description, primaryLanguage, starsCount, forksCount, createdAt, pushedAt, url, isArchived } = repo
 
   return (
     <Card elevation={0}>
-      <CardActionArea disableRipple component="a" href={html_url} target="_blank">
+      <CardActionArea disableRipple component="a" href={url} target="_blank">
         <CardContent className={styles.cardContent}>
           <div className={styles.repoName}>
             <Typography variant="h6">{name}</Typography>
-            {archived && (
+            {isArchived && (
               <Chip
                 label="archived"
                 className={styles.archivedChip}
@@ -104,38 +103,39 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
           <Typography color="textSecondary">{description}</Typography>
           <div className={styles.infoBlock}>
             <div className={styles.infoRow}>
-              {language && (
+              {primaryLanguage && (
                 <div className={styles.itemWithIcon}>
-                  <Circle fontSize="inherit" htmlColor={getLangColor(language)} />{' '}
-                  <Typography variant="caption">{language}</Typography>
+                  <Circle fontSize="inherit" htmlColor={primaryLanguage.color ?? undefined} />{' '}
+                  <Typography variant="caption">{primaryLanguage.name}</Typography>
                 </div>
               )}
-              {stargazers_count > 0 ? (
+              {starsCount > 0 ? (
                 <div className={styles.itemWithIcon}>
-                  <Star fontSize="inherit" htmlColor="gray" />{' '}
-                  <Typography variant="caption">{stargazers_count}</Typography>
+                  <Star fontSize="inherit" htmlColor="gray" /> <Typography variant="caption">{starsCount}</Typography>
                 </div>
               ) : null}
-              {forks_count > 0 ? (
+              {forksCount > 0 ? (
                 <div className={styles.itemWithIcon}>
                   <SourceFork fontSize="inherit" htmlColor="gray" />{' '}
-                  <Typography variant="caption">{forks_count}</Typography>
+                  <Typography variant="caption">{forksCount}</Typography>
                 </div>
               ) : null}
             </div>
             <div className={styles.infoRow}>
               <Typography variant="caption">
                 Created{' '}
-                {dayjs(created_at).calendar(undefined, {
+                {dayjs(createdAt).calendar(undefined, {
                   sameElse: 'MMM D, YYYY'
                 })}
               </Typography>
-              <Typography variant="caption">
-                Pushed{' '}
-                {dayjs(pushed_at).calendar(undefined, {
-                  sameElse: 'MMM D, YYYY'
-                })}
-              </Typography>
+              {pushedAt && (
+                <Typography variant="caption">
+                  Pushed{' '}
+                  {dayjs(pushedAt).calendar(undefined, {
+                    sameElse: 'MMM D, YYYY'
+                  })}
+                </Typography>
+              )}
             </div>
           </div>
         </CardContent>

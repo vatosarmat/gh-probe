@@ -1,10 +1,10 @@
-import { keyBy, cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 import { SearchUserResultItem, User, ReposPage } from './types'
 import { defaultState as _defaultState } from 'state'
 
 export default function() {
-  const usersArray: User[] = [
+  const users: User[] = [
     {
       id: '123',
       type: 'User',
@@ -30,11 +30,9 @@ export default function() {
     }
   ]
 
-  const users = keyBy(usersArray, 'id')
-
   const usersSearchQuery = 'vasiliy'
 
-  const usersSearchResultItems: SearchUserResultItem[] = [
+  const usersSearchResult: SearchUserResultItem[] = [
     {
       id: '123',
       type: 'User',
@@ -56,8 +54,6 @@ export default function() {
       avatarUrl: 'no need for test'
     }
   ]
-
-  const usersSearchResult = keyBy(usersSearchResultItems, 'id')
 
   const singleReposPage: ReposPage = {
     totalReposCount: 1,
@@ -82,7 +78,7 @@ export default function() {
     ]
   }
 
-  const reposPagesArray: ReposPage[] = [
+  const multipleRepoPages: ReposPage[] = [
     {
       totalReposCount: 2,
       hasNextPage: true,
@@ -90,8 +86,8 @@ export default function() {
       repos: [
         {
           id: '54',
-          name: 'typescript',
-          description: 'Type-safe language compiled to JS',
+          name: 'reactxp',
+          description: 'Library for cross-platform app development.',
           primaryLanguage: {
             name: 'typescript',
             color: 'blue'
@@ -100,7 +96,7 @@ export default function() {
           forksCount: 131,
           createdAt: 'Tue, 14 Nov 2019 13:25:45 GMT',
           pushedAt: 'Tue, 14 Nov 2019 13:25:45 GMT',
-          url: 'github.com/microsoft/typescript',
+          url: 'github.com/microsoft/reactxp',
           isArchived: false
         }
       ]
@@ -134,13 +130,11 @@ export default function() {
   const defaultState = cloneDeep(_defaultState)
 
   return {
-    usersArray,
     users,
     usersSearchQuery,
-    usersSearchResultItems,
     usersSearchResult,
     singleReposPage,
-    reposPagesArray,
+    multipleRepoPages,
     networkError,
     defaultState
   }

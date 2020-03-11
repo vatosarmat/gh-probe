@@ -53,7 +53,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
   if (!user) {
     return null
   }
-  let { login, name, bio, avatar_url, location, company, blog } = user
+  let { login, name, bio, description, avatarUrl, location, company, websiteUrl } = user
 
   name = name || login
 
@@ -61,7 +61,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
     <div className={styles.info}>
       {company && <IconWithText icon={Group} caption={company} />}
       {location && <IconWithText icon={LocationOn} caption={location} />}
-      {blog && <IconWithText icon={Bookmark} caption={blog} link />}
+      {websiteUrl && <IconWithText icon={Bookmark} caption={websiteUrl} link />}
     </div>
   )
 
@@ -69,7 +69,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
     <div className={styles.root}>
       <div className={styles.content}>
         <div className={styles.imgContainer}>
-          <img className={styles.img} src={avatar_url} alt={name} />
+          <img className={styles.img} src={avatarUrl} alt={name} />
         </div>
         <div className={styles.textContainer}>
           <Typography variant="h5">{name}</Typography>
@@ -83,6 +83,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
       </div>
       {isScreenSmall && info}
       {bio && <Typography>{bio}</Typography>}
+      {description && <Typography>{description}</Typography>}
     </div>
   )
 }

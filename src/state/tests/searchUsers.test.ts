@@ -1,5 +1,5 @@
 import { call, put } from 'redux-saga/effects'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, keyBy } from 'lodash'
 
 import { searchUser } from 'services/api'
 import { usersSearchActions, State } from 'state'
@@ -18,21 +18,19 @@ describe('Fetch user data', () => {
 
   it('Success', () => {
     // eslint-disable-next-line no-extra-semi
-    ;(searchUser as jest.Mock).mockResolvedValueOnce(fx.usersSearchResultItems)
+    ;(searchUser as jest.Mock).mockResolvedValueOnce(fx.usersSearchResult)
 
     const initialState = fx.defaultState as Mutable<State>
 
     const expectedState = cloneDeep(initialState)
     expectedState.usersSearch.query = fx.usersSearchQuery
-    expectedState.usersSearch.result = fx.usersSearchResult
+    expectedState.usersSearch.result = keyBy(fx.usersSearchResult, 'id')
 
     return expectSagaState({
       initialState,
       dispatchActions: [usersSearchActions.request(fx.usersSearchQuery)],
       expectedState,
-      expectedEffects: [
-        [call(searchUser, fx.usersSearchQuery), put(usersSearchActions.success(fx.usersSearchResultItems))]
-      ]
+      expectedEffects: [[call(searchUser, fx.usersSearchQuery), put(usersSearchActions.success(fx.usersSearchResult))]]
     })
   })
 

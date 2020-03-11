@@ -40,9 +40,9 @@ const ReposProgress: React.FC<ReposProgressProps> = ({ progress, stopReposFetch 
     return (
       <div className={styles.root}>
         <Typography variant="caption" gutterBottom>
-          Loading repos: {progress.current + '/' + progress.total}
+          Loading repos: {progress.currentPage + '/' + progress.totalPages} pages
         </Typography>
-        <LinearProgress variant="determinate" value={(progress.current * 100) / progress.total} />
+        <LinearProgress variant="determinate" value={(progress.currentPage * 100) / progress.totalPages} />
         <Button size="small" variant="outlined" onClick={handleStopClick} className={styles.stopButton}>
           Stop
         </Button>

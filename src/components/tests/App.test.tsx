@@ -4,14 +4,12 @@ import { createBrowserHistory } from 'history'
 import { render, fireEvent, waitForElement, waitForElementToBeRemoved } from '@testing-library/react'
 
 import { createPersistentStore } from 'state'
-import { Api, ReposPage, ReposPager } from 'services/api'
+import { searchUser, fetchUserAndRepos } from 'services/api'
 import App from 'components/App'
 
 import makeFx from 'services/api/fixtures'
 
 jest.mock('services/api')
-
-export const api = new Api()
 
 describe('App basic functionality', () => {
   let history
@@ -22,7 +20,7 @@ describe('App basic functionality', () => {
 
   beforeAll(() => {
     history = createBrowserHistory()
-    ;({ persistor, store } = createPersistentStore(api, history))
+    ;({ persistor, store } = createPersistentStore(history))
     app = React.createElement(App, { history, store, persistor })
     fx = makeFx()
   })
@@ -57,37 +55,27 @@ describe('App basic functionality', () => {
   })
 
   it('Searches users and shows repos', async () => {
-    const searchQuery = fx.usersSearchQuery
-    const queryResult = fx.usersSearchResultResponseBody
-    const { login: userLogin, id: userId } = fx.usersSearchResultResponseBody.items[0]
-    const userData = fx.users[userId]
-    const { name: userName, bio: userBio } = fx.users[userId]
-    const userReposPage = fx.singleReposPage
-
-      //eslint-disable-next-line no-extra-semi
-    ;(api.searchUser as jest.Mock).mockResolvedValueOnce(queryResult)
-    ;(api.fetchUser as jest.Mock).mockResolvedValueOnce(userData)
-    const pager = new ReposPager('this is mock')
-    const pagerNextResult: IteratorResult<ReposPage, ReposPage> = {
-      done: true,
-      value: userReposPage
-    }
-    ;(pager.next as jest.Mock).mockResolvedValueOnce(pagerNextResult)
-    ;(api.fetchRepos as jest.Mock).mockReturnValueOnce(pager)
+    const expectedUserData = fx.users[0]
+    ;(searchUser as jest.Mock).mockResolvedValueOnce(fx.usersSearchResult)
+    ;(fetchUserAndRepos as jest.Mock).mockResolvedValueOnce([expectedUserData, fx.singleReposPage])
 
     //eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-    const { getByLabelText, getByText, debug } = render(app)
+    const { getByLabelText, getByText } = render(app)
     const searchInput = getByLabelText('Search user')
     const searchButton = getByText(/^search$/i)
     fireEvent.change(searchInput, {
       target: {
-        value: searchQuery
+        value: fx.usersSearchQuery
       }
     })
     fireEvent.click(searchButton)
-    await waitForElement(() => queryResult.items.map(item => getByText(item.login)))
+    await waitForElement(() => fx.usersSearchResult.map(item => getByText(item.login)))
 
-    fireEvent.click(getByText(userLogin))
-    await waitForElement(() => [getByText(userName!), getByText(userBio!)])
+    fireEvent.click(getByText(expectedUserData.login))
+    return waitForElement(() => [
+      getByText(expectedUserData.name!),
+      getByText(expectedUserData.bio!),
+      getByText(fx.singleReposPage.repos[0].name)
+    ])
   })
 })

@@ -65,7 +65,7 @@ const Ui: React.FC<UiProps> = ({ primaryColor, history }) => {
         <TopBar />
         <Router history={history}>
           <Switch>
-            <Route path="/users/:username" component={UserRoute} />
+            <Route path="/users/:login" component={UserRoute} />
             <Route path="/search" component={SearchRoute} />
             <Redirect to="/search" />
           </Switch>

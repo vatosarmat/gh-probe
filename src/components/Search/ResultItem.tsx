@@ -8,7 +8,7 @@ import { Group, Person } from '@material-ui/icons'
 import { reduce } from 'lodash'
 
 import { State, usersSearchSelectors } from 'state'
-import { SearchResultItem, UserBrief } from 'services/api'
+import { SearchUserResultItem } from 'services/api'
 import { appConfig } from 'config'
 
 const { getSearchResultById } = usersSearchSelectors
@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 interface StateProps {
-  item?: SearchResultItem<UserBrief>
+  item?: SearchUserResultItem
 }
 
 interface OwnProps {
@@ -55,12 +55,12 @@ const ResultItem: React.FC<ResultItemProps> = ({ item }) => {
   if (!item) {
     return null
   }
-  const { login, avatar_url, type } = item
+  const { login, avatarUrl, type } = item
 
   return (
-    <ListItem key={item.login} button component={Link} to={`/users/${login}`} className={styles.listItem}>
+    <ListItem key={item.id} button component={Link} to={`/users/${login}`} className={styles.listItem}>
       <ListItemAvatar>
-        <Avatar alt="" src={avatar_url} />
+        <Avatar alt="" src={avatarUrl} />
       </ListItemAvatar>
       <ListItemText primary={login} />
       <ListItemSecondaryAction className={styles.secondaryAction}>

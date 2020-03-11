@@ -96,13 +96,13 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
   }
 
   const getLanguageInfoLabel = (languageInfo: LanguageInfo) => {
-    const lang = languageInfo.language
-    return lang === ANY_LANGUAGE ? 'All' : lang === NO_LANGUAGE ? 'None' : lang
+    const { name } = languageInfo
+    return name === ANY_LANGUAGE ? 'All' : name === NO_LANGUAGE ? 'None' : name
   }
 
   const getSortingKeyLabel = (key: RepoSortingKey) => repoSortingKeyName[key]
 
-  const { language, repoCount } = languageInfo
+  const { name: languageName, repoCount } = languageInfo
 
   return (
     <div>
@@ -144,7 +144,7 @@ const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, language
       <Divider />
 
       <RepoList
-        language={language}
+        languageName={languageName}
         page={page}
         sortingKey={sortingKey}
         sortingOrder={sortingOrder}

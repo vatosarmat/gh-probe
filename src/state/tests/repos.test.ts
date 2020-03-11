@@ -10,7 +10,7 @@ import { expectSagaState } from './helpers'
 
 jest.mock('services/api')
 
-describe('Fetch repos by username', () => {
+describe('Fetch repos by login', () => {
   let fx: ReturnType<typeof makeFx>
   beforeEach(() => {
     fx = makeFx()
@@ -18,8 +18,8 @@ describe('Fetch repos by username', () => {
   })
 
   it('Success single page', () => {
-    const fxRequestedUserLogin = fx.usersArray[0].login!
-    const fxUser = fx.usersArray[0]
+    const fxRequestedUserLogin = fx.users[0].login!
+    const fxUser = fx.users[0]
     const fxReposPage = fx.singleReposPage
     ;(fetchUserAndRepos as jest.Mock).mockResolvedValueOnce([fxUser, fxReposPage])
 
@@ -47,11 +47,10 @@ describe('Fetch repos by username', () => {
   })
 
   it('Success multi page', () => {
-    const fxRequestedUserLogin = fx.usersArray[1].login!
-    const fxUser = fx.usersArray[1]
-    const fxReposPages = fx.reposPagesArray
-    ;(fetchUserAndRepos as jest.Mock).mockResolvedValueOnce([fxUser, fxReposPages[0]])
-    ;(fetchReposAfterCursor as jest.Mock).mockResolvedValueOnce(fxReposPages[1])
+    const fxRequestedUserLogin = fx.users[1].login!
+    const fxUser = fx.users[1]
+    ;(fetchUserAndRepos as jest.Mock).mockResolvedValueOnce([fxUser, fx.multipleRepoPages[0]])
+    ;(fetchReposAfterCursor as jest.Mock).mockResolvedValueOnce(fx.multipleRepoPages[1])
 
     const initialState = fx.defaultState as Mutable<State>
 
@@ -59,11 +58,15 @@ describe('Fetch repos by username', () => {
     expectedState.repos.requestedUserLogin = fxRequestedUserLogin
     expectedState.repos.userData = fxUser
     expectedState.repos.items = {
-      ...keyBy(fxReposPages[0].repos, 'id'),
-      ...keyBy(fxReposPages[1].repos, 'id')
+      ...keyBy(fx.multipleRepoPages[0].repos, 'id'),
+      ...keyBy(fx.multipleRepoPages[1].repos, 'id')
     }
     expectedState.repos.status = 'COMPLETE'
-    expectedState.repos.progress = { currentPage: 2, totalPages: 2, lastRepoCursor: fxReposPages[1].lastRepoCursor }
+    expectedState.repos.progress = {
+      currentPage: 2,
+      totalPages: 2,
+      lastRepoCursor: fx.multipleRepoPages[1].lastRepoCursor
+    }
 
     return expectSagaState({
       initialState,
@@ -73,19 +76,18 @@ describe('Fetch repos by username', () => {
         [
           call(fetchUserAndRepos, fxRequestedUserLogin),
           put(reposActions.userDataReady(fxUser)),
-          put(reposActions.pageReady(fxReposPages[0])),
-          call(fetchReposAfterCursor, fxRequestedUserLogin, fxReposPages[0].lastRepoCursor),
-          put(reposActions.pageReady(fxReposPages[1]))
+          put(reposActions.pageReady(fx.multipleRepoPages[0])),
+          call(fetchReposAfterCursor, fxRequestedUserLogin, fx.multipleRepoPages[0].lastRepoCursor),
+          put(reposActions.pageReady(fx.multipleRepoPages[1]))
         ]
       ]
     })
   })
 
   it('Network error in multi page', () => {
-    const fxRequestedUserLogin = fx.usersArray[1].login!
-    const fxUser = fx.usersArray[1]
-    const fxReposPages = fx.reposPagesArray
-    ;(fetchUserAndRepos as jest.Mock).mockReturnValueOnce([fxUser, fxReposPages[0]])
+    const fxRequestedUserLogin = fx.users[1].login!
+    const fxUser = fx.users[1]
+    ;(fetchUserAndRepos as jest.Mock).mockReturnValueOnce([fxUser, fx.multipleRepoPages[0]])
     ;(fetchReposAfterCursor as jest.Mock).mockRejectedValueOnce(fx.networkError)
 
     const initialState = fx.defaultState as Mutable<State>
@@ -93,10 +95,14 @@ describe('Fetch repos by username', () => {
     const expectedState = cloneDeep(initialState)
     expectedState.repos.requestedUserLogin = fxRequestedUserLogin
     expectedState.repos.userData = fxUser
-    expectedState.repos.items = keyBy(fxReposPages[0].repos, 'id')
+    expectedState.repos.items = keyBy(fx.multipleRepoPages[0].repos, 'id')
     expectedState.repos.status = 'ERROR'
     expectedState.repos.error = fx.networkError.toString()
-    expectedState.repos.progress = { currentPage: 1, totalPages: 2, lastRepoCursor: fxReposPages[0].lastRepoCursor }
+    expectedState.repos.progress = {
+      currentPage: 1,
+      totalPages: 2,
+      lastRepoCursor: fx.multipleRepoPages[0].lastRepoCursor
+    }
 
     return expectSagaState({
       initialState,
@@ -106,8 +112,8 @@ describe('Fetch repos by username', () => {
         [
           call(fetchUserAndRepos, fxRequestedUserLogin),
           put(reposActions.userDataReady(fxUser)),
-          put(reposActions.pageReady(fxReposPages[0])),
-          call(fetchReposAfterCursor, fxRequestedUserLogin, fxReposPages[0].lastRepoCursor),
+          put(reposActions.pageReady(fx.multipleRepoPages[0])),
+          call(fetchReposAfterCursor, fxRequestedUserLogin, fx.multipleRepoPages[0].lastRepoCursor),
           put(reposActions.error(fx.networkError))
         ]
       ]
@@ -115,10 +121,9 @@ describe('Fetch repos by username', () => {
   })
 
   it('Stop by user in multi page', () => {
-    const fxRequestedUserLogin = fx.usersArray[1].login!
-    const fxUser = fx.usersArray[1]
-    const fxReposPages = fx.reposPagesArray
-    ;(fetchUserAndRepos as jest.Mock).mockReturnValueOnce([fxUser, fxReposPages[0]])
+    const fxRequestedUserLogin = fx.users[1].login!
+    const fxUser = fx.users[1]
+    ;(fetchUserAndRepos as jest.Mock).mockReturnValueOnce([fxUser, fx.multipleRepoPages[0]])
     ;(fetchReposAfterCursor as jest.Mock).mockImplementationOnce(() => {
       let timeout: NodeJS.Timeout
       const prom = new Promise(resolve => {
@@ -134,9 +139,13 @@ describe('Fetch repos by username', () => {
     const expectedState = cloneDeep(initialState)
     expectedState.repos.requestedUserLogin = fxRequestedUserLogin
     expectedState.repos.userData = fxUser
-    expectedState.repos.items = keyBy(fxReposPages[0].repos, 'id')
+    expectedState.repos.items = keyBy(fx.multipleRepoPages[0].repos, 'id')
     expectedState.repos.status = 'STOPPED'
-    expectedState.repos.progress = { currentPage: 1, totalPages: 2, lastRepoCursor: fxReposPages[0].lastRepoCursor }
+    expectedState.repos.progress = {
+      currentPage: 1,
+      totalPages: 2,
+      lastRepoCursor: fx.multipleRepoPages[0].lastRepoCursor
+    }
 
     return expectSagaState({
       initialState,
@@ -146,29 +155,35 @@ describe('Fetch repos by username', () => {
         [
           call(fetchUserAndRepos, fxRequestedUserLogin),
           put(reposActions.userDataReady(fxUser)),
-          put(reposActions.pageReady(fxReposPages[0])),
-          call(fetchReposAfterCursor, fxRequestedUserLogin, fxReposPages[0].lastRepoCursor)
+          put(reposActions.pageReady(fx.multipleRepoPages[0])),
+          call(fetchReposAfterCursor, fxRequestedUserLogin, fx.multipleRepoPages[0].lastRepoCursor)
         ]
       ],
-      unexpectedEffects: [[put(reposActions.error(fx.networkError))], [put(reposActions.pageReady(fxReposPages[1]))]]
+      unexpectedEffects: [
+        [put(reposActions.error(fx.networkError))],
+        [put(reposActions.pageReady(fx.multipleRepoPages[1]))]
+      ]
     })
   })
 
   it('New request overrides results of the previous', () => {
-    const initialUserData = fx.usersArray[1]
-    const expectedUserData = fx.usersArray[0]
+    const initialUserData = fx.users[1]
+    const expectedUserData = fx.users[0]
     const expectedReposPage = fx.singleReposPage
-    const fxReposPages = fx.reposPagesArray
     ;(fetchUserAndRepos as jest.Mock).mockResolvedValueOnce([expectedUserData, expectedReposPage])
 
     const initialState = fx.defaultState as Mutable<State>
     initialState.repos.requestedUserLogin = initialUserData.login
     initialState.repos.userData = initialUserData
     initialState.repos.items = {
-      ...keyBy(fxReposPages[0].repos, 'id'),
-      ...keyBy(fxReposPages[1].repos, 'id')
+      ...keyBy(fx.multipleRepoPages[0].repos, 'id'),
+      ...keyBy(fx.multipleRepoPages[1].repos, 'id')
     }
-    initialState.repos.progress = { currentPage: 2, totalPages: 2, lastRepoCursor: fxReposPages[1].lastRepoCursor }
+    initialState.repos.progress = {
+      currentPage: 2,
+      totalPages: 2,
+      lastRepoCursor: fx.multipleRepoPages[1].lastRepoCursor
+    }
 
     const expectedState = cloneDeep(initialState)
     expectedState.repos.requestedUserLogin = expectedUserData.login

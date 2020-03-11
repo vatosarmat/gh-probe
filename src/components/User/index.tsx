@@ -5,64 +5,60 @@ import { useParams } from 'react-router'
 
 import { ErrorBox, ProgressBox } from 'components/common'
 import { User } from 'services/api'
-import { State, ReposFetchStatus, userSelectors, userActions, reposSelectors, reposActions } from 'state'
+import { State, ReposFetchStatus, reposSelectors, reposActions } from 'state'
 
 import BackButton from './BackButton'
 import UserCard from './UserCard'
 import ReposProgress from './ReposProgress'
 import ReposView from './ReposView'
 
-const { getUserQuery, getUserData, getUserError, isUserDataFetching } = userSelectors
-const { request: requestUserData } = userActions
-const { getReposFetchStatus, getReposUsername } = reposSelectors
-const { start: requestReposData, stop: stopReposDataLoading } = reposActions
+const {
+  getRequestedUserLogin,
+  getReposUserData,
+  isUserDataFetching,
+  getUserDataFetchError,
+  getReposFetchStatus
+} = reposSelectors
+const { start: requestUserAndReposData, stop: stopReposDataLoading } = reposActions
 
 interface StateProps {
-  userQuery?: string
+  requestedUserLogin?: string
   userData?: User
   isUserDataFetching: boolean
   error?: string
-
   reposFetchStatus: ReposFetchStatus
-  reposUsername?: string
 }
 
 interface DispatchProps {
-  requestUserData: typeof requestUserData
-  requestReposData: typeof requestReposData
+  requestUserAndReposData: typeof requestUserAndReposData
   stopReposDataLoading: typeof stopReposDataLoading
 }
 
 type UserRouteProps = StateProps & DispatchProps
 
 const UserRoute: React.FC<UserRouteProps> = ({
-  userQuery,
+  requestedUserLogin,
   userData,
   isUserDataFetching,
   error,
   reposFetchStatus,
-  reposUsername,
 
-  requestUserData,
-  requestReposData,
+  requestUserAndReposData,
   stopReposDataLoading
 }) => {
-  const { username: paramUsername } = useParams<{ username: string }>()
-
-  const wasUserRequested = userQuery === paramUsername
-  const hasUserFetched = wasUserRequested && userData && userData.login === userQuery
+  const { login: routeParamLogin } = useParams<{ login: string }>()
+  const wasUserDataRequested = requestedUserLogin === routeParamLogin
+  const wasUserDataFetched = wasUserDataRequested && userData
 
   useEffect(() => {
-    if (!paramUsername) {
+    if (!routeParamLogin) {
       return
     }
 
-    if (!wasUserRequested) {
-      requestUserData(paramUsername)
-    } else if (hasUserFetched && reposUsername !== paramUsername) {
-      requestReposData(paramUsername)
+    if (!wasUserDataRequested) {
+      requestUserAndReposData(routeParamLogin)
     }
-  }, [paramUsername, reposUsername, wasUserRequested, hasUserFetched, requestUserData, requestReposData])
+  }, [routeParamLogin, wasUserDataRequested, requestUserAndReposData])
 
   useEffect(
     () => () => {
@@ -73,13 +69,13 @@ const UserRoute: React.FC<UserRouteProps> = ({
 
   let content = null
 
-  if (!paramUsername) {
+  if (!routeParamLogin) {
     content = <ErrorBox error={'No such user'} />
   } else if (error) {
     content = <ErrorBox error={error} />
   } else if (isUserDataFetching) {
     content = <ProgressBox />
-  } else if (hasUserFetched) {
+  } else if (wasUserDataFetched) {
     content = (
       <>
         <UserCard user={userData} />
@@ -98,13 +94,12 @@ const UserRoute: React.FC<UserRouteProps> = ({
 }
 
 export default connect<StateProps, DispatchProps, {}, State>(
-  state => ({
-    userQuery: getUserQuery(state),
-    userData: getUserData(state),
+  (state: State) => ({
+    requestedUserLogin: getRequestedUserLogin(state),
+    userData: getReposUserData(state),
     isUserDataFetching: isUserDataFetching(state),
-    error: getUserError(state),
-    reposFetchStatus: getReposFetchStatus(state),
-    reposUsername: getReposUsername(state)
+    error: getUserDataFetchError(state),
+    reposFetchStatus: getReposFetchStatus(state)
   }),
-  { requestUserData, requestReposData, stopReposDataLoading }
+  { requestUserAndReposData, stopReposDataLoading }
 )(UserRoute)

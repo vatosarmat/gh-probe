@@ -3,8 +3,6 @@ import { User, Repo, ReposPage } from 'services/api'
 import { keyBy } from 'lodash'
 
 import { DeepReadonly } from 'utils/common'
-import { appConfig } from 'config'
-const { reposPageLength } = appConfig
 
 export type ReposFetchStatus = 'IDLE' | 'IN_PROGRESS' | 'STOPPED' | 'ERROR' | 'COMPLETE'
 
