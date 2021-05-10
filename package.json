@@ -16,7 +16,7 @@
     "@types/react-router-dom": "^4.3.4",
     "coveralls": "^3.0.9",
     "dayjs": "^1.8.15",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "mdi-material-ui": "^6.4.1",
     "parse-link-header": "^1.0.1",
     "query-string": "^6.8.2",
