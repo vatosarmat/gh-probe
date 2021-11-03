@@ -27,7 +27,7 @@ import React, {
   useEffect
 } from 'react'
 import { connect } from 'react-redux'
-import { reduce } from 'lodash'
+import { reduce } from 'lodash-es'
 
 import { usersSearchActions } from 'state'
 import { appConfig } from 'config'
@@ -222,7 +222,7 @@ const SearchUserForm: React.FC<SearchUsersFormProps> = ({ searchRequest }) => {
           </Button>
         </div>
       </ClickAwayListener>
-      <Typography variant={isScreenSmall ? 'body2' : 'body1'}>
+      <Typography variant="subtitle2">
         Add modifier:{' '}
         <span className={styles.searchModifiers}>
           <Link

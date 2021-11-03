@@ -1,5 +1,5 @@
 import { CANCEL } from 'redux-saga'
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 
 import { SearchUserResultItem, User, Repo, ReposPage } from './types'
 import { appConfig } from 'config'

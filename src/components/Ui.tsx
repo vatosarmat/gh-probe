@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Container, createMuiTheme, makeStyles, Paper, Theme } from '@material-ui/core'
+import { Container, createTheme, makeStyles, Paper, Theme } from '@material-ui/core'
 import * as colors from '@material-ui/core/colors'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Router, Switch, Route, Redirect } from 'react-router-dom'
@@ -37,7 +37,7 @@ type ThemeDict = Record<PrimaryColor, Theme>
 const theme: ThemeDict = primaryColorTuple.reduce(
   (themeMap, color: PrimaryColor) => ({
     ...themeMap,
-    [color]: createMuiTheme({
+    [color]: createTheme({
       palette: {
         primary: colors[color]
       }

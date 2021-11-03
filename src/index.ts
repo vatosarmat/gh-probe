@@ -19,5 +19,5 @@ try {
 
   ReactDOM.render(React.createElement(App, { store, persistor, history }), document.getElementById('root'))
 } catch (error) {
-  ReactDOM.render(React.createElement(AppError, { error }), document.getElementById('root'))
+  ReactDOM.render(React.createElement(AppError, { error: error as Error }), document.getElementById('root'))
 }

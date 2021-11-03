@@ -22,7 +22,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
 import { CSSProperties } from '@material-ui/styles'
 import { Menu as MenuIcon } from '@material-ui/icons'
 import { connect } from 'react-redux'
-import { reduce } from 'lodash'
+import { reduce } from 'lodash-es'
 
 import ArraySelect from './common/ArraySelect'
 import { appConfig, ReposPerPage, PrimaryColor, reposPerPageTuple, primaryColorTuple } from 'config'
@@ -161,7 +161,7 @@ const TopBar: React.FC<TopBarProps> = ({
     setReposPerPage(value)
   }
 
-  const handlePrimaryColorChange = (evt: unknown, value: string) => {
+  const handlePrimaryColorChange = (_evt: unknown, value: string) => {
     setPrimaryColor(value as PrimaryColor)
   }
 

@@ -1,0 +1,13 @@
+diff --git a/node_modules/jest-watch-typeahead/build/test_utils/pluginTester.js b/node_modules/jest-watch-typeahead/build/test_utils/pluginTester.js
+index e4e4e0e..08b29f7 100644
+--- a/node_modules/jest-watch-typeahead/build/test_utils/pluginTester.js
++++ b/node_modules/jest-watch-typeahead/build/test_utils/pluginTester.js
+@@ -19,7 +19,7 @@ expect.addSnapshotSerializer({
+  * See https://github.com/facebook/jest/pull/7523 for more details
+  */
+ 
+-const CLEAR = '\x1B[2J\x1B[3J\x1B[H';
++const CLEAR = '';
+ expect.addSnapshotSerializer({
+   test: val => val.includes(CLEAR),
+   print: val => (0, _stripAnsi.default)(val.replace(CLEAR, '[MOCK - clear]'))

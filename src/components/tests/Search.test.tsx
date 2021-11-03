@@ -1,8 +1,8 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 
-import { render, fireEvent, waitForElement } from '@testing-library/react'
+import { render, fireEvent, waitFor } from '@testing-library/react'
 
 import { createTestStore } from 'state'
 import { searchUser } from 'services/api'
@@ -47,7 +47,7 @@ describe('Search page', () => {
       }
     })
     fireEvent.click(searchButton)
-    return waitForElement(() => fx.usersSearchResult.map(item => getByText(item.login)))
+    return waitFor(() => fx.usersSearchResult.map(item => getByText(item.login)))
   })
 
   it('Examples and search modifiers', () => {
@@ -73,6 +73,6 @@ describe('Search page', () => {
     })
     fireEvent.keyDown(searchInput, { key: 'Enter', code: 13 })
 
-    return waitForElement(() => getByText(appConfig.emptySearchQueryTooltip))
+    return waitFor(() => getByText(appConfig.emptySearchQueryTooltip))
   })
 })

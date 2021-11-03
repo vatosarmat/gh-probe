@@ -7,7 +7,7 @@ export type ReposPerPage = typeof reposPerPageTuple[number]
 export const defaultReposPerPage: ReposPerPage = 10
 
 export const appConfig = {
-  exampleUsers: ['piotrwitek', 'gaearon', 'tj', 'mozilla', 'microsoft'],
+  exampleUsers: ['sindresorhus', 'ai', 'tj', 'mozilla', 'microsoft'],
   searchUserLabel: 'Search user',
   emptySearchQueryTooltip: 'Query must be non-empty',
   searchResultsCount: 20,

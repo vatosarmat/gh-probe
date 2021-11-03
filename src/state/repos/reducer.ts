@@ -1,6 +1,6 @@
 import { ActionType, createReducer, createAction } from 'typesafe-actions'
 import { User, Repo, ReposPage } from 'services/api'
-import { keyBy } from 'lodash'
+import { keyBy } from 'lodash-es'
 
 import { DeepReadonly } from 'utils/common'
 
