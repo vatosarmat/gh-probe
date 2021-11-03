@@ -5,7 +5,7 @@ import { ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
 import { CSSProperties } from '@material-ui/styles'
 import { Group, Person } from '@material-ui/icons'
-import { reduce } from 'lodash'
+import { reduce } from 'lodash-es'
 
 import { State, usersSearchSelectors } from 'state'
 import { SearchUserResultItem } from 'services/api'

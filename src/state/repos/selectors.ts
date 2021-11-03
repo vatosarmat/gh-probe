@@ -1,10 +1,10 @@
-import { createSelector } from 'reselect'
-import { some, chain, orderBy, map } from 'lodash'
+import { createSelector, Selector } from 'reselect'
+import { some, flow, orderBy, map, countBy, assign, reduce } from 'lodash-es'
 
 import { Repo } from 'services/api'
 
 import { ReposState } from './reducer'
-import { ILayoutState, layoutSelectors } from '../layout'
+import { layoutSelectors } from '../layout'
 
 const { getReposPerPage } = layoutSelectors
 
@@ -54,48 +54,43 @@ const getReposFetchProgress = (state: IReposState) => state.repos.progress
 const getReposFetchStatus = (state: IReposState) => state.repos.status
 const getReposRecord = (state: IReposState) => state.repos.items
 
-const getLanguageName = (state: IReposState, props: RepoProps) => props.languageName
-const getPage = (state: IReposState, props: RepoProps) => props.page
-const getRepoSortingKey = (state: IReposState, props: RepoProps) => props.sortingKey
-const getRepoSortingOrder = (state: IReposState, props: RepoProps) => props.sortingOrder
+const getLanguageName = (_state: IReposState, props: RepoProps) => props.languageName
+const getPage = (_state: IReposState, props: RepoProps) => props.page
+const getRepoSortingKey = (_state: IReposState, props: RepoProps) => props.sortingKey
+const getRepoSortingOrder = (_state: IReposState, props: RepoProps) => props.sortingOrder
 
 const isUserDataFetching = (state: IReposState) => !state.repos.userData && state.repos.status === 'IN_PROGRESS'
 const getUserDataFetchError = (state: IReposState) => (state.repos.userData ? undefined : state.repos.error)
 
-const getLanguageInfos = createSelector<IReposState, Record<string, Repo>, LanguageInfo[]>(
-  getReposRecord,
-  reposRecord => {
-    const length = Object.keys(reposRecord).length
-    return chain(reposRecord)
-      .countBy(repo => repo.primaryLanguage?.name ?? NO_LANGUAGE)
-      .assign({ [ANY_LANGUAGE]: length })
-      .reduce<LanguageInfo[]>((langItems, repoCount, name) => {
-        langItems.push({ name, repoCount })
-        return langItems
-      }, [])
-      .orderBy('repoCount', 'desc') //order by count, ANY_LANGUAGE should be the first
-      .value()
-  }
+const getLanguageInfos = createSelector(getReposRecord, reposRecord => {
+  const length = Object.keys(reposRecord).length
+  return flow(
+    v => countBy(v, repo => repo.primaryLanguage?.name ?? NO_LANGUAGE),
+    v => assign(v, { [ANY_LANGUAGE]: length }),
+    v =>
+      reduce<Record<string, number>, LanguageInfo[]>(
+        v,
+        (langItems, repoCount, name) => {
+          langItems.push({ name, repoCount })
+          return langItems
+        },
+        []
+      ),
+    v => orderBy(v, 'repoCount', 'desc') //order by count, ANY_LANGUAGE should be the first
+  )(reposRecord)
+})
+
+const getReposSorted: Selector<IReposState, Repo[], [RepoProps]> = createSelector(
+  [getReposRecord, getRepoSortingKey, getRepoSortingOrder],
+  (reposRecord, key, order) =>
+    key === 'name'
+      ? orderBy(Object.values(reposRecord), repo => repo.name.toLocaleLowerCase(), order)
+      : orderBy(Object.values(reposRecord), key, order)
 )
 
-const getReposSorted = createSelector<
-  IReposState,
-  RepoProps,
-  Record<string, Repo>,
-  RepoSortingKey,
-  RepoSortingOrder,
-  Repo[]
->([getReposRecord, getRepoSortingKey, getRepoSortingOrder], (reposRecord, key, order) =>
-  key === 'name'
-    ? orderBy(Object.values(reposRecord), repo => repo.name.toLocaleLowerCase(), order)
-    : orderBy(Object.values(reposRecord), key, order)
-)
+const haveReposStars = createSelector(getReposRecord, reposRecord => some(reposRecord, 'starsCount'))
 
-const haveReposStars = createSelector<IReposState, Record<string, Repo>, boolean>(getReposRecord, reposRecord =>
-  some(reposRecord, 'starsCount')
-)
-
-const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string, Repo[]>(
+const getReposByLanguage: Selector<IReposState, Repo[], [RepoProps]> = createSelector(
   [getReposSorted, getLanguageName],
   (repos, languageName) =>
     languageName === ANY_LANGUAGE
@@ -104,19 +99,7 @@ const getReposByLanguage = createSelector<IReposState, RepoProps, Repo[], string
           repo => repo.primaryLanguage?.name === languageName || (languageName === NO_LANGUAGE && !repo.primaryLanguage)
         )
 )
-
-const getReposIdsPage = createSelector<
-  IReposState,
-  IReposState,
-  ILayoutState,
-  RepoProps,
-  RepoProps,
-  {},
-  Repo[],
-  number,
-  number,
-  ReposIdsPage
->([getReposByLanguage, getPage, getReposPerPage], (repos, page, reposPerPage) => {
+const getReposIdsPage = createSelector([getReposByLanguage, getPage, getReposPerPage], (repos, page, reposPerPage) => {
   const from = page * reposPerPage
   const to = Math.min((page + 1) * reposPerPage, repos.length)
   const hasPrevPage = page > 0

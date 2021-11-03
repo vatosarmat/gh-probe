@@ -15,10 +15,10 @@ function* usersSearch({ payload: query }: RequestAction) {
 
     yield put(success(searchResult))
   } catch (error) {
-    yield put(failure(error))
+    yield put(failure(error as Error))
   }
 }
 
-export default function*() {
+export default function* () {
   yield takeLatest(getType(request), usersSearch)
 }

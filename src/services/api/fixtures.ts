@@ -1,9 +1,9 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 import { SearchUserResultItem, User, ReposPage } from './types'
 import { defaultState as _defaultState } from 'state'
 
-export default function() {
+export default function () {
   const users: User[] = [
     {
       id: '123',

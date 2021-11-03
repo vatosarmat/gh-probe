@@ -1,5 +1,5 @@
 import { call, put } from 'redux-saga/effects'
-import { cloneDeep, keyBy } from 'lodash'
+import { cloneDeep, keyBy } from 'lodash-es'
 
 import { searchUser } from 'services/api'
 import { usersSearchActions, State } from 'state'

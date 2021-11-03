@@ -1,6 +1,6 @@
 import { CANCEL } from 'redux-saga'
 import { call, put } from 'redux-saga/effects'
-import { cloneDeep, keyBy } from 'lodash'
+import { cloneDeep, keyBy } from 'lodash-es'
 
 import { fetchUserAndRepos, fetchReposAfterCursor } from 'services/api'
 import { reposActions, State } from 'state'

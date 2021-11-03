@@ -7,12 +7,13 @@ import { reposActions, ReposState } from './reducer'
 
 const { start, userDataReady, pageReady, stop, resume, error: errorAction } = reposActions
 
-type RequestAction = ReturnType<typeof start>
+type RequestStart = ReturnType<typeof start>
+type RequestResume = ReturnType<typeof resume>
 
 const getLastRepoCursor = ({ repos }: { repos: ReposState }) => repos.progress?.lastRepoCursor
 const getRequestedUserLogin = ({ repos }: { repos: ReposState }) => repos.requestedUserLogin
 
-function* startFetch({ payload: login }: RequestAction) {
+function* startFetch({ payload: login }: RequestStart) {
   let reposPage
   let user
   try {
@@ -22,7 +23,7 @@ function* startFetch({ payload: login }: RequestAction) {
     yield put(userDataReady(user))
     yield put(pageReady(reposPage))
   } catch (error) {
-    yield put(errorAction(error))
+    yield put(errorAction(error as Error))
   }
 
   if (reposPage?.hasNextPage) {
@@ -43,13 +44,13 @@ function* resumeFetch() {
       yield put(pageReady(reposPage))
     } while (reposPage.hasNextPage)
   } catch (error) {
-    yield put(errorAction(error))
+    yield put(errorAction(error as Error))
   }
 }
 
-export default function*() {
+export default function* () {
   while (true) {
-    const action = yield take([getType(start), getType(resume)])
+    const action: RequestStart | RequestResume = yield take([getType(start), getType(resume)])
 
     switch (action.type) {
       case getType(start):

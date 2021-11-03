@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react'
 import { createBrowserHistory } from 'history'
 
-import { render, fireEvent, waitForElement, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 
 import { createPersistentStore } from 'state'
 import { searchUser, fetchUserAndRepos } from 'services/api'
@@ -69,10 +69,10 @@ describe('App basic functionality', () => {
       }
     })
     fireEvent.click(searchButton)
-    await waitForElement(() => fx.usersSearchResult.map(item => getByText(item.login)))
+    await waitFor(() => fx.usersSearchResult.map(item => getByText(item.login)))
 
     fireEvent.click(getByText(expectedUserData.login))
-    return waitForElement(() => [
+    return waitFor(() => [
       getByText(expectedUserData.name!),
       getByText(expectedUserData.bio!),
       getByText(fx.singleReposPage.repos[0].name)

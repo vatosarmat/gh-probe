@@ -1,5 +1,5 @@
 import { createAsyncAction, createReducer, ActionType } from 'typesafe-actions'
-import { omit, keyBy } from 'lodash'
+import { omit, keyBy } from 'lodash-es'
 
 import { SearchUserResultItem } from 'services/api'
 import { DeepReadonly } from 'utils/common'

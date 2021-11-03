@@ -1,8 +1,7 @@
-import React from 'react'
 import { Provider } from 'react-redux'
 import { MemoryRouter, Route } from 'react-router-dom'
 
-import { render, waitForElement } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 
 import { createTestStore } from 'state'
 import { fetchUserAndRepos, fetchReposAfterCursor } from 'services/api'
@@ -40,7 +39,7 @@ describe('User page', () => {
 
     const { getByText } = renderUserPage(expectedUserData.login)
 
-    return waitForElement(() => [
+    return waitFor(() => [
       getByText(expectedUserData.name!),
       getByText(expectedUserData.bio!),
       ...fx.multipleRepoPages.map(item => getByText(item.repos[0].name))
