@@ -10,7 +10,7 @@ import TopBar from './TopBar'
 import SearchRoute from './Search'
 import UserRoute from './User'
 import { State, layoutSelectors } from 'state'
-import { PrimaryColor, primaryColorTuple } from 'config'
+import { PrimaryColor, primaryColorTuple, appConfig } from 'config'
 
 const { getPrimaryColor } = layoutSelectors
 
@@ -65,9 +65,9 @@ const Ui: React.FC<UiProps> = ({ primaryColor, history }) => {
         <TopBar />
         <Router history={history}>
           <Switch>
-            <Route path="/users/:login" component={UserRoute} />
-            <Route path="/search" component={SearchRoute} />
-            <Redirect to="/search" />
+            <Route path={`${appConfig.routerBasename}/users/:login`} component={UserRoute} />
+            <Route path={`${appConfig.routerBasename}/search`} component={SearchRoute} />
+            <Redirect to={`${appConfig.routerBasename}/search`} />
           </Switch>
         </Router>
       </Container>

@@ -6,6 +6,9 @@ export const reposPerPageTuple = [5, 10, 15, 20] as const
 export type ReposPerPage = typeof reposPerPageTuple[number]
 export const defaultReposPerPage: ReposPerPage = 10
 
+const origin = ((window as any).ORIGIN as string) ?? ''
+const basename = ((window as any).BASENAME as string) ?? ''
+
 export const appConfig = {
   exampleUsers: ['sindresorhus', 'ai', 'tj', 'mozilla', 'microsoft'],
   searchUserLabel: 'Search user',
@@ -13,7 +16,9 @@ export const appConfig = {
   searchResultsCount: 20,
   reposPageLength: 100,
   title: 'GitHub repos',
-  ghApiBaseUrl: (process.env.REACT_APP_GITHUB_API_BASE_URL ?? (window as any).REACT_APP_GITHUB_API_BASE_URL) as string,
+  //local ?? docker
+  ghApiBaseUrl: process.env.REACT_APP_GITHUB_API_BASE_URL ?? `${origin}${basename}/gh-api`,
+  routerBasename: basename,
   ghToken: process.env.REACT_APP_GITHUB_TOKEN,
   padding: {
     topBar: {
