@@ -19,6 +19,7 @@ if [ "$BASENAME" ]; then
   basename=$(echo "${BASENAME}" | sed 's/\\/\\\\/g; s/\//\\\//g; s/&/\\\&/g')
   sed -i "s/<body><script>/&BASENAME=\'${basename}\';/i;\
           s/\/favicon.ico/${basename}&/ig;\
+          s/\/static\/js/${basename}&/ig;\
           s/\/manifest.json/${basename}&/ig" \
     "$index_html"
 fi
