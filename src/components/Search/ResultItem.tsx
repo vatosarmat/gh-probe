@@ -58,7 +58,13 @@ const ResultItem: React.FC<ResultItemProps> = ({ item }) => {
   const { login, avatarUrl, type } = item
 
   return (
-    <ListItem key={item.id} button component={Link} to={`/users/${login}`} className={styles.listItem}>
+    <ListItem
+      key={item.id}
+      button
+      component={Link}
+      to={`${appConfig.routerBasename}/users/${login}`}
+      className={styles.listItem}
+    >
       <ListItemAvatar>
         <Avatar alt="" src={avatarUrl} />
       </ListItemAvatar>
