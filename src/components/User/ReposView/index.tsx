@@ -72,8 +72,8 @@ type ReposViewProps = StateProps
 const ReposView: React.FC<ReposViewProps> = ({ reposFetchStatus, error, languageInfos, haveStars }) => {
   const [languageInfo, setLanguageInfo] = useState<LanguageInfo>(languageInfos[0])
   const [page, setPage] = useState<number>(0)
-  const [sortingKey, setSortingKey] = useState<RepoSortingKey>('name')
-  const [sortingOrder, setSortingOrder] = useState<RepoSortingOrder>('asc')
+  const [sortingKey, setSortingKey] = useState<RepoSortingKey>('starsCount')
+  const [sortingOrder, setSortingOrder] = useState<RepoSortingOrder>('desc')
 
   const styles = useStyles()
 
